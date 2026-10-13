@@ -68,24 +68,34 @@ public final class AnimalRepository {
         ejecutor.ejecutar(() -> {
             Animal animal = animalExistente(idAnimal);
             validar(entrada);
-            boolean fechaDeEstadoSigueAlIngreso = Animal.ACTIVO.equals(animal.estado) && animal.fechaIngreso.equals(animal.fechaEstado);
-            animal.idRaza = entrada.idRaza.isEmpty() ? null : entrada.idRaza;
-            animal.codigo = ValidadorAnimal.normalizarCodigo(entrada.codigo);
-            animal.nombre = entrada.nombre.isEmpty() ? null : entrada.nombre;
-            animal.sexo = entrada.sexo;
-            animal.fechaNacimiento = entrada.fechaNacimiento.isEmpty() ? null : entrada.fechaNacimiento;
-            animal.fechaIngreso = entrada.fechaIngreso;
-            animal.observaciones = entrada.observaciones.isEmpty() ? null : entrada.observaciones;
-            if (fechaDeEstadoSigueAlIngreso) animal.fechaEstado = entrada.fechaIngreso;
-            animal.actualizadoEn = Tiempo.ahoraUtc();
-            try {
-                db.runInTransaction(() -> {
-                    db.animalDao().actualizar(animal);
-                    db.pesajeDao().recalcularAntecedentes(animal.idAnimal, animal.fechaIngreso);
-                });
-            } catch (SQLiteConstraintException ex) {
-                throw errorDeRestriccion(ex);
+            aplicarDatos(animal, entrada);
+            guardarCambios(animal);
+            return animal;
+        }, callback);
+    }
+
+    /**
+     * Actualiza los datos y el estado (RF06, RF07) en una sola operación. Si el estado y la fecha son los que el
+     * animal ya tiene, el estado no se toca; si cambian, deben ser válidos (estado conocido; fecha no futura ni
+     * anterior al ingreso, ya con el ingreso nuevo) o no se escribe nada.
+     */
+    public void actualizar(String idAnimal, EntradaAnimal entrada, String estado, String fechaEstado, Callback<Animal> callback) {
+        ejecutor.ejecutar(() -> {
+            Animal animal = animalExistente(idAnimal);
+            validar(entrada);
+            boolean estadoSinCambio = estado != null && fechaEstado != null
+                    && estado.equals(animal.estado) && fechaEstado.trim().equals(animal.fechaEstado);
+            aplicarDatos(animal, entrada);
+            if (!estadoSinCambio) {
+                Map<String, ErrorCampo> errores = new LinkedHashMap<>();
+                if (estado == null || !ESTADOS.contains(estado)) errores.put("estado", new ErrorCampo(CodigoError.VALOR_INVALIDO));
+                ErrorCampo fecha = ValidadorAnimal.fechaEstado(fechaEstado, animal, Tiempo.hoy());
+                if (fecha != null) errores.put("fechaEstado", fecha);
+                if (!errores.isEmpty()) throw ErrorModelo.validacion(errores);
+                animal.estado = estado;
+                animal.fechaEstado = fechaEstado.trim();
             }
+            guardarCambios(animal);
             return animal;
         }, callback);
     }
@@ -148,6 +158,32 @@ public final class AnimalRepository {
             errores.put("idRaza", new ErrorCampo(CodigoError.VALOR_INVALIDO));
         }
         if (!errores.isEmpty()) throw ErrorModelo.validacion(errores);
+    }
+
+    /** Copia los datos editables; un animal activo cuya fecha de estado era su ingreso la mueve con él. */
+    private static void aplicarDatos(Animal animal, EntradaAnimal entrada) {
+        boolean fechaDeEstadoSigueAlIngreso = Animal.ACTIVO.equals(animal.estado) && animal.fechaIngreso.equals(animal.fechaEstado);
+        animal.idRaza = entrada.idRaza.isEmpty() ? null : entrada.idRaza;
+        animal.codigo = ValidadorAnimal.normalizarCodigo(entrada.codigo);
+        animal.nombre = entrada.nombre.isEmpty() ? null : entrada.nombre;
+        animal.sexo = entrada.sexo;
+        animal.fechaNacimiento = entrada.fechaNacimiento.isEmpty() ? null : entrada.fechaNacimiento;
+        animal.fechaIngreso = entrada.fechaIngreso;
+        animal.observaciones = entrada.observaciones.isEmpty() ? null : entrada.observaciones;
+        if (fechaDeEstadoSigueAlIngreso) animal.fechaEstado = entrada.fechaIngreso;
+        animal.actualizadoEn = Tiempo.ahoraUtc();
+    }
+
+    /** Escribe el animal y reclasifica sus pesajes en una transacción. */
+    private void guardarCambios(Animal animal) throws ErrorModelo {
+        try {
+            db.runInTransaction(() -> {
+                db.animalDao().actualizar(animal);
+                db.pesajeDao().recalcularAntecedentes(animal.idAnimal, animal.fechaIngreso);
+            });
+        } catch (SQLiteConstraintException ex) {
+            throw errorDeRestriccion(ex);
+        }
     }
 
     private Animal animalExistente(String idAnimal) throws ErrorModelo {

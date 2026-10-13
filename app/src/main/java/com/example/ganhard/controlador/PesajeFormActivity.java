@@ -88,7 +88,7 @@ public class PesajeFormActivity extends BaseActivity {
 
     private void guardar() {
         if (guardando) return;
-        EntradaPesaje entrada = new EntradaPesaje(texto(vista.fecha), texto(vista.hora), texto(vista.peso), texto(vista.observaciones));
+        EntradaPesaje entrada = new EntradaPesaje(FormatoFecha.aIso(texto(vista.fecha)), texto(vista.hora), texto(vista.peso), texto(vista.observaciones));
         guardando = true;
         ocupado(true);
         vista.mensaje.setVisibility(View.GONE);

@@ -31,11 +31,11 @@ public abstract class BaseActivity extends AppCompatActivity {
     /** Abre el selector de fechas con la que ya esté escrita (u hoy) y deja la elegida como AAAA-MM-DD. */
     protected void elegirFecha(TextInputEditText campo) {
         LocalDate actual;
-        try { actual = LocalDate.parse(String.valueOf(campo.getText()).trim()); }
+        try { actual = LocalDate.parse(FormatoFecha.aIso(String.valueOf(campo.getText()).trim())); }
         catch (DateTimeParseException ex) { actual = Tiempo.hoy(); }
         MaterialDatePicker<Long> selector = MaterialDatePicker.Builder.datePicker()
                 .setTitleText(R.string.elegir_fecha).setSelection(Tiempo.aSelector(actual)).build();
-        selector.addOnPositiveButtonClickListener(seleccion -> campo.setText(Tiempo.fechaDeSelector(seleccion).toString()));
+        selector.addOnPositiveButtonClickListener(seleccion -> campo.setText(FormatoFecha.aPantalla(Tiempo.fechaDeSelector(seleccion).toString())));
         selector.show(getSupportFragmentManager(), "fecha");
     }
 

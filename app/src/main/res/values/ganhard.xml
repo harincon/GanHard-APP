@@ -64,7 +64,6 @@
     <string name="sin_raza">Sin raza</string>
     <string name="fecha_nacimiento">Fecha de nacimiento</string>
     <string name="fecha_ingreso">Fecha de ingreso *</string>
-    <string name="ayuda_fecha">Formato AAAA-MM-DD</string>
     <string name="elegir_fecha">Elegir fecha</string>
     <string name="observaciones_animal">Observaciones</string>
     <string name="guardar_animal">Guardar animal</string>
@@ -74,7 +73,7 @@
     <string name="error_codigo_duplicado">Ya existe un animal con ese código en esta finca.</string>
     <string name="error_sexo_obligatorio">Elige el sexo del animal.</string>
     <string name="error_ingreso_obligatorio">Escribe la fecha de ingreso.</string>
-    <string name="error_fecha_formato">Usa el formato AAAA-MM-DD.</string>
+    <string name="error_fecha_formato">Usa el formato DD/MM/AAAA.</string>
     <string name="animales_titulo">Animales</string>
     <string name="buscar_animales">Buscar por código o nombre</string>
     <string name="filtro_activos">Activos</string>
@@ -167,4 +166,10 @@
     <string name="sexo_y_raza">%1$s · %2$s</string>
     <string name="raza_sin_registrar">Raza sin registrar</string>
     <string name="ultimo_pesaje_lista">Último pesaje: %1$s kg · %2$s</string>
+    <string name="ayuda_fecha">Formato DD/MM/AAAA</string>
+    <string name="formato_fecha">dd/mm/aaaa</string>
+    <string name="campos_obligatorios">* Campos obligatorios</string>
+    <string name="ayuda_codigo">Debe ser único en esta finca.</string>
+    <string name="estado_hint">Estado *</string>
+    <string name="fecha_estado_hint">Fecha del estado *</string>
 </resources>

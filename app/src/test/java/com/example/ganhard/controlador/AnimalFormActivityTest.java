@@ -12,9 +12,10 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Looper;
+import android.view.View;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
-import android.widget.RadioButton;
+import android.widget.TextView;
 import com.example.ganhard.GanHardApplication;
 import com.example.ganhard.R;
 import com.example.ganhard.modelo.datos.CatalogoRazas;
@@ -25,6 +26,7 @@ import com.example.ganhard.modelo.entidad.Usuario;
 import com.example.ganhard.modelo.nucleo.Tiempo;
 import com.example.ganhard.modelo.reglas.EntradaAnimal;
 import com.example.ganhard.pruebas.Captura;
+import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.textfield.TextInputLayout;
 import org.junit.After;
 import org.junit.Before;
@@ -43,6 +45,7 @@ import org.robolectric.shadows.ShadowToast;
 @Config(sdk = 28)
 @LooperMode(LooperMode.Mode.PAUSED)
 public class AnimalFormActivityTest {
+    private static final String ANGUS = "4fda5aab-035d-4f2e-b1e1-c8159de431d4";
     private GanHardDatabase db;
     private GanHardApplication app;
 
@@ -69,10 +72,25 @@ public class AnimalFormActivityTest {
         shadowOf(Looper.getMainLooper()).idle();
         return controlador;
     }
+    private ActivityController<AnimalFormActivity> abrirEditando(String idAnimal) {
+        Intent intento = new Intent().putExtra(AnimalFormActivity.EXTRA_ID_ANIMAL, idAnimal);
+        ActivityController<AnimalFormActivity> controlador = Robolectric.buildActivity(AnimalFormActivity.class, intento).create().start().resume();
+        shadowOf(Looper.getMainLooper()).idle();
+        return controlador;
+    }
+    private Animal registrarCompleto(String codigo, String nombre) {
+        Captura<Animal> captura = new Captura<>();
+        app.animales().registrar(new EntradaAnimal(codigo, nombre, "H", ANGUS, "2025-03-01", "2026-01-10", "Compra reciente"), captura);
+        return captura.esperar().valor;
+    }
     private void escribir(Activity pantalla, int id, String texto) { ((EditText) pantalla.findViewById(id)).setText(texto); }
-    private String texto(Activity pantalla, int id) { return ((EditText) pantalla.findViewById(id)).getText().toString(); }
-    private CharSequence error(Activity pantalla, int idCampo) { return ((TextInputLayout) pantalla.findViewById(idCampo)).getError(); }
-    private void elegirHembra(Activity pantalla) { ((RadioButton) pantalla.findViewById(R.id.sexoHembra)).setChecked(true); }
+    private String texto(Activity pantalla, int id) { return ((TextView) pantalla.findViewById(id)).getText().toString(); }
+    private String error(Activity pantalla, int idCampo) {
+        CharSequence error = ((TextInputLayout) pantalla.findViewById(idCampo)).getError();
+        return error == null ? null : error.toString();
+    }
+    private void elegirSexo(Activity pantalla, String sexo) { ((AutoCompleteTextView) pantalla.findViewById(R.id.sexo)).setText(sexo, false); }
+    private void elegirEstado(Activity pantalla, String estado) { ((AutoCompleteTextView) pantalla.findViewById(R.id.estado)).setText(estado, false); }
     private void guardar(Activity pantalla) {
         pantalla.findViewById(R.id.guardar).performClick();
         shadowOf(Looper.getMainLooper()).idle();
@@ -83,6 +101,7 @@ public class AnimalFormActivityTest {
             return c.getInt(0);
         }
     }
+    private String hoyEnPantalla() { return FormatoFecha.aPantalla(Tiempo.hoy().toString()); }
 
     @Test public void sinFincaConfiguradaAbreConfiguracion() {
         AnimalFormActivity pantalla = abrir().get();
@@ -92,17 +111,33 @@ public class AnimalFormActivityTest {
         assertTrue(pantalla.isFinishing());
     }
 
-    @Test public void elIngresoComienzaEnLaFechaDeHoy() {
+    @Test public void muestraLaNotaDeCamposObligatoriosYLaAyudaDelCodigo() {
         fincaConfigurada();
-        assertEquals(Tiempo.hoy().toString(), texto(abrir().get(), R.id.ingreso));
+        AnimalFormActivity pantalla = abrir().get();
+        assertEquals(pantalla.getString(R.string.campos_obligatorios), texto(pantalla, R.id.notaObligatorios));
+        assertEquals(pantalla.getString(R.string.ayuda_codigo), String.valueOf(((TextInputLayout) pantalla.findViewById(R.id.campoCodigo)).getHelperText()));
+    }
+
+    @Test public void laFechaDeIngresoComienzaEnHoyConFormatoDiaMesAnio() {
+        fincaConfigurada();
+        String hoy = texto(abrir().get(), R.id.ingreso);
+        assertEquals(hoyEnPantalla(), hoy);
+        assertTrue(hoy.matches("^\\d{2}/\\d{2}/\\d{4}$"));
+    }
+
+    @Test public void enRegistroNoSeVenEstadoNiFechaDelEstado() {
+        fincaConfigurada();
+        AnimalFormActivity pantalla = abrir().get();
+        assertEquals(View.GONE, pantalla.findViewById(R.id.campoEstado).getVisibility());
+        assertEquals(View.GONE, pantalla.findViewById(R.id.campoFechaEstado).getVisibility());
     }
 
     @Test public void codigoVacioMuestraErrorYNoGuarda() {
         fincaConfigurada();
         AnimalFormActivity pantalla = abrir().get();
-        elegirHembra(pantalla);
+        elegirSexo(pantalla, "Hembra");
         guardar(pantalla);
-        assertEquals(pantalla.getString(R.string.error_codigo_obligatorio), String.valueOf(error(pantalla, R.id.campoCodigo)));
+        assertEquals(pantalla.getString(R.string.error_codigo_obligatorio), error(pantalla, R.id.campoCodigo));
         assertEquals(0, contarAnimales());
         assertFalse(pantalla.isFinishing());
     }
@@ -112,8 +147,22 @@ public class AnimalFormActivityTest {
         AnimalFormActivity pantalla = abrir().get();
         escribir(pantalla, R.id.codigo, "GH-001");
         guardar(pantalla);
-        assertEquals(android.view.View.VISIBLE, pantalla.findViewById(R.id.errorSexo).getVisibility());
+        assertEquals(pantalla.getString(R.string.error_sexo_obligatorio), error(pantalla, R.id.campoSexo));
         assertEquals(0, contarAnimales());
+    }
+
+    @Test public void elSexoSeEligeEnUnaListaYSeGuarda() {
+        fincaConfigurada();
+        AnimalFormActivity pantalla = abrir().get();
+        AutoCompleteTextView lista = pantalla.findViewById(R.id.sexo);
+        assertEquals(2, lista.getAdapter().getCount());
+        escribir(pantalla, R.id.codigo, "GH-001");
+        elegirSexo(pantalla, "Macho");
+        guardar(pantalla);
+        try (Cursor c = db.getOpenHelper().getWritableDatabase().query("SELECT sexo FROM animal")) {
+            assertTrue(c.moveToFirst());
+            assertEquals("M", c.getString(0));
+        }
     }
 
     @Test public void guardarValidoMuestraConfirmacionYVuelve() {
@@ -121,7 +170,7 @@ public class AnimalFormActivityTest {
         AnimalFormActivity pantalla = abrir().get();
         escribir(pantalla, R.id.codigo, "GH-001");
         escribir(pantalla, R.id.nombre, "Lucero");
-        elegirHembra(pantalla);
+        elegirSexo(pantalla, "Hembra");
         guardar(pantalla);
         assertTrue(pantalla.isFinishing());
         assertEquals(Activity.RESULT_OK, shadowOf(pantalla).getResultCode());
@@ -129,18 +178,47 @@ public class AnimalFormActivityTest {
         assertEquals(1, contarAnimales());
     }
 
+    @Test public void unaFechaEscritaDdMmAaaaSeGuardaEnIso() {
+        fincaConfigurada();
+        AnimalFormActivity pantalla = abrir().get();
+        escribir(pantalla, R.id.codigo, "GH-001");
+        elegirSexo(pantalla, "Hembra");
+        escribir(pantalla, R.id.nacimiento, "05/03/2025");
+        escribir(pantalla, R.id.ingreso, "5/1/2026");
+        guardar(pantalla);
+        assertTrue(pantalla.isFinishing());
+        try (Cursor c = db.getOpenHelper().getWritableDatabase().query("SELECT fecha_nacimiento, fecha_ingreso FROM animal")) {
+            assertTrue(c.moveToFirst());
+            assertEquals("2025-03-05", c.getString(0));
+            assertEquals("2026-01-05", c.getString(1));
+        }
+    }
+
+    @Test public void fechasConFormatoIncorrectoMuestranElErrorDeFormatoYConservanLoEscrito() {
+        fincaConfigurada();
+        AnimalFormActivity pantalla = abrir().get();
+        escribir(pantalla, R.id.codigo, "GH-001");
+        elegirSexo(pantalla, "Hembra");
+        escribir(pantalla, R.id.nacimiento, "5-3-2025");
+        escribir(pantalla, R.id.ingreso, "31/02/2026");
+        guardar(pantalla);
+        assertEquals(pantalla.getString(R.string.error_fecha_formato), error(pantalla, R.id.campoNacimiento));
+        assertEquals(pantalla.getString(R.string.error_fecha_formato), error(pantalla, R.id.campoIngreso));
+        assertEquals("5-3-2025", texto(pantalla, R.id.nacimiento));
+        assertEquals("31/02/2026", texto(pantalla, R.id.ingreso));
+        assertEquals(0, contarAnimales());
+    }
+
     @Test public void codigoDuplicadoMuestraErrorEnElCampoYConservaLoEscrito() {
         fincaConfigurada();
-        Captura<Animal> previo = new Captura<>();
-        app.animales().registrar(new EntradaAnimal("GH-001", "Uno", "H", "", "", "2026-01-10", ""), previo);
-        previo.esperar();
+        registrarCompleto("GH-001", "Uno");
         AnimalFormActivity pantalla = abrir().get();
         escribir(pantalla, R.id.codigo, " gh-001 ");
         escribir(pantalla, R.id.nombre, "Otro");
         escribir(pantalla, R.id.observaciones, "Compra reciente");
-        elegirHembra(pantalla);
+        elegirSexo(pantalla, "Hembra");
         guardar(pantalla);
-        assertEquals(pantalla.getString(R.string.error_codigo_duplicado), String.valueOf(error(pantalla, R.id.campoCodigo)));
+        assertEquals(pantalla.getString(R.string.error_codigo_duplicado), error(pantalla, R.id.campoCodigo));
         assertEquals("Otro", texto(pantalla, R.id.nombre));
         assertEquals("Compra reciente", texto(pantalla, R.id.observaciones));
         assertFalse(pantalla.isFinishing());
@@ -151,14 +229,14 @@ public class AnimalFormActivityTest {
         fincaConfigurada();
         AnimalFormActivity pantalla = abrir().get();
         escribir(pantalla, R.id.codigo, "GH-001");
-        elegirHembra(pantalla);
-        escribir(pantalla, R.id.ingreso, Tiempo.hoy().plusDays(1).toString());
+        elegirSexo(pantalla, "Hembra");
+        escribir(pantalla, R.id.ingreso, FormatoFecha.aPantalla(Tiempo.hoy().plusDays(1).toString()));
         guardar(pantalla);
-        assertEquals(pantalla.getString(R.string.error_fecha_futura), String.valueOf(error(pantalla, R.id.campoIngreso)));
+        assertEquals(pantalla.getString(R.string.error_fecha_futura), error(pantalla, R.id.campoIngreso));
         assertEquals(0, contarAnimales());
     }
 
-    @Test public void elDesplegableOfreceLasRazasDelCatalogo() {
+    @Test public void elDesplegableDeRazaOfreceLasRazasDelCatalogo() {
         fincaConfigurada();
         AutoCompleteTextView raza = abrir().get().findViewById(R.id.raza);
         assertEquals(CatalogoRazas.RAZAS.length + 1, raza.getAdapter().getCount()); // más "Sin raza"
@@ -168,13 +246,13 @@ public class AnimalFormActivityTest {
         fincaConfigurada();
         AnimalFormActivity pantalla = abrir().get();
         escribir(pantalla, R.id.codigo, "GH-001");
-        elegirHembra(pantalla);
+        elegirSexo(pantalla, "Hembra");
         AutoCompleteTextView raza = pantalla.findViewById(R.id.raza);
         raza.getOnItemClickListener().onItemClick(null, null, 1, 0); // primera raza por orden alfabético: Angus
         guardar(pantalla);
         try (Cursor c = db.getOpenHelper().getWritableDatabase().query("SELECT id_raza FROM animal")) {
             assertTrue(c.moveToFirst());
-            assertEquals("4fda5aab-035d-4f2e-b1e1-c8159de431d4", c.getString(0));
+            assertEquals(ANGUS, c.getString(0));
         }
     }
 
@@ -183,7 +261,7 @@ public class AnimalFormActivityTest {
         ActivityController<AnimalFormActivity> primera = abrir();
         escribir(primera.get(), R.id.codigo, "GH-001");
         escribir(primera.get(), R.id.nombre, "Lucero");
-        elegirHembra(primera.get());
+        elegirSexo(primera.get(), "Hembra");
         primera.get().findViewById(R.id.guardar).performClick(); // el resultado llega a una pantalla ya destruida
         Bundle estado = new Bundle();
         primera.pause().saveInstanceState(estado).stop().destroy();
@@ -192,10 +270,27 @@ public class AnimalFormActivityTest {
         shadowOf(Looper.getMainLooper()).idle();
         assertEquals("GH-001", texto(segunda.get(), R.id.codigo));
         assertEquals("Lucero", texto(segunda.get(), R.id.nombre));
-        assertTrue(((RadioButton) segunda.get().findViewById(R.id.sexoHembra)).isChecked());
+        assertEquals("Hembra", texto(segunda.get(), R.id.sexo));
         assertFalse(segunda.get().isFinishing());
         assertNull("La pantalla destruida no debe navegar", shadowOf(primera.get()).getNextStartedActivity());
         assertEquals(1, contarAnimales());
+    }
+
+    @Test public void rotarYVolverAGuardarNoDuplicaNiMuestraElErrorDeCodigo() {
+        fincaConfigurada();
+        ActivityController<AnimalFormActivity> primera = abrir();
+        escribir(primera.get(), R.id.codigo, "GH-001");
+        elegirSexo(primera.get(), "Hembra");
+        primera.get().findViewById(R.id.guardar).performClick();
+        Bundle estado = new Bundle();
+        primera.pause().saveInstanceState(estado).stop().destroy();
+        ActivityController<AnimalFormActivity> segunda = Robolectric.buildActivity(AnimalFormActivity.class)
+                .create(estado).start().restoreInstanceState(estado).resume();
+        shadowOf(Looper.getMainLooper()).idle();
+        guardar(segunda.get());
+        assertEquals(1, contarAnimales());
+        assertNull(error(segunda.get(), R.id.campoCodigo));
+        assertTrue(segunda.get().isFinishing());
     }
 
     @Test public void cancelarSinCambiosCierraSinPreguntar() {
@@ -217,31 +312,25 @@ public class AnimalFormActivityTest {
         assertEquals(0, contarAnimales());
     }
 
-    private ActivityController<AnimalFormActivity> abrirEditando(String idAnimal) {
-        Intent intento = new Intent().putExtra(AnimalFormActivity.EXTRA_ID_ANIMAL, idAnimal);
-        ActivityController<AnimalFormActivity> controlador = Robolectric.buildActivity(AnimalFormActivity.class, intento).create().start().resume();
-        shadowOf(Looper.getMainLooper()).idle();
-        return controlador;
-    }
-    private Animal registrarCompleto(String codigo, String nombre) {
-        Captura<Animal> captura = new Captura<>();
-        app.animales().registrar(new EntradaAnimal(codigo, nombre, "H", "4fda5aab-035d-4f2e-b1e1-c8159de431d4", "2025-03-01", "2026-01-10", "Compra reciente"), captura);
-        return captura.esperar().valor;
-    }
+    // ----- Edición -----
 
-    @Test public void enModoEdicionPrecargaLosDatosDelAnimal() {
+    @Test public void enModoEdicionPrecargaLosDatosYMuestraEstadoYFechaDelEstado() {
         fincaConfigurada();
         Animal animal = registrarCompleto("GH-001", "Lucero");
         AnimalFormActivity pantalla = abrirEditando(animal.idAnimal).get();
         assertEquals("GH-001", texto(pantalla, R.id.codigo));
         assertEquals("Lucero", texto(pantalla, R.id.nombre));
-        assertTrue(((RadioButton) pantalla.findViewById(R.id.sexoHembra)).isChecked());
-        assertEquals("Angus", ((AutoCompleteTextView) pantalla.findViewById(R.id.raza)).getText().toString());
-        assertEquals("2025-03-01", texto(pantalla, R.id.nacimiento));
-        assertEquals("2026-01-10", texto(pantalla, R.id.ingreso));
+        assertEquals("Hembra", texto(pantalla, R.id.sexo));
+        assertEquals("Angus", texto(pantalla, R.id.raza));
+        assertEquals("01/03/2025", texto(pantalla, R.id.nacimiento));
+        assertEquals("10/01/2026", texto(pantalla, R.id.ingreso));
         assertEquals("Compra reciente", texto(pantalla, R.id.observaciones));
-        assertEquals(pantalla.getString(R.string.editar_animal), String.valueOf(((com.google.android.material.appbar.MaterialToolbar) pantalla.findViewById(R.id.toolbar)).getTitle()));
-        assertEquals(pantalla.getString(R.string.guardar_cambios), ((android.widget.Button) pantalla.findViewById(R.id.guardar)).getText().toString());
+        assertEquals(View.VISIBLE, pantalla.findViewById(R.id.campoEstado).getVisibility());
+        assertEquals(View.VISIBLE, pantalla.findViewById(R.id.campoFechaEstado).getVisibility());
+        assertEquals("Activo", texto(pantalla, R.id.estado));
+        assertEquals("10/01/2026", texto(pantalla, R.id.fechaEstado));
+        assertEquals(pantalla.getString(R.string.editar_animal), String.valueOf(((MaterialToolbar) pantalla.findViewById(R.id.toolbar)).getTitle()));
+        assertEquals(pantalla.getString(R.string.guardar_cambios), texto(pantalla, R.id.guardar));
     }
 
     @Test public void editarYGuardarActualizaElMismoRegistro() {
@@ -255,8 +344,45 @@ public class AnimalFormActivityTest {
         assertEquals(1, contarAnimales());
         Animal guardado = db.animalDao().porId(animal.idAnimal);
         assertEquals("Lucero editado", guardado.nombre);
-        assertEquals("4fda5aab-035d-4f2e-b1e1-c8159de431d4", guardado.idRaza);
+        assertEquals(ANGUS, guardado.idRaza);
+        assertEquals(Animal.ACTIVO, guardado.estado);
         assertTrue(ShadowToast.getTextOfLatestToast().contains("GH-001"));
+    }
+
+    @Test public void enEdicionCambiarAVendidoGuardaEstadoYFecha() {
+        fincaConfigurada();
+        Animal animal = registrarCompleto("GH-001", "Lucero");
+        AnimalFormActivity pantalla = abrirEditando(animal.idAnimal).get();
+        elegirEstado(pantalla, "Vendido");
+        escribir(pantalla, R.id.fechaEstado, "01/06/2026");
+        guardar(pantalla);
+        assertTrue(pantalla.isFinishing());
+        Animal guardado = db.animalDao().porId(animal.idAnimal);
+        assertEquals(Animal.VENDIDO, guardado.estado);
+        assertEquals("2026-06-01", guardado.fechaEstado);
+    }
+
+    @Test public void enEdicionVendidoConFechaAnteriorAlIngresoMuestraElError() {
+        fincaConfigurada();
+        Animal animal = registrarCompleto("GH-001", "Lucero");
+        AnimalFormActivity pantalla = abrirEditando(animal.idAnimal).get();
+        elegirEstado(pantalla, "Vendido");
+        escribir(pantalla, R.id.fechaEstado, "09/01/2026");
+        guardar(pantalla);
+        assertFalse(pantalla.isFinishing());
+        assertEquals(pantalla.getString(R.string.error_estado_antes_ingreso), error(pantalla, R.id.campoFechaEstado));
+        assertEquals(Animal.ACTIVO, db.animalDao().porId(animal.idAnimal).estado);
+    }
+
+    @Test public void enEdicionUnaFechaDeEstadoFuturaMuestraElError() {
+        fincaConfigurada();
+        Animal animal = registrarCompleto("GH-001", "Lucero");
+        AnimalFormActivity pantalla = abrirEditando(animal.idAnimal).get();
+        elegirEstado(pantalla, "Fallecido");
+        escribir(pantalla, R.id.fechaEstado, FormatoFecha.aPantalla(Tiempo.hoy().plusDays(1).toString()));
+        guardar(pantalla);
+        assertEquals(pantalla.getString(R.string.error_fecha_futura), error(pantalla, R.id.campoFechaEstado));
+        assertEquals(Animal.ACTIVO, db.animalDao().porId(animal.idAnimal).estado);
     }
 
     @Test public void editarAUnCodigoExistenteMuestraDuplicadoYConservaLoEscrito() {
@@ -267,7 +393,7 @@ public class AnimalFormActivityTest {
         escribir(pantalla, R.id.codigo, "gh-001");
         escribir(pantalla, R.id.nombre, "Dos editado");
         guardar(pantalla);
-        assertEquals(pantalla.getString(R.string.error_codigo_duplicado), String.valueOf(error(pantalla, R.id.campoCodigo)));
+        assertEquals(pantalla.getString(R.string.error_codigo_duplicado), error(pantalla, R.id.campoCodigo));
         assertEquals("Dos editado", texto(pantalla, R.id.nombre));
         assertFalse(pantalla.isFinishing());
         assertEquals("GH-002", db.animalDao().porId(segundo.idAnimal).codigo);
@@ -280,40 +406,18 @@ public class AnimalFormActivityTest {
         assertEquals(pantalla.getString(R.string.animal_no_encontrado), ShadowToast.getTextOfLatestToast());
     }
 
-    @Test public void enEdicionCancelarSinTocarNadaNoPregunta() {
+    @Test public void enEdicionCancelarSinTocarNadaNoPreguntaYConCambiosSi() {
         fincaConfigurada();
         Animal animal = registrarCompleto("GH-001", "Lucero");
-        AnimalFormActivity pantalla = abrirEditando(animal.idAnimal).get();
-        pantalla.findViewById(R.id.cancelar).performClick();
-        assertTrue(pantalla.isFinishing());
-    }
-
-    @Test public void enEdicionCancelarConCambiosPideConfirmar() {
-        fincaConfigurada();
-        Animal animal = registrarCompleto("GH-001", "Lucero");
-        AnimalFormActivity pantalla = abrirEditando(animal.idAnimal).get();
-        escribir(pantalla, R.id.nombre, "Otro nombre");
-        pantalla.findViewById(R.id.cancelar).performClick();
+        AnimalFormActivity sinCambios = abrirEditando(animal.idAnimal).get();
+        sinCambios.findViewById(R.id.cancelar).performClick();
+        assertTrue(sinCambios.isFinishing());
+        AnimalFormActivity conCambios = abrirEditando(animal.idAnimal).get();
+        escribir(conCambios, R.id.nombre, "Otro nombre");
+        conCambios.findViewById(R.id.cancelar).performClick();
         shadowOf(Looper.getMainLooper()).idle();
         assertTrue(ShadowDialog.getLatestDialog().isShowing());
-        assertFalse(pantalla.isFinishing());
-    }
-
-    @Test public void rotarYVolverAGuardarNoDuplicaNiMuestraElErrorDeCodigo() {
-        fincaConfigurada();
-        ActivityController<AnimalFormActivity> primera = abrir();
-        escribir(primera.get(), R.id.codigo, "GH-001");
-        elegirHembra(primera.get());
-        primera.get().findViewById(R.id.guardar).performClick(); // el resultado llega a una pantalla ya destruida
-        Bundle estado = new Bundle();
-        primera.pause().saveInstanceState(estado).stop().destroy();
-        ActivityController<AnimalFormActivity> segunda = Robolectric.buildActivity(AnimalFormActivity.class)
-                .create(estado).start().restoreInstanceState(estado).resume();
-        shadowOf(Looper.getMainLooper()).idle();
-        guardar(segunda.get());
-        assertEquals(1, contarAnimales());
-        assertNull(error(segunda.get(), R.id.campoCodigo));
-        assertTrue(segunda.get().isFinishing());
+        assertFalse(conCambios.isFinishing());
     }
 
     @Test public void rotarAntesDeQueCargueElAnimalDeEdicionAunLoRellena() {
@@ -329,7 +433,8 @@ public class AnimalFormActivityTest {
         assertEquals("GH-001", texto(segunda.get(), R.id.codigo));
         assertEquals("Lucero", texto(segunda.get(), R.id.nombre));
         assertEquals("Compra reciente", texto(segunda.get(), R.id.observaciones));
-        assertEquals("Angus", ((AutoCompleteTextView) segunda.get().findViewById(R.id.raza)).getText().toString());
+        assertEquals("Angus", texto(segunda.get(), R.id.raza));
+        assertEquals("Hembra", texto(segunda.get(), R.id.sexo));
     }
 
     @Test public void rotarDespuesDeEditarConservaLoEditado() {
