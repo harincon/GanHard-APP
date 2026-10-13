@@ -9,9 +9,8 @@ import com.example.ganhard.modelo.repositorio.ConfiguracionRepository;
 
 /** Aplica márgenes de las barras Android para API 35+ y comparte el repositorio. */
 public abstract class BaseActivity extends AppCompatActivity {
-    protected ConfiguracionRepository repositorio() {
-        return ((GanHardApplication) getApplication()).configuracion();
-    }
+    protected GanHardApplication app() { return (GanHardApplication) getApplication(); }
+    protected ConfiguracionRepository repositorio() { return app().configuracion(); }
     protected boolean disponible() { return !isFinishing() && !isDestroyed(); }
     protected void ajustarBarras(View vista) {
         int izquierda = vista.getPaddingLeft(), arriba = vista.getPaddingTop();

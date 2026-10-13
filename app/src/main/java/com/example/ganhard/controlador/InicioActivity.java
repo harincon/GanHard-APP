@@ -7,7 +7,8 @@ import androidx.appcompat.app.AppCompatDelegate;
 import com.example.ganhard.R;
 import com.example.ganhard.databinding.ActivityInicioBinding;
 import com.example.ganhard.modelo.ConfiguracionLocal;
-import com.example.ganhard.modelo.repositorio.ConfiguracionRepository;
+import com.example.ganhard.modelo.nucleo.Callback;
+import com.example.ganhard.modelo.nucleo.ErrorModelo;
 import java.text.DecimalFormat;
 
 /** Controlador de Inicio: solicita datos al Modelo y los presenta en la Vista XML. */
@@ -37,7 +38,7 @@ public class InicioActivity extends BaseActivity {
         vista.reintentar.setVisibility(View.GONE);
         vista.mensaje.setText(R.string.cargando);
         vista.mensaje.setVisibility(View.VISIBLE);
-        repositorio().cargar(new ConfiguracionRepository.Callback() {
+        repositorio().cargar(new Callback<ConfiguracionLocal>() {
             @Override public void exito(ConfiguracionLocal datos) {
                 if (!disponible()) return;
                 if (datos == null) {
@@ -55,7 +56,7 @@ public class InicioActivity extends BaseActivity {
                 vista.mensaje.setVisibility(View.GONE);
                 vista.editar.setEnabled(true);
             }
-            @Override public void error(Exception error) {
+            @Override public void error(ErrorModelo error) {
                 if (!disponible()) return;
                 vista.progreso.setVisibility(View.GONE);
                 vista.mensaje.setText(R.string.error_carga);

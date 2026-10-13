@@ -7,9 +7,10 @@ import androidx.activity.OnBackPressedCallback;
 import com.example.ganhard.R;
 import com.example.ganhard.databinding.ActivityConfiguracionBinding;
 import com.example.ganhard.modelo.ConfiguracionLocal;
+import com.example.ganhard.modelo.nucleo.Callback;
+import com.example.ganhard.modelo.nucleo.ErrorModelo;
 import com.example.ganhard.modelo.reglas.EntradaConfiguracion;
 import com.example.ganhard.modelo.reglas.ValidadorConfiguracion;
-import com.example.ganhard.modelo.repositorio.ConfiguracionRepository;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputLayout;
 import java.text.DecimalFormat;
@@ -50,7 +51,7 @@ public class ConfiguracionActivity extends BaseActivity {
         ocupado(true);
         vista.mensaje.setVisibility(View.GONE);
         vista.reintentar.setVisibility(View.GONE);
-        repositorio().cargar(new ConfiguracionRepository.Callback() {
+        repositorio().cargar(new Callback<ConfiguracionLocal>() {
             @Override public void exito(ConfiguracionLocal datos) {
                 if (!disponible()) return;
                 if (datos != null) {
@@ -64,7 +65,7 @@ public class ConfiguracionActivity extends BaseActivity {
                 restaurado = true;
                 ocupado(false);
             }
-            @Override public void error(Exception error) {
+            @Override public void error(ErrorModelo error) {
                 if (!disponible()) return;
                 ocupado(true);
                 vista.progreso.setVisibility(View.GONE);
@@ -86,7 +87,7 @@ public class ConfiguracionActivity extends BaseActivity {
         guardando = true;
         ocupado(true);
         vista.mensaje.setVisibility(View.GONE);
-        repositorio().guardar(datos, new ConfiguracionRepository.Callback() {
+        repositorio().guardar(datos, new Callback<ConfiguracionLocal>() {
             @Override public void exito(ConfiguracionLocal configuracion) {
                 if (!disponible()) return;
                 guardando = false;
@@ -94,7 +95,7 @@ public class ConfiguracionActivity extends BaseActivity {
                         .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP));
                 finish();
             }
-            @Override public void error(Exception error) {
+            @Override public void error(ErrorModelo error) {
                 if (!disponible()) return;
                 guardando = false;
                 ocupado(false);

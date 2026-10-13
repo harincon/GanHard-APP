@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.os.Looper;
 import android.widget.EditText;
 import androidx.room.Room;
+import com.example.ganhard.GanHardApplication;
 import com.example.ganhard.R;
 import com.example.ganhard.modelo.datos.GanHardDatabase;
 import com.example.ganhard.modelo.entidad.Finca;
@@ -23,9 +24,10 @@ import static org.robolectric.Shadows.shadowOf;
 @Config(sdk = 28)
 @LooperMode(LooperMode.Mode.PAUSED)
 public class ConfiguracionRotacionTest {
-    @Test public void rotarDuranteCargaRecuperaDatosYLuegoConservaElFormularioEditado() throws Exception {
-        GanHardDatabase db = Room.databaseBuilder(RuntimeEnvironment.getApplication(), GanHardDatabase.class, "ganhard.db")
+    @Test public void rotarDuranteCargaRecuperaDatosYLuegoConservaElFormularioEditado() {
+        GanHardDatabase db = Room.inMemoryDatabaseBuilder(RuntimeEnvironment.getApplication(), GanHardDatabase.class)
                 .allowMainThreadQueries().build();
+        ((GanHardApplication) RuntimeEnvironment.getApplication()).instalar(db, Runnable::run);
         try {
             Usuario usuario = new Usuario(); usuario.idUsuario = "usuario-prueba"; usuario.nombre = "Helver"; usuario.correo = "helver@ejemplo.com";
             Finca finca = new Finca(); finca.idFinca = "finca-prueba"; finca.idPropietario = usuario.idUsuario; finca.nombre = "La Esperanza";
@@ -53,10 +55,7 @@ public class ConfiguracionRotacionTest {
             assertEquals("finca-prueba", db.configuracionDao().cargar().finca.idFinca);
             assertEquals("usuario-prueba", db.configuracionDao().cargar().usuario.idUsuario);
             cuarta.get().findViewById(R.id.guardar).performClick();
-            long limite = System.currentTimeMillis() + 5000;
-            while (!cuarta.get().isFinishing() && System.currentTimeMillis() < limite) {
-                shadowOf(Looper.getMainLooper()).idle(); Thread.sleep(10);
-            }
+            shadowOf(Looper.getMainLooper()).idle();
             assertTrue("Debe guardar y regresar al inicio", cuarta.get().isFinishing());
             assertEquals("Nombre todavía sin guardar", db.configuracionDao().cargar().finca.nombre);
             assertEquals("finca-prueba", db.configuracionDao().cargar().finca.idFinca);
@@ -66,11 +65,8 @@ public class ConfiguracionRotacionTest {
     private String texto(ConfiguracionActivity pantalla, int id) {
         return ((EditText) pantalla.findViewById(id)).getText().toString();
     }
-    private void esperarCarga(ConfiguracionActivity pantalla) throws Exception {
-        long limite = System.currentTimeMillis() + 5000;
-        while (!pantalla.findViewById(R.id.guardar).isEnabled() && System.currentTimeMillis() < limite) {
-            shadowOf(Looper.getMainLooper()).idle(); Thread.sleep(10);
-        }
+    private void esperarCarga(ConfiguracionActivity pantalla) {
+        shadowOf(Looper.getMainLooper()).idle();
         assertTrue("La carga debe finalizar", pantalla.findViewById(R.id.guardar).isEnabled());
     }
 }

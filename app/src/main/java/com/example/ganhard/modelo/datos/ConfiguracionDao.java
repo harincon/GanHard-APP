@@ -12,6 +12,8 @@ import com.example.ganhard.modelo.entidad.Usuario;
 public abstract class ConfiguracionDao {
     @Query("SELECT * FROM finca WHERE activa = 1 ORDER BY creado_en, id_finca LIMIT 1")
     public abstract Finca fincaActiva();
+    @Query("SELECT id_finca FROM finca WHERE activa = 1 ORDER BY creado_en, id_finca LIMIT 1")
+    public abstract String idFincaActiva();
     @Query("SELECT * FROM usuario WHERE id_usuario = :id")
     public abstract Usuario usuario(String id);
     @Upsert protected abstract void guardarUsuario(Usuario usuario);
