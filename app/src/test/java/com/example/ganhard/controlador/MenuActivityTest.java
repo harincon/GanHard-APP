@@ -95,7 +95,7 @@ public class MenuActivityTest {
         fila(pantalla, R.id.filaAnimales).performClick();
         assertEquals(AnimalesActivity.class.getName(), claseSiguiente(pantalla));
         fila(pantalla, R.id.filaConfiguracion).performClick();
-        assertEquals(ConfiguracionActivity.class.getName(), claseSiguiente(pantalla));
+        assertEquals(AjustesActivity.class.getName(), claseSiguiente(pantalla));
     }
 
     @Test public void inicioVuelveAInicioYCierraElMenu() {

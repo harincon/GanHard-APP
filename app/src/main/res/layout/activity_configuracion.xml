@@ -3,18 +3,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/raiz" android:layout_width="match_parent" android:layout_height="match_parent"
     android:orientation="vertical" android:background="@color/gh_background">
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbar" android:layout_width="match_parent" android:layout_height="?attr/actionBarSize"
-        android:background="@color/gh_surface" app:title="@string/configurar_finca" app:titleTextColor="@color/gh_text" />
+    <com.google.android.material.appbar.MaterialToolbar android:id="@+id/toolbar" style="@style/Gh.Toolbar"
+        android:layout_width="match_parent" android:layout_height="wrap_content" app:title="@string/configurar_finca" />
     <ProgressBar android:id="@+id/progreso" style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="match_parent" android:layout_height="4dp" android:indeterminate="true" />
     <ScrollView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"
         android:fillViewport="true" android:clipToPadding="false">
-        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="@dimen/gh_margen">
             <TextView android:id="@+id/titulo" android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:text="@string/comienza_finca" android:textSize="24sp" android:textStyle="bold" android:textColor="@color/gh_text" />
+                android:text="@string/comienza_finca" android:textAppearance="@style/Gh.Titulo" />
             <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp"
-                android:layout_marginBottom="24dp" android:text="@string/datos_locales" android:textSize="16sp" android:textColor="@color/gh_muted" />
+                android:layout_marginBottom="16dp" android:text="@string/datos_locales" android:textSize="16sp" android:textColor="@color/gh_muted" />
             <com.google.android.material.textfield.TextInputLayout android:id="@+id/campoNombre"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox" android:layout_width="match_parent" android:layout_height="wrap_content"
                 android:hint="@string/nombre_administrador" android:layout_marginBottom="12dp">
@@ -45,23 +44,12 @@
                 <com.google.android.material.textfield.TextInputEditText android:id="@+id/area" android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:inputType="numberDecimal" android:maxLength="11" android:maxLines="1" android:imeOptions="actionDone" android:importantForAutofill="no" />
             </com.google.android.material.textfield.TextInputLayout>
-            <com.google.android.material.button.MaterialButton android:id="@+id/guardar" android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:minHeight="48dp" android:text="@string/guardar_comenzar" app:cornerRadius="24dp" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/guardar" style="@style/Gh.Boton" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:text="@string/guardar_comenzar" />
             <com.google.android.material.button.MaterialButton android:id="@+id/reintentar" style="@style/Widget.Material3.Button.TextButton"
                 android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/reintentar" android:visibility="gone" />
             <TextView android:id="@+id/mensaje" android:layout_width="match_parent" android:layout_height="wrap_content"
                 android:layout_marginTop="12dp" android:textColor="@color/gh_muted" android:textSize="14sp" android:accessibilityLiveRegion="polite" android:visibility="gone" />
-            <TextView android:id="@+id/tituloApariencia" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="32dp"
-                android:text="@string/apariencia" android:textSize="18sp" android:textStyle="bold" android:textColor="@color/gh_text" />
-            <RadioGroup android:id="@+id/temas" android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:contentDescription="@string/apariencia">
-                <com.google.android.material.radiobutton.MaterialRadioButton android:id="@+id/temaClaro" android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:minHeight="48dp" android:text="@string/tema_claro" />
-                <com.google.android.material.radiobutton.MaterialRadioButton android:id="@+id/temaOscuro" android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:minHeight="48dp" android:text="@string/tema_oscuro" />
-                <com.google.android.material.radiobutton.MaterialRadioButton android:id="@+id/temaSistema" android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:minHeight="48dp" android:text="@string/tema_sistema" />
-            </RadioGroup>
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

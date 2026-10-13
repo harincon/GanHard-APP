@@ -24,6 +24,8 @@
         </activity>
         <activity android:name=".controlador.DetalleAnimalActivity"
             android:exported="false" />
+        <activity android:name=".controlador.AjustesActivity"
+            android:exported="false" />
         <activity android:name=".controlador.MenuActivity"
             android:exported="false" />
         <activity android:name=".controlador.PesajesActivity"

@@ -153,4 +153,12 @@
     <string name="sub_historial">Responsables y correcciones · Próximamente</string>
     <string name="sub_sincronizacion">Envíos y cambios por revisar · Próximamente</string>
     <string name="sub_configuracion">Perfil, finca y apariencia</string>
+    <string name="ajustes_rol">Administrador · Perfil local</string>
+    <string name="datos_finca_fila">Datos de la finca</string>
+    <string name="tema_seleccionado">Seleccionado</string>
+    <string name="tema_ejemplo_claro">Ver ejemplo con colores claros</string>
+    <string name="tema_ejemplo_oscuro">Ver ejemplo con colores oscuros</string>
+    <string name="tema_ejemplo_sistema">Usar la configuración del teléfono</string>
+    <string name="opcion_marcada">● %1$s</string>
+    <string name="opcion_sin_marcar">○ %1$s</string>
 </resources>
