@@ -39,7 +39,6 @@ android {
     testOptions { unitTests { isIncludeAndroidResources = true } }
     sourceSets {
         // Los esquemas exportados de Room permiten probar las migraciones.
-        getByName("test").assets.srcDir("$projectDir/schemas")
         getByName("androidTest").assets.srcDir("$projectDir/schemas")
     }
 }

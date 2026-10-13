@@ -1,0 +1,464 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 2,
+    "identityHash": "797953a58254b8b5c785e26b78e72d15",
+    "entities": [
+      {
+        "tableName": "usuario",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id_usuario` TEXT NOT NULL, `id_cuenta_remota` TEXT, `nombre` TEXT NOT NULL, `correo` TEXT NOT NULL, `telefono` TEXT, `activo` INTEGER NOT NULL, `creado_en` TEXT NOT NULL, `actualizado_en` TEXT NOT NULL, `version` INTEGER NOT NULL, PRIMARY KEY(`id_usuario`))",
+        "fields": [
+          {
+            "fieldPath": "idUsuario",
+            "columnName": "id_usuario",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "idCuentaRemota",
+            "columnName": "id_cuenta_remota",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "nombre",
+            "columnName": "nombre",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "correo",
+            "columnName": "correo",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "telefono",
+            "columnName": "telefono",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "activo",
+            "columnName": "activo",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "creadoEn",
+            "columnName": "creado_en",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "actualizadoEn",
+            "columnName": "actualizado_en",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "version",
+            "columnName": "version",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id_usuario"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_usuario_id_cuenta_remota",
+            "unique": true,
+            "columnNames": [
+              "id_cuenta_remota"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_usuario_id_cuenta_remota` ON `${TABLE_NAME}` (`id_cuenta_remota`)"
+          }
+        ]
+      },
+      {
+        "tableName": "finca",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id_finca` TEXT NOT NULL, `id_propietario` TEXT NOT NULL, `nombre` TEXT NOT NULL, `ubicacion` TEXT, `area_hectareas` REAL, `activa` INTEGER NOT NULL, `creado_en` TEXT NOT NULL, `actualizado_en` TEXT NOT NULL, `version` INTEGER NOT NULL, PRIMARY KEY(`id_finca`), FOREIGN KEY(`id_propietario`) REFERENCES `usuario`(`id_usuario`) ON UPDATE NO ACTION ON DELETE RESTRICT )",
+        "fields": [
+          {
+            "fieldPath": "idFinca",
+            "columnName": "id_finca",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "idPropietario",
+            "columnName": "id_propietario",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nombre",
+            "columnName": "nombre",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ubicacion",
+            "columnName": "ubicacion",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "areaHectareas",
+            "columnName": "area_hectareas",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "activa",
+            "columnName": "activa",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "creadoEn",
+            "columnName": "creado_en",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "actualizadoEn",
+            "columnName": "actualizado_en",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "version",
+            "columnName": "version",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id_finca"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_finca_id_propietario",
+            "unique": false,
+            "columnNames": [
+              "id_propietario"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_finca_id_propietario` ON `${TABLE_NAME}` (`id_propietario`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "usuario",
+            "onDelete": "RESTRICT",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "id_propietario"
+            ],
+            "referencedColumns": [
+              "id_usuario"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "raza",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id_raza` TEXT NOT NULL, `nombre` TEXT NOT NULL, `descripcion` TEXT, PRIMARY KEY(`id_raza`))",
+        "fields": [
+          {
+            "fieldPath": "idRaza",
+            "columnName": "id_raza",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nombre",
+            "columnName": "nombre",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "descripcion",
+            "columnName": "descripcion",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id_raza"
+          ]
+        }
+      },
+      {
+        "tableName": "animal",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id_animal` TEXT NOT NULL, `id_finca` TEXT NOT NULL, `id_raza` TEXT, `codigo` TEXT NOT NULL COLLATE NOCASE, `nombre` TEXT, `sexo` TEXT NOT NULL, `fecha_nacimiento` TEXT, `fecha_ingreso` TEXT NOT NULL, `estado` TEXT NOT NULL, `fecha_estado` TEXT NOT NULL, `observaciones` TEXT, `creado_en` TEXT NOT NULL, `actualizado_en` TEXT NOT NULL, `version` INTEGER NOT NULL, PRIMARY KEY(`id_animal`), FOREIGN KEY(`id_finca`) REFERENCES `finca`(`id_finca`) ON UPDATE NO ACTION ON DELETE RESTRICT , FOREIGN KEY(`id_raza`) REFERENCES `raza`(`id_raza`) ON UPDATE NO ACTION ON DELETE SET NULL )",
+        "fields": [
+          {
+            "fieldPath": "idAnimal",
+            "columnName": "id_animal",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "idFinca",
+            "columnName": "id_finca",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "idRaza",
+            "columnName": "id_raza",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "codigo",
+            "columnName": "codigo",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nombre",
+            "columnName": "nombre",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "sexo",
+            "columnName": "sexo",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fechaNacimiento",
+            "columnName": "fecha_nacimiento",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "fechaIngreso",
+            "columnName": "fecha_ingreso",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "estado",
+            "columnName": "estado",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fechaEstado",
+            "columnName": "fecha_estado",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "observaciones",
+            "columnName": "observaciones",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "creadoEn",
+            "columnName": "creado_en",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "actualizadoEn",
+            "columnName": "actualizado_en",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "version",
+            "columnName": "version",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id_animal"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_animal_id_finca_codigo",
+            "unique": true,
+            "columnNames": [
+              "id_finca",
+              "codigo"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_animal_id_finca_codigo` ON `${TABLE_NAME}` (`id_finca`, `codigo`)"
+          },
+          {
+            "name": "index_animal_id_finca_estado",
+            "unique": false,
+            "columnNames": [
+              "id_finca",
+              "estado"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_animal_id_finca_estado` ON `${TABLE_NAME}` (`id_finca`, `estado`)"
+          },
+          {
+            "name": "index_animal_id_raza",
+            "unique": false,
+            "columnNames": [
+              "id_raza"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_animal_id_raza` ON `${TABLE_NAME}` (`id_raza`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "finca",
+            "onDelete": "RESTRICT",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "id_finca"
+            ],
+            "referencedColumns": [
+              "id_finca"
+            ]
+          },
+          {
+            "table": "raza",
+            "onDelete": "SET NULL",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "id_raza"
+            ],
+            "referencedColumns": [
+              "id_raza"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "pesaje",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id_pesaje` TEXT NOT NULL, `id_animal` TEXT NOT NULL, `fecha` TEXT NOT NULL, `hora` TEXT, `peso_kg` REAL NOT NULL, `es_antecedente` INTEGER NOT NULL, `observaciones` TEXT, `anulado` INTEGER NOT NULL, `anulado_en` TEXT, `motivo_anulacion` TEXT, `creado_en` TEXT NOT NULL, `actualizado_en` TEXT NOT NULL, `version` INTEGER NOT NULL, PRIMARY KEY(`id_pesaje`), FOREIGN KEY(`id_animal`) REFERENCES `animal`(`id_animal`) ON UPDATE NO ACTION ON DELETE RESTRICT )",
+        "fields": [
+          {
+            "fieldPath": "idPesaje",
+            "columnName": "id_pesaje",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "idAnimal",
+            "columnName": "id_animal",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fecha",
+            "columnName": "fecha",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "hora",
+            "columnName": "hora",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "pesoKg",
+            "columnName": "peso_kg",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "esAntecedente",
+            "columnName": "es_antecedente",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "observaciones",
+            "columnName": "observaciones",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "anulado",
+            "columnName": "anulado",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "anuladoEn",
+            "columnName": "anulado_en",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "motivoAnulacion",
+            "columnName": "motivo_anulacion",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "creadoEn",
+            "columnName": "creado_en",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "actualizadoEn",
+            "columnName": "actualizado_en",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "version",
+            "columnName": "version",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id_pesaje"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_pesaje_id_animal_fecha_hora",
+            "unique": false,
+            "columnNames": [
+              "id_animal",
+              "fecha",
+              "hora"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_pesaje_id_animal_fecha_hora` ON `${TABLE_NAME}` (`id_animal`, `fecha`, `hora`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "animal",
+            "onDelete": "RESTRICT",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "id_animal"
+            ],
+            "referencedColumns": [
+              "id_animal"
+            ]
+          }
+        ]
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '797953a58254b8b5c785e26b78e72d15')"
+    ]
+  }
+}

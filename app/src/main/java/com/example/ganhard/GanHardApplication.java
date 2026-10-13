@@ -2,7 +2,6 @@ package com.example.ganhard;
 
 import android.app.Application;
 import androidx.annotation.VisibleForTesting;
-import androidx.room.Room;
 import com.example.ganhard.modelo.PreferenciaTema;
 import com.example.ganhard.modelo.datos.GanHardDatabase;
 import com.example.ganhard.modelo.nucleo.EjecutorModelo;
@@ -17,7 +16,7 @@ public class GanHardApplication extends Application {
     @Override public void onCreate() {
         super.onCreate();
         PreferenciaTema.aplicar(this);
-        instalar(Room.databaseBuilder(this, GanHardDatabase.class, "ganhard.db").build(), Executors.newSingleThreadExecutor());
+        instalar(GanHardDatabase.constructor(this, "ganhard.db").build(), Executors.newSingleThreadExecutor());
     }
     /** Arma los repositorios sobre una base y un hilo de trabajo; las pruebas lo usan con una base en memoria. */
     @VisibleForTesting public void instalar(GanHardDatabase database, Executor trabajo) {
