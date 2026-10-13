@@ -15,8 +15,6 @@
         <activity
             android:name=".controlador.InicioActivity"
             android:exported="true"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.GanHard"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

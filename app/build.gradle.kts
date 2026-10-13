@@ -16,6 +16,11 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments["room.schemaLocation"] = "$projectDir/schemas"
+            }
+        }
     }
 
     buildTypes {
@@ -28,25 +33,28 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+        isCoreLibraryDesugaringEnabled = true
     }
     buildFeatures { viewBinding = true }
     testOptions { unitTests { isIncludeAndroidResources = true } }
-    defaultConfig {
-        javaCompileOptions {
-            annotationProcessorOptions {
-                arguments["room.schemaLocation"] = "$projectDir/schemas"
-            }
-        }
+    sourceSets {
+        // Los esquemas exportados de Room permiten probar las migraciones.
+        getByName("test").assets.srcDir("$projectDir/schemas")
+        getByName("androidTest").assets.srcDir("$projectDir/schemas")
     }
 }
 
 dependencies {
-    implementation("androidx.appcompat:appcompat:1.7.1")
-    implementation("com.google.android.material:material:1.13.0")
-    implementation("androidx.room:room-runtime:2.8.4")
-    annotationProcessor("androidx.room:room-compiler:2.8.4")
+    implementation(libs.androidx.appcompat)
+    implementation(libs.material)
+    implementation(libs.androidx.room.runtime)
+    annotationProcessor(libs.androidx.room.compiler)
+    coreLibraryDesugaring(libs.desugar.jdk.libs)
     testImplementation(libs.junit)
-    testImplementation("org.robolectric:robolectric:4.17")
-    androidTestImplementation(libs.androidx.espresso.core)
+    testImplementation(libs.robolectric)
+    testImplementation(libs.androidx.test.core)
+    testImplementation(libs.androidx.junit)
+    testImplementation(libs.androidx.room.testing)
     androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.room.testing)
 }
