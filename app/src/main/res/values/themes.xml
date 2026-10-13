@@ -24,4 +24,45 @@
         <item name="android:textColor">@color/gh_text</item>
         <item name="android:paddingBottom">12dp</item>
     </style>
+    <!-- Sistema de diseño del Figma: botones píldora, tarjetas, etiquetas verdes y barra superior. -->
+    <style name="Gh.Boton" parent="Widget.Material3.Button">
+        <item name="android:minHeight">@dimen/gh_alto_boton</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="cornerRadius">24dp</item>
+        <item name="backgroundTint">@color/gh_primary</item>
+        <item name="android:textColor">@color/gh_on_primary</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="Gh.Boton.Tonal" parent="Gh.Boton">
+        <item name="backgroundTint">@color/gh_soft</item>
+        <item name="android:textColor">@color/gh_primary</item>
+    </style>
+    <style name="Gh.Tarjeta" parent="Widget.Material3.CardView.Filled">
+        <item name="cardBackgroundColor">@color/gh_surface</item>
+        <item name="cardCornerRadius">@dimen/gh_radio_tarjeta</item>
+        <item name="cardElevation">0dp</item>
+        <item name="strokeWidth">0dp</item>
+    </style>
+    <style name="Gh.Tarjeta.Suave" parent="Gh.Tarjeta">
+        <item name="cardBackgroundColor">@color/gh_soft</item>
+    </style>
+    <style name="Gh.Overline" parent="TextAppearance.Material3.LabelSmall">
+        <item name="android:textColor">@color/gh_primary</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:letterSpacing">0.04</item>
+    </style>
+    <style name="Gh.Titulo" parent="TextAppearance.Material3.TitleMedium">
+        <item name="android:textColor">@color/gh_text</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="Gh.Toolbar" parent="Widget.Material3.Toolbar">
+        <item name="android:minHeight">@dimen/gh_alto_barra</item>
+        <item name="android:background">@color/gh_surface</item>
+        <item name="titleTextColor">@color/gh_text</item>
+        <item name="subtitleTextColor">@color/gh_muted</item>
+    </style>
 </resources>

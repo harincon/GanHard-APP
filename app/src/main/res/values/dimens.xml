@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="gh_margen">16dp</dimen>
+    <dimen name="gh_radio_tarjeta">16dp</dimen>
+    <dimen name="gh_radio_fila">8dp</dimen>
+    <dimen name="gh_alto_boton">48dp</dimen>
+    <dimen name="gh_alto_barra">64dp</dimen>
+</resources>
