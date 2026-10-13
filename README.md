@@ -100,7 +100,7 @@ Con el emulador encendido:
 
 Las pruebas locales usan JUnit y Robolectric (Android simulado en el equipo, con la base Room real en memoria): validadores, repositorios, esquema y migración, y cada pantalla (casos válidos e inválidos, rotación, errores de base de datos). Las pruebas instrumentadas (`ConfiguracionPersistenciaTest` y `MigracionInstrumentadaTest`) se ejecutan en un emulador.
 
-**Resultado del 12 de octubre de 2026:** compilación y APK de prueba completos; **250 pruebas locales aprobadas, 0 fallos**; lint con 0 errores y 20 advertencias (dependencias por actualizar, fondos superpuestos y `notifyDataSetChanged` en listas cortas); **3 pruebas instrumentadas aprobadas en un emulador** (AVD Medium_Phone, Android 17 / API 37, x86_64, 1080×2400, orientación vertical), incluida la migración 1→2 con el ayudante oficial de Room. Las pantallas se revisaron visualmente en ese emulador, en tema claro y oscuro, comparándolas con el Figma; las capturas están en `../avance_ganhard/capturas_emulador/`.
+**Resultado del 12 de octubre de 2026:** compilación y APK de prueba completos; **250 pruebas locales aprobadas, 0 fallos**; lint con 0 errores y 21 advertencias (dependencias por actualizar, fondos superpuestos y `notifyDataSetChanged` en listas cortas); **3 pruebas instrumentadas aprobadas en un emulador** (AVD Medium_Phone, Android 17 / API 37, x86_64, 1080×2400, orientación vertical), incluida la migración 1→2 con el ayudante oficial de Room. Las pantallas se revisaron visualmente en ese emulador, en tema claro y oscuro, comparándolas con el Figma; las capturas están en `../avance_ganhard/capturas_emulador/`.
 
 APK generado: `app/build/outputs/apk/debug/app-debug.apk`.
 
