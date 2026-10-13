@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.GanHard" parent="Theme.GanHard.Base">
+        <item name="android:windowLightNavigationBar">@bool/gh_barras_claras</item>
+    </style>
+</resources>

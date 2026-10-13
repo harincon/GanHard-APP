@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.GanHard.Base" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/gh_primary</item>
+        <item name="colorOnPrimary">@color/gh_on_primary</item>
+        <item name="colorPrimaryContainer">@color/gh_soft</item>
+        <item name="colorOnPrimaryContainer">@color/gh_text</item>
+        <item name="colorSecondary">@color/gh_primary</item>
+        <item name="colorSurface">@color/gh_surface</item>
+        <item name="colorOnSurface">@color/gh_text</item>
+        <item name="colorOnSurfaceVariant">@color/gh_muted</item>
+        <item name="colorOutline">@color/gh_line</item>
+        <item name="android:colorBackground">@color/gh_background</item>
+        <item name="android:fontFamily">sans</item>
+        <item name="android:windowLightStatusBar">@bool/gh_barras_claras</item>
+    </style>
+    <style name="Theme.GanHard" parent="Theme.GanHard.Base" />
+</resources>

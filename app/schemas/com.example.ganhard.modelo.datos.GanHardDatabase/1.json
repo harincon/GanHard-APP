@@ -1,0 +1,176 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "467d5459871f4339a3f06d67685da504",
+    "entities": [
+      {
+        "tableName": "usuario",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id_usuario` TEXT NOT NULL, `id_cuenta_remota` TEXT, `nombre` TEXT NOT NULL, `correo` TEXT NOT NULL, `telefono` TEXT, `activo` INTEGER NOT NULL, `creado_en` TEXT NOT NULL, `actualizado_en` TEXT NOT NULL, `version` INTEGER NOT NULL, PRIMARY KEY(`id_usuario`))",
+        "fields": [
+          {
+            "fieldPath": "idUsuario",
+            "columnName": "id_usuario",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "idCuentaRemota",
+            "columnName": "id_cuenta_remota",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "nombre",
+            "columnName": "nombre",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "correo",
+            "columnName": "correo",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "telefono",
+            "columnName": "telefono",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "activo",
+            "columnName": "activo",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "creadoEn",
+            "columnName": "creado_en",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "actualizadoEn",
+            "columnName": "actualizado_en",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "version",
+            "columnName": "version",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id_usuario"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_usuario_id_cuenta_remota",
+            "unique": true,
+            "columnNames": [
+              "id_cuenta_remota"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_usuario_id_cuenta_remota` ON `${TABLE_NAME}` (`id_cuenta_remota`)"
+          }
+        ]
+      },
+      {
+        "tableName": "finca",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id_finca` TEXT NOT NULL, `id_propietario` TEXT NOT NULL, `nombre` TEXT NOT NULL, `ubicacion` TEXT, `area_hectareas` REAL, `activa` INTEGER NOT NULL, `creado_en` TEXT NOT NULL, `actualizado_en` TEXT NOT NULL, `version` INTEGER NOT NULL, PRIMARY KEY(`id_finca`), FOREIGN KEY(`id_propietario`) REFERENCES `usuario`(`id_usuario`) ON UPDATE NO ACTION ON DELETE RESTRICT )",
+        "fields": [
+          {
+            "fieldPath": "idFinca",
+            "columnName": "id_finca",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "idPropietario",
+            "columnName": "id_propietario",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nombre",
+            "columnName": "nombre",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ubicacion",
+            "columnName": "ubicacion",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "areaHectareas",
+            "columnName": "area_hectareas",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "activa",
+            "columnName": "activa",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "creadoEn",
+            "columnName": "creado_en",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "actualizadoEn",
+            "columnName": "actualizado_en",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "version",
+            "columnName": "version",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id_finca"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_finca_id_propietario",
+            "unique": false,
+            "columnNames": [
+              "id_propietario"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_finca_id_propietario` ON `${TABLE_NAME}` (`id_propietario`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "usuario",
+            "onDelete": "RESTRICT",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "id_propietario"
+            ],
+            "referencedColumns": [
+              "id_usuario"
+            ]
+          }
+        ]
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '467d5459871f4339a3f06d67685da504')"
+    ]
+  }
+}

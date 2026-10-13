@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="gh_background">#F4F7F4</color>
+    <color name="gh_surface">#FFFFFF</color>
+    <color name="gh_text">#18271D</color>
+    <color name="gh_muted">#526358</color>
+    <color name="gh_primary">#25613B</color>
+    <color name="gh_on_primary">#FFFFFF</color>
+    <color name="gh_soft">#E5F1E7</color>
+    <color name="gh_line">#B9C9BD</color>
+    <bool name="gh_barras_claras">true</bool>
+    <string name="configurar_finca">Configurar finca</string>
+    <string name="editar_configuracion">Editar finca y perfil</string>
+    <string name="comienza_finca">Comienza con una finca</string>
+    <string name="datos_locales">Estos datos se guardarán en el dispositivo. Puedes editarlos después.</string>
+    <string name="nombre_administrador">Nombre del administrador *</string>
+    <string name="correo_administrador">Correo del administrador *</string>
+    <string name="nombre_finca">Nombre de la finca *</string>
+    <string name="ubicacion">Ubicación</string>
+    <string name="area_hectareas">Área (hectáreas)</string>
+    <string name="ayuda_area">Opcional. Usa coma o punto decimal, sin separadores de miles.</string>
+    <string name="guardar_comenzar">Guardar y comenzar</string>
+    <string name="guardar_cambios">Guardar cambios</string>
+    <string name="cargando">Cargando los datos de tu finca…</string>
+    <string name="error_carga">No se pudieron cargar los datos. Intenta nuevamente.</string>
+    <string name="error_guardado">No se pudieron guardar los datos. Tu formulario se conserva; intenta nuevamente.</string>
+    <string name="reintentar">Reintentar</string>
+    <string name="responsable">%1$s · Administrador</string>
+    <string name="datos_finca">Información de la finca</string>
+    <string name="ubicacion_sin_registrar">Ubicación sin registrar</string>
+    <string name="area_sin_registrar">Área sin registrar</string>
+    <string name="area_formato">%1$s hectáreas</string>
+    <string name="trabaja_sin_conexion">Trabaja sin conexión</string>
+    <string name="datos_dispositivo">Tus datos se guardan en este dispositivo.</string>
+    <string name="apariencia">Apariencia</string>
+    <string name="tema_claro">Claro</string>
+    <string name="tema_oscuro">Oscuro</string>
+    <string name="tema_sistema">Seguir el sistema</string>
+    <string name="descartar_titulo">¿Descartar los cambios?</string>
+    <string name="descartar_mensaje">Tienes datos escritos que todavía no has guardado.</string>
+    <string name="descartar">Descartar</string>
+    <string name="seguir_editando">Seguir editando</string>
+</resources>

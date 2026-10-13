@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="gh_background">#101713</color>
+    <color name="gh_surface">#1B251E</color>
+    <color name="gh_text">#E6EEE7</color>
+    <color name="gh_muted">#B1C1B5</color>
+    <color name="gh_primary">#95D5A5</color>
+    <color name="gh_on_primary">#12351E</color>
+    <color name="gh_soft">#283E2E</color>
+    <color name="gh_line">#64796B</color>
+    <bool name="gh_barras_claras">false</bool>
+</resources>
