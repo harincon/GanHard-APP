@@ -54,4 +54,10 @@ public class FormatoFechaTest {
         assertEquals("", FormatoFecha.aPantalla(""));
         assertEquals("05/03/2025", FormatoFecha.aPantalla("05/03/2025"));
     }
+
+    @Test public void fechaYHoraConComaParaLaFichaYSinHoraSoloLaFecha() {
+        assertEquals("10 oct 2026, 8:15 a. m.", FormatoFecha.fechaYHoraConComa("2026-10-10", "08:15:00"));
+        assertEquals("10 oct 2026", FormatoFecha.fechaYHoraConComa("2026-10-10", null));
+        assertEquals("10 oct 2026", FormatoFecha.fechaYHoraConComa("2026-10-10", ""));
+    }
 }

@@ -15,8 +15,10 @@ import com.example.ganhard.R;
 import com.example.ganhard.modelo.datos.GanHardDatabase;
 import com.example.ganhard.modelo.entidad.Animal;
 import com.example.ganhard.modelo.entidad.Finca;
+import com.example.ganhard.modelo.entidad.Pesaje;
 import com.example.ganhard.modelo.entidad.Usuario;
 import com.example.ganhard.modelo.reglas.EntradaAnimal;
+import com.example.ganhard.modelo.reglas.EntradaPesaje;
 import com.example.ganhard.pruebas.Captura;
 import org.junit.After;
 import org.junit.Before;
@@ -34,7 +36,7 @@ import org.robolectric.shadows.ShadowToast;
 @Config(sdk = 28)
 @LooperMode(LooperMode.Mode.PAUSED)
 public class DetalleAnimalActivityTest {
-    private static final String ANGUS = "4fda5aab-035d-4f2e-b1e1-c8159de431d4";
+    private static final String BRAHMAN = "853193c3-3b52-4d5f-a4df-f73be27e5da1";
     private GanHardDatabase db;
     private GanHardApplication app;
 
@@ -61,8 +63,13 @@ public class DetalleAnimalActivityTest {
         assertTrue(captura.exito);
         return captura.valor;
     }
-    private Animal completo() {
-        return registrar(new EntradaAnimal("GH-001", "Lucero", "H", ANGUS, "2025-03-01", "2026-01-10", "Compra reciente"));
+    private Animal luna() {
+        return registrar(new EntradaAnimal("GH-014", "Luna", "H", BRAHMAN, "2025-03-05", "2026-01-15", "Compra reciente"));
+    }
+    private void pesar(Animal animal, String fecha, String hora, String peso) {
+        Captura<Pesaje> captura = new Captura<>();
+        app.pesajes().registrar(animal.idAnimal, new EntradaPesaje(fecha, hora, peso, ""), captura);
+        assertTrue(captura.esperar().exito);
     }
     private ActivityController<DetalleAnimalActivity> abrir(String idAnimal) {
         Intent intento = new Intent();
@@ -72,43 +79,102 @@ public class DetalleAnimalActivityTest {
         return controlador;
     }
     private String texto(DetalleAnimalActivity pantalla, int id) { return ((TextView) pantalla.findViewById(id)).getText().toString(); }
+    private String tituloDe(DetalleAnimalActivity pantalla, int idFila) {
+        return ((TextView) pantalla.findViewById(idFila).findViewById(R.id.filaTitulo)).getText().toString();
+    }
+    private String subtituloDe(DetalleAnimalActivity pantalla, int idFila) {
+        return ((TextView) pantalla.findViewById(idFila).findViewById(R.id.filaSubtitulo)).getText().toString();
+    }
 
-    @Test public void muestraLosDatosDelAnimal() {
-        DetalleAnimalActivity pantalla = abrir(completo().idAnimal).get();
-        assertEquals("GH-001", texto(pantalla, R.id.fichaCodigo));
-        assertEquals("Lucero", texto(pantalla, R.id.fichaNombre));
-        assertEquals("Hembra", texto(pantalla, R.id.datoSexo));
-        assertEquals("Angus", texto(pantalla, R.id.datoRaza));
-        assertEquals("2025-03-01", texto(pantalla, R.id.datoNacimiento));
-        assertEquals("2026-01-10", texto(pantalla, R.id.datoIngreso));
-        assertEquals("Activo desde 2026-01-10", texto(pantalla, R.id.datoEstado));
-        assertEquals("Compra reciente", texto(pantalla, R.id.datoObservaciones));
+    @Test public void laCabeceraMuestraOverlineNombreRazaYFechasCortas() {
+        DetalleAnimalActivity pantalla = abrir(luna().idAnimal).get();
+        assertEquals("Activo", texto(pantalla, R.id.fichaEstado));
+        assertEquals("GH-014 · Luna", texto(pantalla, R.id.fichaTitulo));
+        assertEquals("Hembra · Brahman", texto(pantalla, R.id.fichaRaza));
+        assertEquals("Ingreso: 15 ene 2026", texto(pantalla, R.id.fichaIngreso));
+        assertEquals("Nacimiento: 5 mar 2025", texto(pantalla, R.id.fichaNacimiento));
+        assertEquals("Observaciones: Compra reciente", texto(pantalla, R.id.fichaObservaciones));
+        assertEquals(View.VISIBLE, pantalla.findViewById(R.id.fichaObservaciones).getVisibility());
+        assertEquals(View.GONE, pantalla.findViewById(R.id.fichaEstadoDesde).getVisibility());
         assertEquals(View.GONE, pantalla.findViewById(R.id.estadoError).getVisibility());
     }
 
-    @Test public void losDatosOpcionalesAusentesDicenSinRegistrar() {
-        Animal animal = registrar(new EntradaAnimal("GH-002", "", "M", "", "", "2026-01-10", ""));
+    @Test public void sinNombreNiRazaNiNacimientoNiObservacionesSeMuestraCompleto() {
+        Animal animal = registrar(new EntradaAnimal("GH-022", "", "M", "", "", "2026-01-10", ""));
         DetalleAnimalActivity pantalla = abrir(animal.idAnimal).get();
-        String sinRegistrar = pantalla.getString(R.string.sin_registrar);
-        assertEquals(pantalla.getString(R.string.sin_nombre), texto(pantalla, R.id.fichaNombre));
-        assertEquals("Macho", texto(pantalla, R.id.datoSexo));
-        assertEquals(sinRegistrar, texto(pantalla, R.id.datoRaza));
-        assertEquals(sinRegistrar, texto(pantalla, R.id.datoNacimiento));
-        assertEquals(sinRegistrar, texto(pantalla, R.id.datoObservaciones));
+        assertEquals("GH-022", texto(pantalla, R.id.fichaTitulo));
+        assertEquals("Macho · Raza sin registrar", texto(pantalla, R.id.fichaRaza));
+        assertEquals("Nacimiento: Sin registrar", texto(pantalla, R.id.fichaNacimiento));
+        assertEquals(View.GONE, pantalla.findViewById(R.id.fichaObservaciones).getVisibility());
     }
 
-    @Test public void sinPesajesMuestraIndicacion() {
-        DetalleAnimalActivity pantalla = abrir(completo().idAnimal).get();
-        assertEquals(pantalla.getString(R.string.sin_pesajes), texto(pantalla, R.id.datoUltimoPeso));
+    @Test public void unVendidoMuestraDesdeCuando() {
+        Animal animal = luna();
+        Animal vendido = db.animalDao().porId(animal.idAnimal);
+        vendido.estado = Animal.VENDIDO;
+        vendido.fechaEstado = "2026-06-01";
+        db.animalDao().actualizar(vendido);
+        DetalleAnimalActivity pantalla = abrir(animal.idAnimal).get();
+        assertEquals("Vendido", texto(pantalla, R.id.fichaEstado));
+        assertEquals(View.VISIBLE, pantalla.findViewById(R.id.fichaEstadoDesde).getVisibility());
+        assertEquals("Vendido desde 1 jun 2026", texto(pantalla, R.id.fichaEstadoDesde));
     }
 
-    @Test public void unAnimalVendidoMuestraSuEstado() {
-        Animal animal = completo();
-        Animal guardado = db.animalDao().porId(animal.idAnimal);
-        guardado.estado = Animal.VENDIDO;
-        guardado.fechaEstado = "2026-06-01";
-        db.animalDao().actualizar(guardado);
-        assertEquals("Vendido desde 2026-06-01", texto(abrir(animal.idAnimal).get(), R.id.datoEstado));
+    @Test public void elPesoRegistradoMuestraKilosYFechaConHora12h() {
+        Animal animal = luna();
+        pesar(animal, "2026-09-25", "07:40", "242");
+        pesar(animal, "2026-10-10", "08:15", "250");
+        DetalleAnimalActivity pantalla = abrir(animal.idAnimal).get();
+        assertEquals("250 kg", texto(pantalla, R.id.pesoKilos));
+        assertEquals("Último pesaje · 10 oct 2026, 8:15 a. m.", texto(pantalla, R.id.pesoDetalle));
+        assertEquals(View.VISIBLE, pantalla.findViewById(R.id.pesoDetalle).getVisibility());
+    }
+
+    @Test public void sinPesajesDiceSinPesajes() {
+        DetalleAnimalActivity pantalla = abrir(luna().idAnimal).get();
+        assertEquals(pantalla.getString(R.string.sin_pesajes), texto(pantalla, R.id.pesoKilos));
+        assertEquals(View.GONE, pantalla.findViewById(R.id.pesoDetalle).getVisibility());
+    }
+
+    @Test public void elHistorialCuentaLasMedicionesConSingularYPlural() {
+        Animal animal = luna();
+        assertEquals(pantallaTexto(abrir(animal.idAnimal).get(), R.string.sin_mediciones), subtituloDe(abrir(animal.idAnimal).get(), R.id.filaHistorial));
+        pesar(animal, "2026-09-25", "07:40", "242");
+        assertEquals("1 medición vigente", subtituloDe(abrir(animal.idAnimal).get(), R.id.filaHistorial));
+        pesar(animal, "2026-10-10", "08:15", "250");
+        pesar(animal, "2026-10-11", "08:15", "251");
+        assertEquals("3 mediciones vigentes", subtituloDe(abrir(animal.idAnimal).get(), R.id.filaHistorial));
+        assertEquals("Historial de pesajes", tituloDe(abrir(animal.idAnimal).get(), R.id.filaHistorial));
+    }
+    private String pantallaTexto(DetalleAnimalActivity pantalla, int recurso) { return pantalla.getString(recurso); }
+
+    @Test public void lasFilasDeSanidadYTareasEstanDeshabilitadasYNoNavegan() {
+        DetalleAnimalActivity pantalla = abrir(luna().idAnimal).get();
+        for (int id : new int[]{R.id.filaSanidad, R.id.filaTareas}) {
+            assertFalse(pantalla.findViewById(id).isEnabled());
+            assertTrue(subtituloDe(pantalla, id).contains(pantalla.getString(R.string.proximamente)));
+            pantalla.findViewById(id).performClick();
+        }
+        assertEquals(null, shadowOf(pantalla).getNextStartedActivity());
+        assertTrue(pantalla.findViewById(R.id.filaEditar).isEnabled());
+        assertTrue(pantalla.findViewById(R.id.filaHistorial).isEnabled());
+    }
+
+    @Test public void registrarPesajeHistorialYEditarAbrenSusPantallas() {
+        Animal animal = luna();
+        DetalleAnimalActivity pantalla = abrir(animal.idAnimal).get();
+        pantalla.findViewById(R.id.registrarPesaje).performClick();
+        Intent registro = shadowOf(pantalla).getNextStartedActivity();
+        assertEquals(PesajeFormActivity.class.getName(), registro.getComponent().getClassName());
+        assertEquals(animal.idAnimal, registro.getStringExtra(PesajeFormActivity.EXTRA_ID_ANIMAL));
+        pantalla.findViewById(R.id.filaHistorial).performClick();
+        Intent historial = shadowOf(pantalla).getNextStartedActivity();
+        assertEquals(PesajesActivity.class.getName(), historial.getComponent().getClassName());
+        assertEquals(animal.idAnimal, historial.getStringExtra(PesajesActivity.EXTRA_ID_ANIMAL));
+        pantalla.findViewById(R.id.filaEditar).performClick();
+        Intent edicion = shadowOf(pantalla).getNextStartedActivity();
+        assertEquals(AnimalFormActivity.class.getName(), edicion.getComponent().getClassName());
+        assertEquals(animal.idAnimal, edicion.getStringExtra(AnimalFormActivity.EXTRA_ID_ANIMAL));
     }
 
     @Test public void idInexistenteMuestraMensajeYSeCierra() {
@@ -122,7 +188,7 @@ public class DetalleAnimalActivityTest {
     }
 
     @Test public void errorDeBaseDeDatosMuestraReintentar() {
-        Animal animal = completo();
+        Animal animal = luna();
         db.close();
         DetalleAnimalActivity pantalla = abrir(animal.idAnimal).get();
         assertEquals(View.VISIBLE, pantalla.findViewById(R.id.estadoError).getVisibility());
@@ -130,7 +196,7 @@ public class DetalleAnimalActivityTest {
     }
 
     @Test public void rotarConservaLaFicha() {
-        Animal animal = completo();
+        Animal animal = luna();
         ActivityController<DetalleAnimalActivity> primera = abrir(animal.idAnimal);
         Bundle estado = new Bundle();
         primera.pause().saveInstanceState(estado).stop().destroy();
@@ -138,103 +204,7 @@ public class DetalleAnimalActivityTest {
         ActivityController<DetalleAnimalActivity> segunda = Robolectric.buildActivity(DetalleAnimalActivity.class, intento)
                 .create(estado).start().restoreInstanceState(estado).resume();
         shadowOf(Looper.getMainLooper()).idle();
-        assertEquals("GH-001", texto(segunda.get(), R.id.fichaCodigo));
-        assertEquals("Angus", texto(segunda.get(), R.id.datoRaza));
-    }
-
-    @Test public void fichaMuestraElUltimoPesoRealYSuFecha() {
-        Animal animal = completo();
-        Captura<com.example.ganhard.modelo.entidad.Pesaje> captura = new Captura<>();
-        app.pesajes().registrar(animal.idAnimal, new com.example.ganhard.modelo.reglas.EntradaPesaje("2026-03-01", "09:00", "420,5", ""), captura);
-        captura.esperar();
-        assertEquals("420.5 kg · 2026-03-01", texto(abrir(animal.idAnimal).get(), R.id.datoUltimoPeso));
-    }
-
-    @Test public void registrarPesajeYVerPesosAbrenSusPantallas() {
-        Animal animal = completo();
-        DetalleAnimalActivity pantalla = abrir(animal.idAnimal).get();
-        pantalla.findViewById(R.id.registrarPesaje).performClick();
-        Intent registro = shadowOf(pantalla).getNextStartedActivity();
-        assertEquals(PesajeFormActivity.class.getName(), registro.getComponent().getClassName());
-        assertEquals(animal.idAnimal, registro.getStringExtra(PesajeFormActivity.EXTRA_ID_ANIMAL));
-        pantalla.findViewById(R.id.verPesos).performClick();
-        Intent historial = shadowOf(pantalla).getNextStartedActivity();
-        assertEquals(PesajesActivity.class.getName(), historial.getComponent().getClassName());
-        assertEquals(animal.idAnimal, historial.getStringExtra(PesajesActivity.EXTRA_ID_ANIMAL));
-    }
-
-    private androidx.appcompat.app.AlertDialog abrirDialogoDeEstado(DetalleAnimalActivity pantalla) {
-        pantalla.findViewById(R.id.cambiarEstado).performClick();
-        shadowOf(Looper.getMainLooper()).idle();
-        return (androidx.appcompat.app.AlertDialog) org.robolectric.shadows.ShadowDialog.getLatestDialog();
-    }
-
-    @Test public void editarAbreElFormularioConElId() {
-        Animal animal = completo();
-        DetalleAnimalActivity pantalla = abrir(animal.idAnimal).get();
-        pantalla.findViewById(R.id.editar).performClick();
-        Intent edicion = shadowOf(pantalla).getNextStartedActivity();
-        assertEquals(AnimalFormActivity.class.getName(), edicion.getComponent().getClassName());
-        assertEquals(animal.idAnimal, edicion.getStringExtra(AnimalFormActivity.EXTRA_ID_ANIMAL));
-    }
-
-    @Test public void elDialogoDeEstadoParteDelEstadoActual() {
-        Animal animal = completo();
-        Animal vendido = db.animalDao().porId(animal.idAnimal);
-        vendido.estado = Animal.VENDIDO;
-        vendido.fechaEstado = "2026-06-01";
-        db.animalDao().actualizar(vendido);
-        androidx.appcompat.app.AlertDialog dialogo = abrirDialogoDeEstado(abrir(animal.idAnimal).get());
-        assertTrue(((android.widget.RadioButton) dialogo.findViewById(R.id.estadoVendido)).isChecked());
-    }
-
-    @Test public void cambiarElEstadoAVendidoLoMuestraEnLaFicha() {
-        Animal animal = completo();
-        DetalleAnimalActivity pantalla = abrir(animal.idAnimal).get();
-        androidx.appcompat.app.AlertDialog dialogo = abrirDialogoDeEstado(pantalla);
-        ((android.widget.RadioButton) dialogo.findViewById(R.id.estadoVendido)).setChecked(true);
-        dialogo.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).performClick();
-        shadowOf(Looper.getMainLooper()).idle();
-        assertEquals("Vendido desde " + com.example.ganhard.modelo.nucleo.Tiempo.hoy(), texto(pantalla, R.id.datoEstado));
-        assertFalse(dialogo.isShowing());
-    }
-
-    @Test public void unaFechaFuturaMuestraElErrorYMantieneElDialogo() {
-        Animal animal = completo();
-        DetalleAnimalActivity pantalla = abrir(animal.idAnimal).get();
-        androidx.appcompat.app.AlertDialog dialogo = abrirDialogoDeEstado(pantalla);
-        ((android.widget.RadioButton) dialogo.findViewById(R.id.estadoFallecido)).setChecked(true);
-        ((android.widget.EditText) dialogo.findViewById(R.id.estadoFecha)).setText(com.example.ganhard.modelo.nucleo.Tiempo.hoy().plusDays(1).toString());
-        dialogo.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).performClick();
-        shadowOf(Looper.getMainLooper()).idle();
-        assertTrue(dialogo.isShowing());
-        assertEquals(pantalla.getString(R.string.error_fecha_futura),
-                String.valueOf(((com.google.android.material.textfield.TextInputLayout) dialogo.findViewById(R.id.campoEstadoFecha)).getError()));
-        assertEquals("Activo desde 2026-01-10", texto(pantalla, R.id.datoEstado));
-    }
-
-    @Test public void cancelarElDialogoNoCambiaNada() {
-        Animal animal = completo();
-        DetalleAnimalActivity pantalla = abrir(animal.idAnimal).get();
-        androidx.appcompat.app.AlertDialog dialogo = abrirDialogoDeEstado(pantalla);
-        ((android.widget.RadioButton) dialogo.findViewById(R.id.estadoVendido)).setChecked(true);
-        dialogo.getButton(androidx.appcompat.app.AlertDialog.BUTTON_NEGATIVE).performClick();
-        shadowOf(Looper.getMainLooper()).idle();
-        assertFalse(dialogo.isShowing());
-        assertEquals("Activo desde 2026-01-10", texto(pantalla, R.id.datoEstado));
-    }
-
-    @Test public void aplicarSinCambiarNadaConservaLaFechaDelEstado() {
-        Animal animal = completo();
-        Animal vendido = db.animalDao().porId(animal.idAnimal);
-        vendido.estado = Animal.VENDIDO;
-        vendido.fechaEstado = "2026-06-01";
-        db.animalDao().actualizar(vendido);
-        DetalleAnimalActivity pantalla = abrir(animal.idAnimal).get();
-        androidx.appcompat.app.AlertDialog dialogo = abrirDialogoDeEstado(pantalla);
-        assertEquals("2026-06-01", ((android.widget.EditText) dialogo.findViewById(R.id.estadoFecha)).getText().toString());
-        dialogo.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).performClick();
-        shadowOf(Looper.getMainLooper()).idle();
-        assertEquals("Vendido desde 2026-06-01", texto(pantalla, R.id.datoEstado));
+        assertEquals("GH-014 · Luna", texto(segunda.get(), R.id.fichaTitulo));
+        assertEquals("Hembra · Brahman", texto(segunda.get(), R.id.fichaRaza));
     }
 }

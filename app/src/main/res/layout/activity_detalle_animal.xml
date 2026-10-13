@@ -3,54 +3,47 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/raiz" android:layout_width="match_parent" android:layout_height="match_parent"
     android:orientation="vertical" android:background="@color/gh_background">
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbar" android:layout_width="match_parent" android:layout_height="?attr/actionBarSize"
-        android:background="@color/gh_surface" app:title="@string/ficha_animal" app:titleTextColor="@color/gh_text" />
+    <com.google.android.material.appbar.MaterialToolbar android:id="@+id/toolbar" style="@style/Gh.Toolbar"
+        android:layout_width="match_parent" android:layout_height="wrap_content" app:title="@string/ficha_animal" />
     <ProgressBar android:id="@+id/progreso" style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="match_parent" android:layout_height="4dp" android:indeterminate="true" />
     <ScrollView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:fillViewport="true" android:clipToPadding="false">
         <FrameLayout android:layout_width="match_parent" android:layout_height="wrap_content">
             <LinearLayout android:id="@+id/contenido" android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:orientation="vertical" android:padding="16dp" android:visibility="gone">
-                <TextView android:id="@+id/fichaCodigo" android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:textSize="28sp" android:textStyle="bold" android:textColor="@color/gh_text" />
-                <TextView android:id="@+id/fichaNombre" android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp" android:layout_marginBottom="16dp" android:textSize="18sp" android:textColor="@color/gh_muted" />
-                <com.google.android.material.card.MaterialCardView android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp" app:cardCornerRadius="12dp" app:cardElevation="0dp" app:strokeWidth="0dp" app:cardBackgroundColor="@color/gh_soft">
+                android:orientation="vertical" android:padding="@dimen/gh_margen" android:visibility="gone">
+                <com.google.android.material.card.MaterialCardView style="@style/Gh.Tarjeta" android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp">
                     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp">
-                        <TextView style="@style/Gh.Etiqueta" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/ultimo_peso_titulo" />
-                        <TextView android:id="@+id/datoUltimoPeso" android:layout_width="match_parent" android:layout_height="wrap_content"
-                            android:textSize="22sp" android:textStyle="bold" android:textColor="@color/gh_primary" />
+                        <TextView android:id="@+id/fichaEstado" android:layout_width="match_parent" android:layout_height="wrap_content" android:textAppearance="@style/Gh.Overline" />
+                        <TextView android:id="@+id/fichaTitulo" android:layout_width="match_parent" android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp" android:textAppearance="@style/Gh.Titulo" />
+                        <TextView android:id="@+id/fichaRaza" style="@style/Gh.Dato" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" />
+                        <TextView android:id="@+id/fichaIngreso" style="@style/Gh.Dato" android:layout_width="match_parent" android:layout_height="wrap_content" />
+                        <TextView android:id="@+id/fichaNacimiento" style="@style/Gh.Dato" android:layout_width="match_parent" android:layout_height="wrap_content" />
+                        <TextView android:id="@+id/fichaEstadoDesde" style="@style/Gh.Dato" android:layout_width="match_parent" android:layout_height="wrap_content" android:visibility="gone" />
+                        <TextView android:id="@+id/fichaObservaciones" style="@style/Gh.Dato" android:layout_width="match_parent" android:layout_height="wrap_content" android:visibility="gone" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
-                <com.google.android.material.button.MaterialButton android:id="@+id/registrarPesaje" android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:minHeight="48dp" android:text="@string/registrar_pesaje" app:cornerRadius="24dp" />
-                <com.google.android.material.button.MaterialButton android:id="@+id/verPesos" style="@style/Widget.Material3.Button.OutlinedButton"
-                    android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="16dp" android:minHeight="48dp" android:text="@string/ver_pesos" />
-                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="16dp">
-                    <com.google.android.material.button.MaterialButton android:id="@+id/editar" style="@style/Widget.Material3.Button.OutlinedButton"
-                        android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:layout_marginEnd="8dp" android:minHeight="48dp" android:text="@string/editar" />
-                    <com.google.android.material.button.MaterialButton android:id="@+id/cambiarEstado" style="@style/Widget.Material3.Button.OutlinedButton"
-                        android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:minHeight="48dp" android:text="@string/cambiar_estado" />
-                </LinearLayout>
-                <com.google.android.material.card.MaterialCardView android:layout_width="match_parent" android:layout_height="wrap_content"
-                    app:cardCornerRadius="12dp" app:cardElevation="0dp" app:strokeWidth="0dp" app:cardBackgroundColor="@color/gh_surface">
+                <com.google.android.material.card.MaterialCardView style="@style/Gh.Tarjeta" android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp">
                     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp">
-                        <TextView style="@style/Gh.Etiqueta" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/sexo_titulo_ficha" />
-                        <TextView android:id="@+id/datoSexo" style="@style/Gh.Valor" android:layout_width="match_parent" android:layout_height="wrap_content" />
-                        <TextView style="@style/Gh.Etiqueta" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/raza" />
-                        <TextView android:id="@+id/datoRaza" style="@style/Gh.Valor" android:layout_width="match_parent" android:layout_height="wrap_content" />
-                        <TextView style="@style/Gh.Etiqueta" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/fecha_nacimiento" />
-                        <TextView android:id="@+id/datoNacimiento" style="@style/Gh.Valor" android:layout_width="match_parent" android:layout_height="wrap_content" />
-                        <TextView style="@style/Gh.Etiqueta" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/fecha_ingreso_ficha" />
-                        <TextView android:id="@+id/datoIngreso" style="@style/Gh.Valor" android:layout_width="match_parent" android:layout_height="wrap_content" />
-                        <TextView style="@style/Gh.Etiqueta" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/estado_titulo" />
-                        <TextView android:id="@+id/datoEstado" style="@style/Gh.Valor" android:layout_width="match_parent" android:layout_height="wrap_content" />
-                        <TextView style="@style/Gh.Etiqueta" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/observaciones_animal" />
-                        <TextView android:id="@+id/datoObservaciones" style="@style/Gh.Valor" android:layout_width="match_parent" android:layout_height="wrap_content" />
+                        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/peso_registrado_titulo" android:textAppearance="@style/Gh.Overline" />
+                        <TextView android:id="@+id/pesoKilos" android:layout_width="match_parent" android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp" android:textAppearance="@style/Gh.Titulo" />
+                        <TextView android:id="@+id/pesoDetalle" style="@style/Gh.Dato" android:layout_width="match_parent" android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp" android:visibility="gone" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
+                <com.google.android.material.button.MaterialButton android:id="@+id/registrarPesaje" style="@style/Gh.Boton"
+                    android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="16dp" android:text="@string/registrar_pesaje" />
+                <com.example.ganhard.controlador.FilaNavegacion android:id="@+id/filaHistorial" android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp" app:titulo="@string/historial_pesajes" />
+                <com.example.ganhard.controlador.FilaNavegacion android:id="@+id/filaSanidad" android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp" app:titulo="@string/modulo_sanidad" app:subtitulo="@string/sanidad_ficha_sub" />
+                <com.example.ganhard.controlador.FilaNavegacion android:id="@+id/filaTareas" android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp" app:titulo="@string/tareas_ficha" app:subtitulo="@string/tareas_ficha_sub" />
+                <com.example.ganhard.controlador.FilaNavegacion android:id="@+id/filaEditar" android:layout_width="match_parent" android:layout_height="wrap_content"
+                    app:titulo="@string/editar_datos" app:subtitulo="@string/editar_datos_sub" />
             </LinearLayout>
             <LinearLayout android:id="@+id/estadoError" android:layout_width="match_parent" android:layout_height="wrap_content"
                 android:orientation="vertical" android:padding="24dp" android:gravity="center_horizontal" android:visibility="gone">

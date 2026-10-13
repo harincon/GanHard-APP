@@ -16,4 +16,8 @@
         <item quantity="one">%d fallecido en la finca</item>
         <item quantity="other">%d fallecidos en la finca</item>
     </plurals>
+    <plurals name="mediciones_vigentes">
+        <item quantity="one">%d medición vigente</item>
+        <item quantity="other">%d mediciones vigentes</item>
+    </plurals>
 </resources>

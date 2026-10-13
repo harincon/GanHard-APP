@@ -60,6 +60,11 @@ final class FormatoFecha {
         }
     }
 
+    /** "2026-10-10" + "08:15:00" → "10 oct 2026, 8:15 a. m."; sin hora, solo la fecha. */
+    static String fechaYHoraConComa(String iso, String horaONull) {
+        return horaONull == null || horaONull.isEmpty() ? corta(iso) : corta(iso) + ", " + hora12(horaONull);
+    }
+
     private static LocalDate leerIso(String iso) {
         if (iso == null) return null;
         try { return LocalDate.parse(iso); }
