@@ -8,11 +8,8 @@ import com.example.ganhard.databinding.ActivityInicioBinding;
 import com.example.ganhard.modelo.ConfiguracionLocal;
 import com.example.ganhard.modelo.nucleo.Callback;
 import com.example.ganhard.modelo.nucleo.ErrorModelo;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.util.Locale;
 
-/** Controlador de Inicio (RF10): resumen real del inventario y acceso a los módulos disponibles. */
+/** Controlador de Inicio (RF10): resumen real del inventario; el menú ☰ lleva a los demás módulos. */
 public class InicioActivity extends BaseActivity {
     private ActivityInicioBinding vista;
 
@@ -21,9 +18,10 @@ public class InicioActivity extends BaseActivity {
         vista = ActivityInicioBinding.inflate(getLayoutInflater());
         setContentView(vista.getRoot());
         ajustarBarras(vista.getRoot());
+        vista.toolbar.setNavigationIcon(R.drawable.ic_menu);
+        vista.toolbar.setNavigationContentDescription(R.string.abrir_menu);
+        vista.toolbar.setNavigationOnClickListener(v -> abrir(MenuActivity.class));
         vista.registrarAnimal.setOnClickListener(v -> abrir(AnimalFormActivity.class));
-        vista.moduloAnimales.setOnClickListener(v -> abrir(AnimalesActivity.class));
-        vista.moduloConfiguracion.setOnClickListener(v -> abrir(ConfiguracionActivity.class));
         vista.reintentar.setOnClickListener(v -> cargar());
     }
 
@@ -46,7 +44,8 @@ public class InicioActivity extends BaseActivity {
                     finish();
                     return;
                 }
-                mostrarFinca(datos);
+                vista.nombreFinca.setText(datos.finca.nombre);
+                vista.administrador.setText(getString(R.string.responsable, datos.usuario.nombre));
                 contarActivos();
             }
             @Override public void error(ErrorModelo error) { if (disponible()) mostrarError(); }
@@ -63,15 +62,6 @@ public class InicioActivity extends BaseActivity {
             }
             @Override public void error(ErrorModelo error) { if (disponible()) mostrarError(); }
         });
-    }
-
-    private void mostrarFinca(ConfiguracionLocal datos) {
-        vista.nombreFinca.setText(datos.finca.nombre);
-        vista.administrador.setText(getString(R.string.responsable, datos.usuario.nombre));
-        vista.correo.setText(datos.usuario.correo);
-        vista.ubicacion.setText(datos.finca.ubicacion == null ? getString(R.string.ubicacion_sin_registrar) : datos.finca.ubicacion);
-        vista.area.setText(datos.finca.areaHectareas == null ? getString(R.string.area_sin_registrar)
-                : getString(R.string.area_formato, new DecimalFormat("0.##", DecimalFormatSymbols.getInstance(Locale.US)).format(datos.finca.areaHectareas)));
     }
 
     private void mostrarError() {

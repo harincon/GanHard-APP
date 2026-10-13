@@ -1,15 +1,17 @@
 package com.example.ganhard.controlador;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.robolectric.Shadows.shadowOf;
 
 import android.content.Intent;
 import android.os.Looper;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.TextView;
+import androidx.appcompat.widget.Toolbar;
 import com.example.ganhard.GanHardApplication;
 import com.example.ganhard.R;
 import com.example.ganhard.modelo.datos.GanHardDatabase;
@@ -80,11 +82,27 @@ public class InicioActivityTest {
         assertNotNull(siguiente);
         return siguiente.getComponent().getClassName();
     }
+    /** El botón de navegación de la barra (el icono ☰) es el único ImageButton hijo directo. */
+    private View botonDeMenu(InicioActivity pantalla) {
+        Toolbar barra = pantalla.findViewById(R.id.toolbar);
+        for (int i = 0; i < barra.getChildCount(); i++) if (barra.getChildAt(i) instanceof ImageButton) return barra.getChildAt(i);
+        return null;
+    }
 
     @Test public void sinConfiguracionAbreConfiguracion() {
         InicioActivity pantalla = abrir().get();
         assertEquals(ConfiguracionActivity.class.getName(), claseSiguiente(pantalla));
         assertTrue(pantalla.isFinishing());
+    }
+
+    @Test public void laBarraTieneElIconoDeMenuYAbreElMenu() {
+        fincaConfigurada();
+        InicioActivity pantalla = abrir().get();
+        View boton = botonDeMenu(pantalla);
+        assertNotNull("La barra debe tener el icono ☰", boton);
+        assertEquals(pantalla.getString(R.string.abrir_menu), boton.getContentDescription().toString());
+        boton.performClick();
+        assertEquals(MenuActivity.class.getName(), claseSiguiente(pantalla));
     }
 
     @Test public void muestraLaFincaElAdministradorYElConteoReal() {
@@ -97,19 +115,20 @@ public class InicioActivityTest {
         assertEquals("La Esperanza", texto(pantalla, R.id.nombreFinca));
         assertEquals("Helver · Administrador", texto(pantalla, R.id.administrador));
         assertEquals(activos(pantalla, 3), texto(pantalla, R.id.inventarioActivos));
+        assertEquals(pantalla.getString(R.string.inventario_ayuda), texto(pantalla, R.id.inventarioAyuda));
         assertEquals(View.GONE, pantalla.findViewById(R.id.estadoError).getVisibility());
     }
 
     @Test public void sinAnimalesElConteoEsCero() {
         fincaConfigurada();
-        assertEquals(activos(abrir().get(), 0), texto(abrir().get(), R.id.inventarioActivos));
+        InicioActivity pantalla = abrir().get();
+        assertEquals(activos(pantalla, 0), texto(pantalla, R.id.inventarioActivos));
     }
 
     @Test public void conUnSoloAnimalUsaElSingular() {
         fincaConfigurada();
         registrar("GH-001");
-        InicioActivity pantalla = abrir().get();
-        assertEquals("1 animal activo", texto(pantalla, R.id.inventarioActivos));
+        assertEquals("1 animal activo", texto(abrir().get(), R.id.inventarioActivos));
     }
 
     @Test public void altaYCambioDeEstadoActualizanAlVolver() {
@@ -135,25 +154,18 @@ public class InicioActivityTest {
         assertEquals(pantalla.getString(R.string.error_carga), texto(pantalla, R.id.mensajeError));
     }
 
-    @Test public void soloLosModulosImplementadosEstanHabilitados() {
-        fincaConfigurada();
-        InicioActivity pantalla = abrir().get();
-        assertTrue(pantalla.findViewById(R.id.moduloAnimales).isEnabled());
-        assertTrue(pantalla.findViewById(R.id.moduloConfiguracion).isEnabled());
-        for (int id : new int[]{R.id.moduloSanidad, R.id.moduloTareas, R.id.moduloGastos}) {
-            assertFalse(pantalla.findViewById(id).isEnabled());
-            assertTrue(texto(pantalla, id).contains(pantalla.getString(R.string.proximamente)));
-        }
-    }
-
-    @Test public void losAccesosAbrenSusPantallas() {
+    @Test public void elBotonRegistrarAnimalAbreElFormulario() {
         fincaConfigurada();
         InicioActivity pantalla = abrir().get();
         pantalla.findViewById(R.id.registrarAnimal).performClick();
         assertEquals(AnimalFormActivity.class.getName(), claseSiguiente(pantalla));
-        pantalla.findViewById(R.id.moduloAnimales).performClick();
-        assertEquals(AnimalesActivity.class.getName(), claseSiguiente(pantalla));
-        pantalla.findViewById(R.id.moduloConfiguracion).performClick();
-        assertEquals(ConfiguracionActivity.class.getName(), claseSiguiente(pantalla));
+    }
+
+    @Test public void yaNoMuestraBotonesDeModulosNiTarjetaDeInformacion() {
+        fincaConfigurada();
+        InicioActivity pantalla = abrir().get();
+        for (String nombre : new String[]{"moduloAnimales", "moduloSanidad", "moduloTareas", "moduloGastos", "moduloConfiguracion", "ubicacion", "area", "correo"}) {
+            assertNull(nombre, pantalla.findViewById(pantalla.getResources().getIdentifier(nombre, "id", pantalla.getPackageName())));
+        }
     }
 }

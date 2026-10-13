@@ -101,11 +101,7 @@
     <string name="estado_desde">%1$s desde %2$s</string>
     <string name="animal_no_encontrado">No se encontró el animal.</string>
     <string name="inventario_titulo">Inventario</string>
-    <string name="modulos_titulo">Módulos</string>
     <string name="proximamente">Próximamente</string>
-    <string name="modulo_sanidad_pendiente">Sanidad · Próximamente</string>
-    <string name="modulo_tareas_pendiente">Tareas · Próximamente</string>
-    <string name="modulo_gastos_pendiente">Gastos · Próximamente</string>
     <string name="modulo_configuracion">Configuración</string>
     <string name="pesajes_titulo">Pesajes</string>
     <string name="registrar_pesaje">Registrar pesaje</string>
@@ -140,4 +136,21 @@
     <string name="estado_fecha">Fecha del cambio *</string>
     <string name="animal_actualizado">Cambios de %1$s guardados.</string>
     <string name="error_estado_antes_ingreso">La fecha no puede ser anterior al ingreso del animal.</string>
+    <string name="abrir_menu">Abrir menú</string>
+    <string name="inventario_ayuda">Consulta el inventario y las fichas de tu finca.</string>
+    <string name="menu_titulo">Menú</string>
+    <string name="modulo_inicio">Inicio</string>
+    <string name="modulo_sanidad">Sanidad</string>
+    <string name="modulo_tareas">Tareas</string>
+    <string name="modulo_gastos">Gastos</string>
+    <string name="modulo_historial">Historial de cambios</string>
+    <string name="modulo_sincronizacion">Sincronización</string>
+    <string name="sub_inicio">Resumen del inventario</string>
+    <string name="sub_animales">Inventario, fichas y pesajes</string>
+    <string name="sub_sanidad">Actividades realizadas por animal · Próximamente</string>
+    <string name="sub_tareas">Actividades programadas · Próximamente</string>
+    <string name="sub_gastos">Egresos y total del periodo · Próximamente</string>
+    <string name="sub_historial">Responsables y correcciones · Próximamente</string>
+    <string name="sub_sincronizacion">Envíos y cambios por revisar · Próximamente</string>
+    <string name="sub_configuracion">Perfil, finca y apariencia</string>
 </resources>
