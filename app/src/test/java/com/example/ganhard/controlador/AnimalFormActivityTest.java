@@ -450,4 +450,13 @@ public class AnimalFormActivityTest {
         shadowOf(Looper.getMainLooper()).idle();
         assertEquals("Cambiado", texto(segunda.get(), R.id.nombre));
     }
+
+    @Test public void escribirSoloDigitosInsertaLasBarrasDeLaFecha() {
+        fincaConfigurada();
+        AnimalFormActivity pantalla = abrir().get();
+        escribir(pantalla, R.id.nacimiento, "05032025");
+        assertEquals("05/03/2025", texto(pantalla, R.id.nacimiento));
+        escribir(pantalla, R.id.nacimiento, "5/3/2025");
+        assertEquals("5/3/2025", texto(pantalla, R.id.nacimiento));
+    }
 }

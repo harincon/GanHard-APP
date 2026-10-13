@@ -60,6 +60,19 @@ final class FormatoFecha {
         }
     }
 
+    /**
+     * Máscara dd/mm/aaaa para escribir solo con dígitos: "05032025" → "05/03/2025". Si el texto ya trae barras u otros
+     * símbolos no se toca, para respetar lo que la persona escribe (el validador marcará lo incorrecto).
+     */
+    static String mascara(String texto) {
+        if (texto == null) return "";
+        if (!texto.matches("[0-9]*")) return texto;
+        String d = texto.length() > 8 ? texto.substring(0, 8) : texto;
+        if (d.length() <= 2) return d;
+        if (d.length() <= 4) return d.substring(0, 2) + "/" + d.substring(2);
+        return d.substring(0, 2) + "/" + d.substring(2, 4) + "/" + d.substring(4);
+    }
+
     /** "2026-10-10" + "08:15:00" → "10 oct 2026, 8:15 a. m."; sin hora, solo la fecha. */
     static String fechaYHoraConComa(String iso, String horaONull) {
         return horaONull == null || horaONull.isEmpty() ? corta(iso) : corta(iso) + ", " + hora12(horaONull);

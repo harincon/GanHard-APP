@@ -60,4 +60,22 @@ public class FormatoFechaTest {
         assertEquals("10 oct 2026", FormatoFecha.fechaYHoraConComa("2026-10-10", null));
         assertEquals("10 oct 2026", FormatoFecha.fechaYHoraConComa("2026-10-10", ""));
     }
+
+    @Test public void laMascaraInsertaLasBarrasMientrasSeEscribenSoloDigitos() {
+        assertEquals("", FormatoFecha.mascara(""));
+        assertEquals("0", FormatoFecha.mascara("0"));
+        assertEquals("05", FormatoFecha.mascara("05"));
+        assertEquals("05/0", FormatoFecha.mascara("050"));
+        assertEquals("05/03", FormatoFecha.mascara("0503"));
+        assertEquals("05/03/2", FormatoFecha.mascara("05032"));
+        assertEquals("05/03/2025", FormatoFecha.mascara("05032025"));
+    }
+
+    @Test public void laMascaraNoTocaLoQueYaTieneBarrasOOtrosSimbolosNiRecortaMas() {
+        assertEquals("5/3/2025", FormatoFecha.mascara("5/3/2025"));
+        assertEquals("05/03", FormatoFecha.mascara("05/03"));
+        assertEquals("5-3-2025", FormatoFecha.mascara("5-3-2025"));
+        assertEquals("2026-02-01", FormatoFecha.mascara("2026-02-01"));
+        assertEquals("05/03/2025", FormatoFecha.mascara("050320259999"));
+    }
 }

@@ -12,6 +12,15 @@
         <item name="colorOnSurfaceVariant">@color/gh_muted</item>
         <item name="colorOutline">@color/gh_line</item>
         <item name="android:colorBackground">@color/gh_background</item>
+        <item name="colorSurfaceContainer">@color/gh_surface</item>
+        <item name="colorSurfaceContainerHigh">@color/gh_surface</item>
+        <item name="colorSurfaceContainerHighest">@color/gh_soft</item>
+        <item name="colorSurfaceContainerLow">@color/gh_surface</item>
+        <item name="colorSurfaceContainerLowest">@color/gh_surface</item>
+        <item name="colorSurfaceBright">@color/gh_surface</item>
+        <item name="colorSurfaceVariant">@color/gh_soft</item>
+        <item name="colorSecondaryContainer">@color/gh_soft</item>
+        <item name="colorOnSecondaryContainer">@color/gh_text</item>
         <item name="android:fontFamily">sans</item>
         <item name="android:windowLightStatusBar">@bool/gh_barras_claras</item>
     </style>

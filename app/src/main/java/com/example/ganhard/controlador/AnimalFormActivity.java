@@ -81,6 +81,9 @@ public class AnimalFormActivity extends BaseActivity {
         if (restaurado) idRaza = estado.getString(ESTADO_RAZA, "");
         vista.guardar.setOnClickListener(v -> guardar());
         vista.cancelar.setOnClickListener(v -> getOnBackPressedDispatcher().onBackPressed());
+        vista.nacimiento.addTextChangedListener(new MascaraFecha());
+        vista.ingreso.addTextChangedListener(new MascaraFecha());
+        vista.fechaEstado.addTextChangedListener(new MascaraFecha());
         vista.campoNacimiento.setEndIconOnClickListener(v -> elegirFecha(vista.nacimiento));
         vista.campoIngreso.setEndIconOnClickListener(v -> elegirFecha(vista.ingreso));
         vista.campoFechaEstado.setEndIconOnClickListener(v -> elegirFecha(vista.fechaEstado));

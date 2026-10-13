@@ -63,6 +63,7 @@ public class PesajeFormActivity extends BaseActivity {
         }
         vista.guardar.setOnClickListener(v -> guardar());
         vista.cancelar.setOnClickListener(v -> getOnBackPressedDispatcher().onBackPressed());
+        vista.fecha.addTextChangedListener(new MascaraFecha());
         vista.campoFecha.setEndIconOnClickListener(v -> elegirFecha(vista.fecha));
         vista.campoHora.setEndIconOnClickListener(v -> elegirHora());
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {

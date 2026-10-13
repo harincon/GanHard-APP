@@ -291,4 +291,13 @@ public class PesajeFormActivityTest {
         assertTrue(ShadowDialog.getLatestDialog().isShowing());
         assertFalse(conCambios.isFinishing());
     }
+
+    @Test public void escribirSoloDigitosInsertaLasBarrasDeLaFecha() {
+        
+        PesajeFormActivity pantalla = abrir().get();
+        escribir(pantalla, R.id.fecha, "05032025");
+        assertEquals("05/03/2025", texto(pantalla, R.id.fecha));
+        escribir(pantalla, R.id.fecha, "5/3/2025");
+        assertEquals("5/3/2025", texto(pantalla, R.id.fecha));
+    }
 }
