@@ -2,8 +2,8 @@ package com.example.ganhard;
 
 import android.app.Application;
 import androidx.annotation.VisibleForTesting;
-import androidx.appcompat.app.AppCompatDelegate;
 import androidx.room.Room;
+import com.example.ganhard.modelo.PreferenciaTema;
 import com.example.ganhard.modelo.datos.GanHardDatabase;
 import com.example.ganhard.modelo.nucleo.EjecutorModelo;
 import com.example.ganhard.modelo.repositorio.ConfiguracionRepository;
@@ -16,8 +16,7 @@ public class GanHardApplication extends Application {
     private ConfiguracionRepository configuracion;
     @Override public void onCreate() {
         super.onCreate();
-        int tema = getSharedPreferences("preferencias", MODE_PRIVATE).getInt("tema", AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
-        AppCompatDelegate.setDefaultNightMode(tema);
+        PreferenciaTema.aplicar(this);
         instalar(Room.databaseBuilder(this, GanHardDatabase.class, "ganhard.db").build(), Executors.newSingleThreadExecutor());
     }
     /** Arma los repositorios sobre una base y un hilo de trabajo; las pruebas lo usan con una base en memoria. */

@@ -4,9 +4,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import androidx.activity.OnBackPressedCallback;
+import androidx.appcompat.app.AppCompatDelegate;
 import com.example.ganhard.R;
 import com.example.ganhard.databinding.ActivityConfiguracionBinding;
 import com.example.ganhard.modelo.ConfiguracionLocal;
+import com.example.ganhard.modelo.PreferenciaTema;
 import com.example.ganhard.modelo.nucleo.Callback;
 import com.example.ganhard.modelo.nucleo.ErrorModelo;
 import com.example.ganhard.modelo.reglas.EntradaConfiguracion;
@@ -35,6 +37,12 @@ public class ConfiguracionActivity extends BaseActivity {
                 estado.getString("finca"), estado.getString("ubicacion"), estado.getString("area")));
         vista.guardar.setOnClickListener(v -> guardar());
         vista.reintentar.setOnClickListener(v -> cargar());
+        int tema = PreferenciaTema.leer(this);
+        vista.temas.check(tema == AppCompatDelegate.MODE_NIGHT_YES ? R.id.temaOscuro
+                : tema == AppCompatDelegate.MODE_NIGHT_NO ? R.id.temaClaro : R.id.temaSistema);
+        vista.temas.setOnCheckedChangeListener((grupo, id) -> PreferenciaTema.guardar(this,
+                id == R.id.temaOscuro ? AppCompatDelegate.MODE_NIGHT_YES
+                        : id == R.id.temaClaro ? AppCompatDelegate.MODE_NIGHT_NO : AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM));
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override public void handleOnBackPressed() {
                 if (guardando) return;

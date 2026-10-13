@@ -3,7 +3,6 @@ package com.example.ganhard.controlador;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import androidx.appcompat.app.AppCompatDelegate;
 import com.example.ganhard.R;
 import com.example.ganhard.databinding.ActivityInicioBinding;
 import com.example.ganhard.modelo.ConfiguracionLocal;
@@ -23,15 +22,6 @@ public class InicioActivity extends BaseActivity {
         ajustarBarras(vista.getRoot());
         vista.editar.setOnClickListener(v -> startActivity(new Intent(this, ConfiguracionActivity.class)));
         vista.reintentar.setOnClickListener(v -> cargar());
-        int tema = AppCompatDelegate.getDefaultNightMode();
-        vista.temas.check(tema == AppCompatDelegate.MODE_NIGHT_YES ? R.id.temaOscuro
-                : tema == AppCompatDelegate.MODE_NIGHT_NO ? R.id.temaClaro : R.id.temaSistema);
-        vista.temas.setOnCheckedChangeListener((grupo, id) -> {
-            int modo = id == R.id.temaOscuro ? AppCompatDelegate.MODE_NIGHT_YES
-                    : id == R.id.temaClaro ? AppCompatDelegate.MODE_NIGHT_NO : AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM;
-            getSharedPreferences("preferencias", MODE_PRIVATE).edit().putInt("tema", modo).apply();
-            AppCompatDelegate.setDefaultNightMode(modo);
-        });
     }
     @Override protected void onResume() { super.onResume(); cargar(); }
     private void cargar() {

@@ -51,6 +51,17 @@
                 android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/reintentar" android:visibility="gone" />
             <TextView android:id="@+id/mensaje" android:layout_width="match_parent" android:layout_height="wrap_content"
                 android:layout_marginTop="12dp" android:textColor="@color/gh_muted" android:textSize="14sp" android:accessibilityLiveRegion="polite" android:visibility="gone" />
+            <TextView android:id="@+id/tituloApariencia" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="32dp"
+                android:text="@string/apariencia" android:textSize="18sp" android:textStyle="bold" android:textColor="@color/gh_text" />
+            <RadioGroup android:id="@+id/temas" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:contentDescription="@string/apariencia">
+                <com.google.android.material.radiobutton.MaterialRadioButton android:id="@+id/temaClaro" android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:minHeight="48dp" android:text="@string/tema_claro" />
+                <com.google.android.material.radiobutton.MaterialRadioButton android:id="@+id/temaOscuro" android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:minHeight="48dp" android:text="@string/tema_oscuro" />
+                <com.google.android.material.radiobutton.MaterialRadioButton android:id="@+id/temaSistema" android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:minHeight="48dp" android:text="@string/tema_sistema" />
+            </RadioGroup>
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

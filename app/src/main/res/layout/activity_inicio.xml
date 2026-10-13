@@ -37,16 +37,6 @@
             </com.google.android.material.card.MaterialCardView>
             <com.google.android.material.button.MaterialButton android:id="@+id/editar" android:layout_width="match_parent" android:layout_height="wrap_content"
                 android:minHeight="48dp" android:text="@string/editar_configuracion" app:cornerRadius="24dp" />
-            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="24dp"
-                android:text="@string/apariencia" android:textSize="18sp" android:textStyle="bold" android:textColor="@color/gh_text" />
-            <RadioGroup android:id="@+id/temas" android:layout_width="match_parent" android:layout_height="wrap_content">
-                <com.google.android.material.radiobutton.MaterialRadioButton android:id="@+id/temaClaro" android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:minHeight="48dp" android:text="@string/tema_claro" />
-                <com.google.android.material.radiobutton.MaterialRadioButton android:id="@+id/temaOscuro" android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:minHeight="48dp" android:text="@string/tema_oscuro" />
-                <com.google.android.material.radiobutton.MaterialRadioButton android:id="@+id/temaSistema" android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:minHeight="48dp" android:text="@string/tema_sistema" />
-            </RadioGroup>
             <TextView android:id="@+id/mensaje" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/cargando"
                 android:textSize="14sp" android:textColor="@color/gh_muted" android:accessibilityLiveRegion="polite" />
             <com.google.android.material.button.MaterialButton android:id="@+id/reintentar" style="@style/Widget.Material3.Button.TextButton"
