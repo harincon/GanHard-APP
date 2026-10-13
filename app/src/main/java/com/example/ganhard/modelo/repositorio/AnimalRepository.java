@@ -156,7 +156,7 @@ public final class AnimalRepository {
 
     /** Solo la unicidad (finca, código) cuenta como duplicado; una referencia inválida es otro tipo de fallo. */
     private static ErrorModelo errorDeRestriccion(SQLiteConstraintException ex) {
-        boolean repetido = ex.getMessage() != null && ex.getMessage().toUpperCase().contains("UNIQUE");
+        boolean repetido = ex.getMessage() != null && ex.getMessage().toUpperCase(java.util.Locale.ROOT).contains("UNIQUE");
         return repetido ? ErrorModelo.duplicado("codigo") : ErrorModelo.baseDeDatos(ex);
     }
 

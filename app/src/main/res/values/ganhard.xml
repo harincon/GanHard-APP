@@ -21,7 +21,6 @@
     <string name="ayuda_area">Opcional. Usa coma o punto decimal, sin separadores de miles.</string>
     <string name="guardar_comenzar">Guardar y comenzar</string>
     <string name="guardar_cambios">Guardar cambios</string>
-    <string name="cargando">Cargando los datos de tu finca…</string>
     <string name="error_carga">No se pudieron cargar los datos. Intenta nuevamente.</string>
     <string name="error_guardado">No se pudieron guardar los datos. Tu formulario se conserva; intenta nuevamente.</string>
     <string name="reintentar">Reintentar</string>
@@ -30,7 +29,6 @@
     <string name="ubicacion_sin_registrar">Ubicación sin registrar</string>
     <string name="area_sin_registrar">Área sin registrar</string>
     <string name="area_formato">%1$s hectáreas</string>
-    <string name="trabaja_sin_conexion">Trabaja sin conexión</string>
     <string name="datos_dispositivo">Tus datos se guardan en este dispositivo.</string>
     <string name="apariencia">Apariencia</string>
     <string name="tema_claro">Claro</string>
