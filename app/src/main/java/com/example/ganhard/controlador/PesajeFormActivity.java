@@ -28,10 +28,13 @@ import java.util.Map;
 public class PesajeFormActivity extends BaseActivity {
     public static final String EXTRA_ID_ANIMAL = "id_animal";
     private static final String ESTADO_FECHA_INICIAL = "fecha_inicial";
+    private static final String ESTADO_REGISTRO = "id_registro";
     private static final String ESTADO_HORA_INICIAL = "hora_inicial";
 
     private ActivityPesajeFormBinding vista;
     private String idAnimal;
+    /** Id del pesaje nuevo: se genera al abrir y se conserva al rotar para que guardar dos veces no duplique. */
+    private String idRegistro;
     private String fechaInicial, horaInicial;
     private boolean guardando;
 
@@ -42,6 +45,8 @@ public class PesajeFormActivity extends BaseActivity {
         ajustarBarras(vista.getRoot());
         configurarToolbar(vista.toolbar, true);
         idAnimal = getIntent().getStringExtra(EXTRA_ID_ANIMAL);
+        idRegistro = estado == null ? null : estado.getString(ESTADO_REGISTRO);
+        if (idRegistro == null) idRegistro = java.util.UUID.randomUUID().toString();
         if (estado == null) {
             fechaInicial = Tiempo.hoy().toString();
             LocalTime ahora = Tiempo.ahora().toLocalTime();
@@ -87,7 +92,7 @@ public class PesajeFormActivity extends BaseActivity {
         guardando = true;
         ocupado(true);
         vista.mensaje.setVisibility(View.GONE);
-        app().pesajes().registrar(idAnimal, entrada, new Callback<Pesaje>() {
+        app().pesajes().registrar(idRegistro, idAnimal, entrada, new Callback<Pesaje>() {
             @Override public void exito(Pesaje pesaje) {
                 if (!disponible()) return;
                 guardando = false;
@@ -167,6 +172,7 @@ public class PesajeFormActivity extends BaseActivity {
 
     @Override protected void onSaveInstanceState(Bundle estado) {
         estado.putString(ESTADO_FECHA_INICIAL, fechaInicial);
+        estado.putString(ESTADO_REGISTRO, idRegistro);
         estado.putString(ESTADO_HORA_INICIAL, horaInicial);
         super.onSaveInstanceState(estado);
     }

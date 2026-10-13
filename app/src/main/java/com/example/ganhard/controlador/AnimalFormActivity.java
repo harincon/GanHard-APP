@@ -32,15 +32,21 @@ import java.util.Map;
 public class AnimalFormActivity extends BaseActivity {
     public static final String EXTRA_ID_ANIMAL = "id_animal";
     private static final String ESTADO_RAZA = "id_raza";
+    private static final String ESTADO_REGISTRO = "id_registro";
+    private static final String ESTADO_CARGADO = "formulario_cargado";
 
     private ActivityAnimalFormBinding vista;
     private final List<Raza> razas = new ArrayList<>();
     private String idAnimal;
     private String idRaza = "";
+    /** Id del animal nuevo: se genera al abrir y se conserva al rotar para que guardar dos veces no duplique. */
+    private String idRegistro;
     private String ingresoInicial;
     /** Datos del animal al abrir la edición; permite saber si hay cambios sin guardar. */
     private EntradaAnimal original;
     private boolean restaurado, razasCargadas, guardando;
+    /** En edición, indica que los campos ya recibieron los datos del animal (aunque la pantalla se haya recreado). */
+    private boolean formularioCargado;
 
     @Override protected void onCreate(Bundle estado) {
         super.onCreate(estado);
@@ -50,6 +56,9 @@ public class AnimalFormActivity extends BaseActivity {
         configurarToolbar(vista.toolbar, true);
         idAnimal = getIntent().getStringExtra(EXTRA_ID_ANIMAL);
         restaurado = estado != null;
+        formularioCargado = restaurado && estado.getBoolean(ESTADO_CARGADO, false);
+        idRegistro = restaurado ? estado.getString(ESTADO_REGISTRO) : null;
+        if (idRegistro == null) idRegistro = java.util.UUID.randomUUID().toString();
         ingresoInicial = Tiempo.hoy().toString();
         if (esEdicion()) {
             vista.toolbar.setTitle(R.string.editar_animal);
@@ -120,7 +129,7 @@ public class AnimalFormActivity extends BaseActivity {
             @Override public void exito(Animal animal) {
                 if (!disponible()) return;
                 original = entradaDe(animal);
-                if (!restaurado) {
+                if (!formularioCargado) {
                     vista.codigo.setText(original.codigo);
                     vista.nombre.setText(original.nombre);
                     vista.sexoHembra.setChecked(Animal.HEMBRA.equals(original.sexo));
@@ -131,6 +140,7 @@ public class AnimalFormActivity extends BaseActivity {
                     idRaza = original.idRaza;
                     mostrarRazaElegida();
                 }
+                formularioCargado = true;
                 vista.guardar.setEnabled(true);
             }
             @Override public void error(ErrorModelo error) {
@@ -188,7 +198,7 @@ public class AnimalFormActivity extends BaseActivity {
             }
         };
         if (esEdicion()) app().animales().actualizar(idAnimal, entrada, resultado);
-        else app().animales().registrar(entrada, resultado);
+        else app().animales().registrar(idRegistro, entrada, resultado);
     }
 
     private EntradaAnimal entrada() {
@@ -258,6 +268,8 @@ public class AnimalFormActivity extends BaseActivity {
 
     @Override protected void onSaveInstanceState(Bundle estado) {
         estado.putString(ESTADO_RAZA, idRaza);
+        estado.putString(ESTADO_REGISTRO, idRegistro);
+        estado.putBoolean(ESTADO_CARGADO, formularioCargado);
         super.onSaveInstanceState(estado);
     }
 }

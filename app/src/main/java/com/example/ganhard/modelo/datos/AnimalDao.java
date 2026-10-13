@@ -25,15 +25,14 @@ public abstract class AnimalDao {
     public abstract int contarActivos(String idFinca);
 
     /**
-     * Lista de la finca con el último peso vigente por animal en una sola consulta. {@code estado} y {@code patron}
-     * nulos no filtran; el patrón llega ya con sus comodines y con \ como carácter de escape.
+     * Lista de la finca con el último peso vigente por animal en una sola consulta; {@code estado} nulo no filtra.
+     * La búsqueda por texto la hace el repositorio, porque SQLite no ignora tildes ni mayúsculas fuera de ASCII.
      */
     @Query("SELECT a.id_animal, a.codigo, a.nombre, a.sexo, a.estado, "
             + "(SELECT p.peso_kg FROM pesaje p WHERE p.id_animal = a.id_animal AND p.anulado = 0 "
             + "ORDER BY p.fecha DESC, COALESCE(p.hora, '') DESC, p.creado_en DESC LIMIT 1) AS ultimo_peso_kg "
             + "FROM animal a WHERE a.id_finca = :idFinca "
             + "AND (:estado IS NULL OR a.estado = :estado) "
-            + "AND (:patron IS NULL OR a.codigo LIKE :patron ESCAPE '\\' OR a.nombre LIKE :patron ESCAPE '\\') "
             + "ORDER BY a.codigo")
-    public abstract List<AnimalResumen> buscar(String idFinca, String estado, String patron);
+    public abstract List<AnimalResumen> buscar(String idFinca, String estado);
 }

@@ -82,4 +82,10 @@ public class ValidadorPesajeTest {
         EntradaPesaje largo = new EntradaPesaje("2026-10-12", "09:15", "450", "o".repeat(501));
         assertEquals(500, validar(largo).get("observaciones").limite);
     }
+
+    @Test public void unPuntoDeMilesNoSeLeeComoDecimal() {
+        for (String peso : new String[]{"1.050", "1.000", "450,500"}) {
+            assertEquals(peso, CodigoError.FORMATO, error(entrada("2026-10-12", "09:15", peso), "peso").codigo);
+        }
+    }
 }

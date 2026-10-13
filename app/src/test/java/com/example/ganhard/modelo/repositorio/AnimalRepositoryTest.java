@@ -416,4 +416,36 @@ public class AnimalRepositoryTest {
         repositorio.contarActivos(vuelta);
         assertEquals(Integer.valueOf(2), vuelta.esperar().valor);
     }
+
+    @Test public void buscarIgnoraTildesYMayusculas() {
+        fincaConfigurada();
+        registrar("GH-001", "Perla Pérez");
+        registrar("GH-002", "LUCÍA");
+        for (String texto : new String[]{"perez", "PÉREZ", "pérez"}) assertEquals(texto, "GH-001", buscar(texto, null).get(0).codigo);
+        for (String texto : new String[]{"lucia", "LUCÍA", "lucía"}) assertEquals(texto, "GH-002", buscar(texto, null).get(0).codigo);
+        assertEquals(0, buscar("zzz", null).size());
+    }
+
+    @Test public void registrarDosVecesConElMismoIdDevuelveElMismoAnimalSinDuplicar() {
+        fincaConfigurada();
+        Captura<Animal> primero = new Captura<>();
+        repositorio.registrar("id-fijo", entrada("GH-001", "Uno"), primero);
+        primero.esperar();
+        Captura<Animal> segundo = new Captura<>();
+        repositorio.registrar("id-fijo", entrada("GH-001", "Uno"), segundo);
+        segundo.esperar();
+        assertTrue(primero.exito);
+        assertTrue(segundo.exito);
+        assertEquals("id-fijo", segundo.valor.idAnimal);
+        assertEquals(1, contar("SELECT COUNT(*) FROM animal"));
+    }
+
+    @Test public void cambiarAlMismoEstadoYFechaNoModificaNada() {
+        fincaConfigurada();
+        Animal animal = registrar("GH-001", "Uno");
+        assertTrue(cambiarEstado(animal.idAnimal, Animal.VENDIDO, "2026-06-01").exito);
+        db.getOpenHelper().getWritableDatabase().execSQL("UPDATE animal SET actualizado_en = '2000-01-01T00:00:00.000Z'");
+        assertTrue(cambiarEstado(animal.idAnimal, Animal.VENDIDO, "2026-06-01").exito);
+        assertEquals("2000-01-01T00:00:00.000Z", db.animalDao().porId(animal.idAnimal).actualizadoEn);
+    }
 }

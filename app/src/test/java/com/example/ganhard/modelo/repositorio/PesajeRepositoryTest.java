@@ -173,4 +173,17 @@ public class PesajeRepositoryTest {
         db.animalDao().actualizar(vendido);
         assertTrue(registrar("2026-02-01", "09:15", "450").exito);
     }
+
+    @Test public void registrarDosVecesConElMismoIdDevuelveElMismoPesajeSinDuplicar() {
+        Captura<Pesaje> primero = new Captura<>();
+        pesajes.registrar("pesaje-fijo", animal.idAnimal, new EntradaPesaje("2026-02-01", "09:15", "450", ""), primero);
+        primero.esperar();
+        Captura<Pesaje> segundo = new Captura<>();
+        pesajes.registrar("pesaje-fijo", animal.idAnimal, new EntradaPesaje("2026-02-01", "09:15", "450", ""), segundo);
+        segundo.esperar();
+        assertTrue(primero.exito);
+        assertTrue(segundo.exito);
+        assertEquals("pesaje-fijo", segundo.valor.idPesaje);
+        assertEquals(1, contar());
+    }
 }

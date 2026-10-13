@@ -95,7 +95,7 @@ Con el emulador encendido:
 
 Las pruebas locales usan JUnit y Robolectric (Android simulado en el equipo, con la base Room real en memoria): validadores, repositorios, esquema y migración, y cada pantalla (casos válidos e inválidos, rotación, errores de base de datos). La migración 1→2 se prueba creando la base v1 desde `schemas/1.json`, aplicándola y comparando el DDL con `schemas/2.json`; `MigracionInstrumentadaTest` repite la prueba con el ayudante oficial de Room y requiere emulador.
 
-**Resultado del 12 de octubre de 2026:** compilación y APK de prueba completos; **172 pruebas locales aprobadas, 0 fallos**; lint con 0 errores y 18 advertencias (dependencias por actualizar, fondos superpuestos y `notifyDataSetChanged` en listas cortas). Las pruebas instrumentadas están compiladas pero **no se han ejecutado**, y las pantallas no se han inspeccionado visualmente en un emulador: Robolectric no sustituye las capturas ni la ejecución real exigidas por el curso.
+**Resultado del 12 de octubre de 2026:** compilación y APK de prueba completos; **182 pruebas locales aprobadas, 0 fallos**; lint con 0 errores y 18 advertencias (dependencias por actualizar, fondos superpuestos y `notifyDataSetChanged` en listas cortas). Las pruebas instrumentadas están compiladas pero **no se han ejecutado**, y las pantallas no se han inspeccionado visualmente en un emulador: Robolectric no sustituye las capturas ni la ejecución real exigidas por el curso.
 
 APK generado: `app/build/outputs/apk/debug/app-debug.apk`.
 

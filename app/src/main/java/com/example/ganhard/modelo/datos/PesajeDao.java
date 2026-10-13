@@ -25,4 +25,7 @@ public abstract class PesajeDao {
     /** Tras editar el ingreso del animal, reclasifica sus pesajes: anteriores al ingreso son antecedente. */
     @Query("UPDATE pesaje SET es_antecedente = CASE WHEN fecha < :ingreso THEN 1 ELSE 0 END WHERE id_animal = :idAnimal")
     public abstract void recalcularAntecedentes(String idAnimal, String ingreso);
+
+    @Query("SELECT * FROM pesaje WHERE id_pesaje = :idPesaje")
+    public abstract Pesaje porId(String idPesaje);
 }

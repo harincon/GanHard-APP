@@ -125,14 +125,14 @@ public class DetalleAnimalActivity extends BaseActivity {
         TextInputEditText fecha = contenido.findViewById(R.id.estadoFecha);
         grupo.check(Animal.VENDIDO.equals(actual.estado) ? R.id.estadoVendido
                 : Animal.FALLECIDO.equals(actual.estado) ? R.id.estadoFallecido : R.id.estadoActivo);
-        fecha.setText(Tiempo.hoy().toString());
+        fecha.setText(actual.fechaEstado);
+        grupo.setOnCheckedChangeListener((g, id) -> fecha.setText(estadoDe(id).equals(actual.estado) ? actual.fechaEstado : Tiempo.hoy().toString()));
         campoFecha.setEndIconOnClickListener(v -> elegirFecha(fecha));
         AlertDialog dialogo = new MaterialAlertDialogBuilder(this).setTitle(R.string.cambiar_estado).setView(contenido)
                 .setPositiveButton(R.string.aplicar, null).setNegativeButton(R.string.cancelar, null).create();
         dialogo.show();
         dialogo.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
-            String estado = grupo.getCheckedRadioButtonId() == R.id.estadoVendido ? Animal.VENDIDO
-                    : grupo.getCheckedRadioButtonId() == R.id.estadoFallecido ? Animal.FALLECIDO : Animal.ACTIVO;
+            String estado = estadoDe(grupo.getCheckedRadioButtonId());
             app().animales().cambiarEstado(idAnimal, estado, String.valueOf(fecha.getText()), new Callback<Animal>() {
                 @Override public void exito(Animal animal) {
                     if (!disponible()) return;
@@ -147,6 +147,10 @@ public class DetalleAnimalActivity extends BaseActivity {
                 }
             });
         });
+    }
+
+    private static String estadoDe(int idBoton) {
+        return idBoton == R.id.estadoVendido ? Animal.VENDIDO : idBoton == R.id.estadoFallecido ? Animal.FALLECIDO : Animal.ACTIVO;
     }
 
     private void mostrarError() {

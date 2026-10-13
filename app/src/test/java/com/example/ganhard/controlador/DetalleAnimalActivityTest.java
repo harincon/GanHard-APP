@@ -223,4 +223,18 @@ public class DetalleAnimalActivityTest {
         assertFalse(dialogo.isShowing());
         assertEquals("Activo desde 2026-01-10", texto(pantalla, R.id.datoEstado));
     }
+
+    @Test public void aplicarSinCambiarNadaConservaLaFechaDelEstado() {
+        Animal animal = completo();
+        Animal vendido = db.animalDao().porId(animal.idAnimal);
+        vendido.estado = Animal.VENDIDO;
+        vendido.fechaEstado = "2026-06-01";
+        db.animalDao().actualizar(vendido);
+        DetalleAnimalActivity pantalla = abrir(animal.idAnimal).get();
+        androidx.appcompat.app.AlertDialog dialogo = abrirDialogoDeEstado(pantalla);
+        assertEquals("2026-06-01", ((android.widget.EditText) dialogo.findViewById(R.id.estadoFecha)).getText().toString());
+        dialogo.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).performClick();
+        shadowOf(Looper.getMainLooper()).idle();
+        assertEquals("Vendido desde 2026-06-01", texto(pantalla, R.id.datoEstado));
+    }
 }

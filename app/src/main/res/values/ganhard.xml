@@ -111,7 +111,7 @@
     <string name="registrar_pesaje">Registrar pesaje</string>
     <string name="ver_pesos">Ver pesos</string>
     <string name="peso_kg_titulo">Peso (kg) *</string>
-    <string name="ayuda_peso">Hasta 2 decimales; coma o punto.</string>
+    <string name="ayuda_peso">Hasta 2 decimales; coma o punto, sin separadores de miles.</string>
     <string name="fecha_pesaje">Fecha del pesaje *</string>
     <string name="hora_pesaje">Hora *</string>
     <string name="ayuda_hora">Formato HH:MM. Solo un antecedente anterior al ingreso puede omitirla.</string>
@@ -127,7 +127,7 @@
     <string name="error_guardado_pesaje">No se pudo guardar el pesaje. Lo escrito se conserva; intenta nuevamente.</string>
     <string name="error_peso_obligatorio">Escribe el peso en kilogramos.</string>
     <string name="error_peso_invalido">Escribe un peso mayor que cero, solo con números.</string>
-    <string name="error_peso_decimales">Usa como máximo 2 decimales.</string>
+    <string name="error_peso_decimales">Usa como máximo 2 decimales y no uses separadores de miles.</string>
     <string name="error_peso_fuera_rango">El peso debe ser de %1$d kg o menos.</string>
     <string name="error_fecha_pesaje_obligatoria">Escribe la fecha del pesaje.</string>
     <string name="error_fecha_antes_nacimiento">La fecha no puede ser anterior al nacimiento del animal.</string>

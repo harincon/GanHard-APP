@@ -228,4 +228,20 @@ public class PesajeFormActivityTest {
         assertTrue(ShadowDialog.getLatestDialog().isShowing());
         assertFalse(conCambios.isFinishing());
     }
+
+    @Test public void rotarYVolverAGuardarNoDuplicaElPesaje() {
+        ActivityController<PesajeFormActivity> primera = abrir();
+        escribir(primera.get(), R.id.fecha, "2026-02-01");
+        escribir(primera.get(), R.id.hora, "09:15");
+        escribir(primera.get(), R.id.peso, "450,5");
+        primera.get().findViewById(R.id.guardar).performClick(); // el resultado llega a una pantalla ya destruida
+        Bundle estado = new Bundle();
+        primera.pause().saveInstanceState(estado).stop().destroy();
+        ActivityController<PesajeFormActivity> segunda = Robolectric.buildActivity(PesajeFormActivity.class, intento(animal.idAnimal))
+                .create(estado).start().restoreInstanceState(estado).resume();
+        shadowOf(Looper.getMainLooper()).idle();
+        guardar(segunda.get());
+        assertEquals(1, contar());
+        assertTrue(segunda.get().isFinishing());
+    }
 }

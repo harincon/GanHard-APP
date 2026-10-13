@@ -28,15 +28,24 @@ public final class PesajeRepository {
         this.ejecutor = ejecutor;
     }
 
-    /** Valida contra el animal (nacimiento e ingreso), calcula el antecedente y guarda el pesaje. */
     public void registrar(String idAnimal, EntradaPesaje entrada, Callback<Pesaje> callback) {
+        registrar(UUID.randomUUID().toString(), idAnimal, entrada, callback);
+    }
+
+    /**
+     * Valida contra el animal (nacimiento e ingreso), calcula el antecedente y guarda el pesaje. Es idempotente:
+     * si el id ya existe devuelve el pesaje guardado, así repetir la solicitud (por ejemplo tras rotar) no duplica.
+     */
+    public void registrar(String idPesaje, String idAnimal, EntradaPesaje entrada, Callback<Pesaje> callback) {
         ejecutor.ejecutar(() -> {
+            Pesaje existente = db.pesajeDao().porId(idPesaje);
+            if (existente != null) return existente;
             Animal animal = animalExistente(idAnimal);
             Map<String, ErrorCampo> errores = ValidadorPesaje.validar(entrada, animal, Tiempo.ahora());
             if (!errores.isEmpty()) throw ErrorModelo.validacion(errores);
             String ahora = Tiempo.ahoraUtc();
             Pesaje pesaje = new Pesaje();
-            pesaje.idPesaje = UUID.randomUUID().toString();
+            pesaje.idPesaje = idPesaje;
             pesaje.idAnimal = idAnimal;
             pesaje.fecha = entrada.fecha;
             pesaje.hora = entrada.hora.isEmpty() ? null : LocalTime.parse(entrada.hora).format(HORA);

@@ -298,4 +298,51 @@ public class AnimalFormActivityTest {
         assertTrue(ShadowDialog.getLatestDialog().isShowing());
         assertFalse(pantalla.isFinishing());
     }
+
+    @Test public void rotarYVolverAGuardarNoDuplicaNiMuestraElErrorDeCodigo() {
+        fincaConfigurada();
+        ActivityController<AnimalFormActivity> primera = abrir();
+        escribir(primera.get(), R.id.codigo, "GH-001");
+        elegirHembra(primera.get());
+        primera.get().findViewById(R.id.guardar).performClick(); // el resultado llega a una pantalla ya destruida
+        Bundle estado = new Bundle();
+        primera.pause().saveInstanceState(estado).stop().destroy();
+        ActivityController<AnimalFormActivity> segunda = Robolectric.buildActivity(AnimalFormActivity.class)
+                .create(estado).start().restoreInstanceState(estado).resume();
+        shadowOf(Looper.getMainLooper()).idle();
+        guardar(segunda.get());
+        assertEquals(1, contarAnimales());
+        assertNull(error(segunda.get(), R.id.campoCodigo));
+        assertTrue(segunda.get().isFinishing());
+    }
+
+    @Test public void rotarAntesDeQueCargueElAnimalDeEdicionAunLoRellena() {
+        fincaConfigurada();
+        Animal animal = registrarCompleto("GH-001", "Lucero");
+        Intent intento = new Intent().putExtra(AnimalFormActivity.EXTRA_ID_ANIMAL, animal.idAnimal);
+        ActivityController<AnimalFormActivity> primera = Robolectric.buildActivity(AnimalFormActivity.class, intento).create().start().resume();
+        Bundle estado = new Bundle(); // la carga del animal todavía no ha llegado
+        primera.pause().saveInstanceState(estado).stop().destroy();
+        ActivityController<AnimalFormActivity> segunda = Robolectric.buildActivity(AnimalFormActivity.class, intento)
+                .create(estado).start().restoreInstanceState(estado).resume();
+        shadowOf(Looper.getMainLooper()).idle();
+        assertEquals("GH-001", texto(segunda.get(), R.id.codigo));
+        assertEquals("Lucero", texto(segunda.get(), R.id.nombre));
+        assertEquals("Compra reciente", texto(segunda.get(), R.id.observaciones));
+        assertEquals("Angus", ((AutoCompleteTextView) segunda.get().findViewById(R.id.raza)).getText().toString());
+    }
+
+    @Test public void rotarDespuesDeEditarConservaLoEditado() {
+        fincaConfigurada();
+        Animal animal = registrarCompleto("GH-001", "Lucero");
+        ActivityController<AnimalFormActivity> primera = abrirEditando(animal.idAnimal);
+        escribir(primera.get(), R.id.nombre, "Cambiado");
+        Bundle estado = new Bundle();
+        primera.pause().saveInstanceState(estado).stop().destroy();
+        Intent intento = new Intent().putExtra(AnimalFormActivity.EXTRA_ID_ANIMAL, animal.idAnimal);
+        ActivityController<AnimalFormActivity> segunda = Robolectric.buildActivity(AnimalFormActivity.class, intento)
+                .create(estado).start().restoreInstanceState(estado).resume();
+        shadowOf(Looper.getMainLooper()).idle();
+        assertEquals("Cambiado", texto(segunda.get(), R.id.nombre));
+    }
 }

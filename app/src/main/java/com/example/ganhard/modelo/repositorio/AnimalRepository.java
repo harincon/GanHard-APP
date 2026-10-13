@@ -13,9 +13,12 @@ import com.example.ganhard.modelo.reglas.CodigoError;
 import com.example.ganhard.modelo.reglas.EntradaAnimal;
 import com.example.ganhard.modelo.reglas.ErrorCampo;
 import com.example.ganhard.modelo.reglas.ValidadorAnimal;
+import java.text.Normalizer;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
@@ -35,9 +38,19 @@ public final class AnimalRepository {
     }
 
     public void registrar(EntradaAnimal entrada, Callback<Animal> callback) {
+        registrar(UUID.randomUUID().toString(), entrada, callback);
+    }
+
+    /**
+     * Registra con un id elegido por quien llama. Es idempotente: si ese id ya existe, devuelve el animal
+     * guardado sin crear otro, de modo que repetir la solicitud (por ejemplo tras rotar la pantalla) no duplica.
+     */
+    public void registrar(String idAnimal, EntradaAnimal entrada, Callback<Animal> callback) {
         ejecutor.ejecutar(() -> {
+            Animal existente = db.animalDao().porId(idAnimal);
+            if (existente != null) return existente;
             validar(entrada);
-            Animal animal = nuevo(entrada, idFincaActiva());
+            Animal animal = nuevo(idAnimal, entrada, idFincaActiva());
             try {
                 db.animalDao().insertar(animal);
             } catch (SQLiteConstraintException ex) {
@@ -77,10 +90,16 @@ public final class AnimalRepository {
         }, callback);
     }
 
-    /** Marca el animal como activo, vendido o fallecido (RF07) con su fecha efectiva; conserva ficha y pesajes. */
+    /**
+     * Marca el animal como activo, vendido o fallecido (RF07) con su fecha efectiva; conserva ficha y pesajes.
+     * Repetir el estado y la fecha que ya tiene no cambia nada.
+     */
     public void cambiarEstado(String idAnimal, String estado, String fechaEstado, Callback<Animal> callback) {
         ejecutor.ejecutar(() -> {
             Animal animal = animalExistente(idAnimal);
+            if (estado != null && fechaEstado != null && estado.equals(animal.estado) && fechaEstado.trim().equals(animal.fechaEstado)) {
+                return animal;
+            }
             Map<String, ErrorCampo> errores = new LinkedHashMap<>();
             if (estado == null || !ESTADOS.contains(estado)) errores.put("estado", new ErrorCampo(CodigoError.VALOR_INVALIDO));
             ErrorCampo fecha = ValidadorAnimal.fechaEstado(fechaEstado, animal, Tiempo.hoy());
@@ -98,12 +117,20 @@ public final class AnimalRepository {
         ejecutor.ejecutar(() -> animalExistente(idAnimal), callback);
     }
 
-    /** Busca por código o nombre (sin distinguir mayúsculas ASCII); {@code estado} nulo trae todos los estados. */
+    /**
+     * Busca por código o nombre ignorando mayúsculas y tildes; {@code estado} nulo trae todos los estados.
+     * La lista de una finca es corta, así que se filtra en memoria con el texto normalizado.
+     */
     public void buscar(String texto, String estado, Callback<List<AnimalResumen>> callback) {
         ejecutor.ejecutar(() -> {
-            String limpio = texto == null ? "" : texto.trim();
-            String patron = limpio.isEmpty() ? null : "%" + escaparLike(limpio) + "%";
-            return db.animalDao().buscar(idFincaActiva(), estado, patron);
+            List<AnimalResumen> animales = db.animalDao().buscar(idFincaActiva(), estado);
+            String buscado = normalizar(texto == null ? "" : texto.trim());
+            if (buscado.isEmpty()) return animales;
+            List<AnimalResumen> coincidencias = new ArrayList<>();
+            for (AnimalResumen animal : animales) {
+                if (normalizar(animal.codigo).contains(buscado) || normalizar(animal.nombre).contains(buscado)) coincidencias.add(animal);
+            }
+            return coincidencias;
         }, callback);
     }
 
@@ -135,10 +162,10 @@ public final class AnimalRepository {
         return idFinca;
     }
 
-    private static Animal nuevo(EntradaAnimal entrada, String idFinca) {
+    private static Animal nuevo(String idAnimal, EntradaAnimal entrada, String idFinca) {
         String ahora = Tiempo.ahoraUtc();
         Animal animal = new Animal();
-        animal.idAnimal = UUID.randomUUID().toString();
+        animal.idAnimal = idAnimal;
         animal.idFinca = idFinca;
         animal.idRaza = entrada.idRaza.isEmpty() ? null : entrada.idRaza;
         animal.codigo = ValidadorAnimal.normalizarCodigo(entrada.codigo);
@@ -156,12 +183,13 @@ public final class AnimalRepository {
 
     /** Solo la unicidad (finca, código) cuenta como duplicado; una referencia inválida es otro tipo de fallo. */
     private static ErrorModelo errorDeRestriccion(SQLiteConstraintException ex) {
-        boolean repetido = ex.getMessage() != null && ex.getMessage().toUpperCase(java.util.Locale.ROOT).contains("UNIQUE");
+        boolean repetido = ex.getMessage() != null && ex.getMessage().toUpperCase(Locale.ROOT).contains("UNIQUE");
         return repetido ? ErrorModelo.duplicado("codigo") : ErrorModelo.baseDeDatos(ex);
     }
 
-    /** Hace literales los comodines de LIKE (%, _) y el propio carácter de escape. */
-    private static String escaparLike(String texto) {
-        return texto.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_");
+    /** Minúsculas y sin tildes, para que "Lucía" coincida con "lucia" y "LUCÍA". */
+    private static String normalizar(String texto) {
+        if (texto == null) return "";
+        return Normalizer.normalize(texto, Normalizer.Form.NFD).replaceAll("\\p{M}+", "").toLowerCase(Locale.ROOT);
     }
 }

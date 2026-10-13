@@ -71,8 +71,9 @@ public final class ValidadorPesaje {
     private static ErrorCampo errorPeso(String valor) {
         if (valor.isEmpty()) return new ErrorCampo(CodigoError.OBLIGATORIO);
         if (!valor.matches("[0-9]+([.,][0-9]+)?")) return new ErrorCampo(CodigoError.VALOR_INVALIDO);
+        // Más de 2 decimales (o un punto de miles como "1.050") no se interpreta: se pide corregir.
+        if (!valor.matches("[0-9]+([.,][0-9]{1,2})?")) return new ErrorCampo(CodigoError.FORMATO);
         BigDecimal peso = new BigDecimal(valor.replace(',', '.'));
-        if (peso.stripTrailingZeros().scale() > 2) return new ErrorCampo(CodigoError.FORMATO);
         if (peso.signum() <= 0) return new ErrorCampo(CodigoError.VALOR_INVALIDO);
         if (peso.compareTo(MAXIMO) > 0) return new ErrorCampo(CodigoError.FUERA_DE_RANGO);
         return null;
