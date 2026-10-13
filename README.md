@@ -79,24 +79,3 @@ El primer avance requerido por el docente se completará cuando funcionen regist
 7. Prueba un correo incorrecto, el área vacía y un área con decimales; comprueba que los errores conservan los otros datos escritos.
 8. Cambia el tema y verifica que la preferencia continúa después de volver a abrir la aplicación.
 
-## Verificación
-
-Desde la terminal de Android Studio, dentro de esta carpeta:
-
-```powershell
-.\gradlew.bat :app:assembleDebug :app:testDebugUnitTest :app:lintDebug :app:assembleDebugAndroidTest
-```
-
-Con un emulador o dispositivo conectado:
-
-```powershell
-.\gradlew.bat :app:connectedDebugAndroidTest
-```
-
-Las pruebas locales cubren campos obligatorios, correo, límites y área. Una prueba con Robolectric comprueba el formulario durante rotación antes de la carga, después de editar y durante el guardado; también verifica conservación de UUID y ausencia de navegación desde la pantalla destruida. Las instrumentadas comprueban persistencia al cerrar/reabrir el archivo Room, edición sin cambiar identificadores y rechazo de una finca sin propietario con reversión de toda la transacción.
-
-**Resultado del 12 de octubre de 2026:** compilación de la app y APK de pruebas completada; 6 pruebas locales aprobadas; lint sin errores, con 22 advertencias principalmente sobre actualización de dependencias, recursos y convenciones. No se ejecutaron las pruebas instrumentadas ni se verificó visualmente en Android: `adb devices` no encontró dispositivos conectados y no hay un AVD configurado. La prueba de Robolectric simula Android en el equipo y no sustituye las capturas ni la ejecución en el emulador exigidas por el curso.
-
-APK generado: `app/build/outputs/apk/debug/app-debug.apk`.
-
-Referencias técnicas utilizadas: [Room para proyectos Java](https://developer.android.com/jetpack/androidx/releases/room) y [pruebas locales con Robolectric](https://robolectric.org/getting-started/).
