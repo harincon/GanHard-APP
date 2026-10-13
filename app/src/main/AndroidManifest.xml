@@ -22,6 +22,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".controlador.AnimalFormActivity"
+            android:exported="false" android:windowSoftInputMode="adjustResize" />
         <activity android:name=".controlador.ConfiguracionActivity"
             android:exported="false" android:windowSoftInputMode="adjustResize" />
     </application>

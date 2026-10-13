@@ -30,8 +30,15 @@ public final class MensajesError {
             if ("nombre".equals(campo)) return contexto.getString(R.string.error_nombre_obligatorio);
             if ("correo".equals(campo)) return contexto.getString(R.string.error_correo_obligatorio);
             if ("finca".equals(campo)) return contexto.getString(R.string.error_finca_obligatoria);
+            if ("codigo".equals(campo)) return contexto.getString(R.string.error_codigo_obligatorio);
+            if ("sexo".equals(campo)) return contexto.getString(R.string.error_sexo_obligatorio);
+            if ("fechaIngreso".equals(campo)) return contexto.getString(R.string.error_ingreso_obligatorio);
         }
-        if (error.codigo == CodigoError.FORMATO && "correo".equals(campo)) return contexto.getString(R.string.error_correo_formato);
+        if (error.codigo == CodigoError.DUPLICADO && "codigo".equals(campo)) return contexto.getString(R.string.error_codigo_duplicado);
+        if (error.codigo == CodigoError.FORMATO) {
+            if ("correo".equals(campo)) return contexto.getString(R.string.error_correo_formato);
+            if ("fechaNacimiento".equals(campo) || "fechaIngreso".equals(campo)) return contexto.getString(R.string.error_fecha_formato);
+        }
         if (error.codigo == CodigoError.VALOR_INVALIDO && "area".equals(campo)) return contexto.getString(R.string.error_area_invalida);
         return texto(contexto, error);
     }

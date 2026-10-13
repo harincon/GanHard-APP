@@ -15,6 +15,12 @@ public class TiempoTest {
         assertEquals(LocalDate.of(2023, 11, 14), Tiempo.fechaDeSelector(1_700_000_000_000L));
     }
 
+    @Test public void aSelectorEsLaMedianocheUtcYVuelveALaMismaFecha() {
+        LocalDate fecha = LocalDate.of(2023, 11, 14);
+        assertEquals(1_699_920_000_000L, Tiempo.aSelector(fecha));
+        assertEquals(fecha, Tiempo.fechaDeSelector(Tiempo.aSelector(fecha)));
+    }
+
     @Test public void ahoraUtcTieneFormatoIso() {
         assertTrue(Tiempo.ahoraUtc().matches("^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$"));
     }

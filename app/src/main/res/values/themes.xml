@@ -16,4 +16,8 @@
         <item name="android:windowLightStatusBar">@bool/gh_barras_claras</item>
     </style>
     <style name="Theme.GanHard" parent="Theme.GanHard.Base" />
+    <style name="Gh.Etiqueta" parent="TextAppearance.Material3.BodyLarge">
+        <item name="android:textColor">@color/gh_muted</item>
+        <item name="android:paddingTop">4dp</item>
+    </style>
 </resources>

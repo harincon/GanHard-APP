@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/raiz" android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical" android:background="@color/gh_background">
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar" android:layout_width="match_parent" android:layout_height="?attr/actionBarSize"
+        android:background="@color/gh_surface" app:title="@string/registrar_animal" app:titleTextColor="@color/gh_text" />
+    <ProgressBar android:id="@+id/progreso" style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent" android:layout_height="4dp" android:indeterminate="true" android:visibility="invisible" />
+    <ScrollView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"
+        android:fillViewport="true" android:clipToPadding="false">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp">
+            <com.google.android.material.textfield.TextInputLayout android:id="@+id/campoCodigo"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:hint="@string/codigo_animal" android:layout_marginBottom="12dp">
+                <com.google.android.material.textfield.TextInputEditText android:id="@+id/codigo" android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:inputType="textCapCharacters" android:maxLength="30" android:maxLines="1" android:imeOptions="actionNext" android:importantForAutofill="no" />
+            </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputLayout android:id="@+id/campoNombre"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:hint="@string/nombre_animal" android:layout_marginBottom="12dp">
+                <com.google.android.material.textfield.TextInputEditText android:id="@+id/nombre" android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:inputType="textCapWords" android:maxLength="100" android:maxLines="1" android:imeOptions="actionNext" android:importantForAutofill="no" />
+            </com.google.android.material.textfield.TextInputLayout>
+            <TextView android:id="@+id/tituloSexo" style="@style/Gh.Etiqueta" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:text="@string/sexo_titulo" />
+            <RadioGroup android:id="@+id/sexo" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="horizontal" android:contentDescription="@string/sexo_titulo">
+                <com.google.android.material.radiobutton.MaterialRadioButton android:id="@+id/sexoHembra" android:layout_width="0dp" android:layout_weight="1"
+                    android:layout_height="wrap_content" android:minHeight="48dp" android:text="@string/sexo_hembra" />
+                <com.google.android.material.radiobutton.MaterialRadioButton android:id="@+id/sexoMacho" android:layout_width="0dp" android:layout_weight="1"
+                    android:layout_height="wrap_content" android:minHeight="48dp" android:text="@string/sexo_macho" />
+            </RadioGroup>
+            <TextView android:id="@+id/errorSexo" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="12dp"
+                android:textColor="?attr/colorError" android:textSize="12sp" android:visibility="gone" android:accessibilityLiveRegion="polite" />
+            <com.google.android.material.textfield.TextInputLayout android:id="@+id/campoRaza"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:hint="@string/raza" android:layout_marginBottom="12dp">
+                <com.google.android.material.textfield.MaterialAutoCompleteTextView android:id="@+id/raza" android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:inputType="none" android:importantForAutofill="no" />
+            </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputLayout android:id="@+id/campoNacimiento"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:hint="@string/fecha_nacimiento" app:helperText="@string/ayuda_fecha" app:endIconMode="custom"
+                app:endIconDrawable="@drawable/ic_calendario" app:endIconContentDescription="@string/elegir_fecha" android:layout_marginBottom="12dp">
+                <com.google.android.material.textfield.TextInputEditText android:id="@+id/nacimiento" android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:inputType="date" android:maxLength="10" android:maxLines="1" android:imeOptions="actionNext" android:importantForAutofill="no" />
+            </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputLayout android:id="@+id/campoIngreso"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:hint="@string/fecha_ingreso" app:helperText="@string/ayuda_fecha" app:endIconMode="custom"
+                app:endIconDrawable="@drawable/ic_calendario" app:endIconContentDescription="@string/elegir_fecha" android:layout_marginBottom="12dp">
+                <com.google.android.material.textfield.TextInputEditText android:id="@+id/ingreso" android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:inputType="date" android:maxLength="10" android:maxLines="1" android:imeOptions="actionNext" android:importantForAutofill="no" />
+            </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputLayout android:id="@+id/campoObservaciones"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:hint="@string/observaciones_animal" app:counterEnabled="true" app:counterMaxLength="500" android:layout_marginBottom="24dp">
+                <com.google.android.material.textfield.TextInputEditText android:id="@+id/observaciones" android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:inputType="textMultiLine|textCapSentences" android:minLines="3" android:gravity="top" android:importantForAutofill="no" />
+            </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.button.MaterialButton android:id="@+id/guardar" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:minHeight="48dp" android:text="@string/guardar_animal" app:cornerRadius="24dp" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/cancelar" style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="48dp" android:text="@string/cancelar" />
+            <TextView android:id="@+id/mensaje" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp"
+                android:textColor="@color/gh_muted" android:textSize="14sp" android:accessibilityLiveRegion="polite" android:visibility="gone" />
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

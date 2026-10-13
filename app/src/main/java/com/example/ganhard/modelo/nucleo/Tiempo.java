@@ -23,6 +23,11 @@ public final class Tiempo {
     public static LocalDateTime ahora() { return ahora(Clock.systemDefaultZone()); }
     public static LocalDateTime ahora(Clock reloj) { return LocalDateTime.now(reloj); }
 
+    /** Inverso de fechaDeSelector: la medianoche UTC del día, que es lo que el selector espera como selección. */
+    public static long aSelector(LocalDate fecha) {
+        return fecha.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli();
+    }
+
     /** El selector de fechas de Material entrega la medianoche UTC del día elegido; no se convierte a zona local. */
     public static LocalDate fechaDeSelector(long milisUtc) {
         return Instant.ofEpochMilli(milisUtc).atZone(ZoneOffset.UTC).toLocalDate();
