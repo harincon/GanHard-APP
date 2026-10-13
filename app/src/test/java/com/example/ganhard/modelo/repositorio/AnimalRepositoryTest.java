@@ -525,4 +525,17 @@ public class AnimalRepositoryTest {
         assertEquals(ErrorModelo.Tipo.NO_ENCONTRADO,
                 actualizarConEstado("no-existe", entrada("GH-001", "Uno"), Animal.ACTIVO, "2026-01-10").error.tipo);
     }
+
+    @Test public void editarElIngresoPosteriorALaFechaDeVentaFallaYNoEscribeNada() {
+        fincaConfigurada();
+        Animal animal = registrar("GH-001", "Uno");
+        assertTrue(cambiarEstado(animal.idAnimal, Animal.VENDIDO, "2026-06-01").exito);
+        EntradaAnimal nueva = new EntradaAnimal("GH-001", "Uno", "H", "", "2025-03-01", "2026-07-01", "");
+        Captura<Animal> sinEstado = actualizar(animal.idAnimal, nueva);
+        assertEquals(ErrorModelo.Tipo.VALIDACION, sinEstado.error.tipo);
+        assertEquals(CodigoError.FECHA_POSTERIOR, sinEstado.error.campos.get("fechaIngreso").codigo);
+        Captura<Animal> conEstado = actualizarConEstado(animal.idAnimal, nueva, Animal.VENDIDO, "2026-06-01");
+        assertEquals(CodigoError.FECHA_POSTERIOR, conEstado.error.campos.get("fechaIngreso").codigo);
+        assertEquals("2026-01-10", db.animalDao().porId(animal.idAnimal).fechaIngreso);
+    }
 }

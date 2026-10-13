@@ -78,4 +78,19 @@ public class FormatoFechaTest {
         assertEquals("2026-02-01", FormatoFecha.mascara("2026-02-01"));
         assertEquals("05/03/2025", FormatoFecha.mascara("050320259999"));
     }
+
+    @Test public void laMascaraSigueFuncionandoAlEscribirTeclaPorTecla() {
+        String texto = "";
+        for (char c : "05032025".toCharArray()) texto = FormatoFecha.mascara(texto + c);
+        assertEquals("05/03/2025", texto);
+    }
+
+    @Test public void laMascaraAguantaElRetrocesoYRespetaLasBarrasManualesFueraDeLugar() {
+        assertEquals("05/03/2025", FormatoFecha.mascara("05/032025"));
+        assertEquals("05/03", FormatoFecha.mascara("05/03"));
+        assertEquals("05", FormatoFecha.mascara("05/"));
+        assertEquals("05/03", FormatoFecha.mascara("05/03/"));
+        assertEquals("5/3/2025", FormatoFecha.mascara("5/3/2025"));
+        assertEquals("05/3/2025", FormatoFecha.mascara("05/3/2025"));
+    }
 }

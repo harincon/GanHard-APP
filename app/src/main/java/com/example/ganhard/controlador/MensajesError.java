@@ -20,6 +20,7 @@ public final class MensajesError {
             case FUERA_DE_RANGO: return contexto.getString(R.string.error_fuera_de_rango);
             case FECHA_FUTURA: return contexto.getString(R.string.error_fecha_futura);
             case FECHA_ANTERIOR: return contexto.getString(R.string.error_fecha_anterior);
+            case FECHA_POSTERIOR: return contexto.getString(R.string.error_fecha_posterior);
             case DUPLICADO: return contexto.getString(R.string.error_duplicado);
             default: return contexto.getString(R.string.error_valor_invalido);
         }
@@ -48,6 +49,7 @@ public final class MensajesError {
             case "sexo": if (codigo == CodigoError.OBLIGATORIO) return contexto.getString(R.string.error_sexo_obligatorio); break;
             case "fechaIngreso":
                 if (codigo == CodigoError.OBLIGATORIO) return contexto.getString(R.string.error_ingreso_obligatorio);
+                if (codigo == CodigoError.FECHA_POSTERIOR) return contexto.getString(R.string.error_ingreso_despues_estado);
                 if (codigo == CodigoError.FORMATO) return contexto.getString(R.string.error_fecha_formato);
                 break;
             case "fechaNacimiento": if (codigo == CodigoError.FORMATO) return contexto.getString(R.string.error_fecha_formato); break;

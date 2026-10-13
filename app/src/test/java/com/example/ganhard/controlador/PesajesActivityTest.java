@@ -172,4 +172,9 @@ public class PesajesActivityTest {
         assertEquals(View.VISIBLE, pantalla.findViewById(R.id.estadoError).getVisibility());
         assertEquals(pantalla.getString(R.string.error_carga), texto(pantalla.findViewById(R.id.estadoError), R.id.mensajeError));
     }
+
+    @Test public void elHistorialMuestraLaNotaDeLosRegistrosAnulados() {
+        PesajesActivity pantalla = abrir(animal.idAnimal).get();
+        assertEquals(pantalla.getString(R.string.nota_pesajes_anulados), texto(pantalla.findViewById(R.id.raiz), R.id.notaAnulados));
+    }
 }

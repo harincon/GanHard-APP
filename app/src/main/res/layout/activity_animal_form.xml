@@ -65,10 +65,12 @@
             </com.google.android.material.textfield.TextInputLayout>
             <com.google.android.material.textfield.TextInputLayout android:id="@+id/campoObservaciones"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox" android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:hint="@string/observaciones_animal" app:counterEnabled="true" app:counterMaxLength="500" android:layout_marginBottom="24dp">
+                android:hint="@string/observaciones_animal" app:counterEnabled="true" app:counterMaxLength="500" android:layout_marginBottom="12dp">
                 <com.google.android.material.textfield.TextInputEditText android:id="@+id/observaciones" android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:inputType="textMultiLine|textCapSentences" android:minLines="2" android:gravity="top" android:importantForAutofill="no" />
             </com.google.android.material.textfield.TextInputLayout>
+            <TextView android:id="@+id/notaEstado" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="24dp"
+                android:text="@string/nota_estado" android:textSize="12sp" android:textColor="@color/gh_muted" android:visibility="gone" />
             <com.google.android.material.button.MaterialButton android:id="@+id/guardar" style="@style/Gh.Boton"
                 android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/guardar_animal" />
             <com.google.android.material.button.MaterialButton android:id="@+id/cancelar" style="@style/Gh.Boton.Tonal"

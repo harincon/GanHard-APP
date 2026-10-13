@@ -300,4 +300,12 @@ public class PesajeFormActivityTest {
         escribir(pantalla, R.id.fecha, "5/3/2025");
         assertEquals("5/3/2025", texto(pantalla, R.id.fecha));
     }
+
+    @Test public void escribirDigitoPorDigitoDejaLaFechaConBarras() {
+        PesajeFormActivity pantalla = abrir().get();
+        escribir(pantalla, R.id.fecha, "");
+        EditText fecha = pantalla.findViewById(R.id.fecha);
+        for (char c : "01022026".toCharArray()) fecha.append(String.valueOf(c));
+        assertEquals("01/02/2026", texto(pantalla, R.id.fecha));
+    }
 }

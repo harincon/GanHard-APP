@@ -459,4 +459,44 @@ public class AnimalFormActivityTest {
         escribir(pantalla, R.id.nacimiento, "5/3/2025");
         assertEquals("5/3/2025", texto(pantalla, R.id.nacimiento));
     }
+
+    @Test public void escribirDigitoPorDigitoDejaUnaFechaValidaYSeGuarda() {
+        fincaConfigurada();
+        AnimalFormActivity pantalla = abrir().get();
+        escribir(pantalla, R.id.codigo, "GH-001");
+        elegirSexo(pantalla, "Hembra");
+        EditText nacimiento = pantalla.findViewById(R.id.nacimiento);
+        for (char c : "05032025".toCharArray()) nacimiento.append(String.valueOf(c));
+        assertEquals("05/03/2025", texto(pantalla, R.id.nacimiento));
+        guardar(pantalla);
+        assertTrue(pantalla.isFinishing());
+        try (Cursor c = db.getOpenHelper().getWritableDatabase().query("SELECT fecha_nacimiento FROM animal")) {
+            assertTrue(c.moveToFirst());
+            assertEquals("2025-03-05", c.getString(0));
+        }
+    }
+
+    @Test public void laNotaDeAntecedentesSoloSeVeEnLaEdicion() {
+        fincaConfigurada();
+        assertEquals(View.GONE, abrir().get().findViewById(R.id.notaEstado).getVisibility());
+        Animal animal = registrarCompleto("GH-001", "Lucero");
+        AnimalFormActivity edicion = abrirEditando(animal.idAnimal).get();
+        assertEquals(View.VISIBLE, edicion.findViewById(R.id.notaEstado).getVisibility());
+        assertEquals(edicion.getString(R.string.nota_estado), texto(edicion, R.id.notaEstado));
+    }
+
+    @Test public void enEdicionUnIngresoPosteriorALaVentaMuestraElError() {
+        fincaConfigurada();
+        Animal animal = registrarCompleto("GH-001", "Lucero");
+        Animal vendido = db.animalDao().porId(animal.idAnimal);
+        vendido.estado = Animal.VENDIDO;
+        vendido.fechaEstado = "2026-06-01";
+        db.animalDao().actualizar(vendido);
+        AnimalFormActivity pantalla = abrirEditando(animal.idAnimal).get();
+        escribir(pantalla, R.id.ingreso, "01/07/2026");
+        guardar(pantalla);
+        assertEquals(pantalla.getString(R.string.error_ingreso_despues_estado), error(pantalla, R.id.campoIngreso));
+        assertFalse(pantalla.isFinishing());
+        assertEquals("2026-01-10", db.animalDao().porId(animal.idAnimal).fechaIngreso);
+    }
 }

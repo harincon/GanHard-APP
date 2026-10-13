@@ -63,4 +63,13 @@ public class FilaNavegacionTest {
         assertTrue(fila.performClick());
         assertEquals(1f, fila.getAlpha(), 0.001f);
     }
+
+    @Test public void elTituloYElSubtituloUsanLosTamanosDelDiseno() {
+        FilaNavegacion fila = fila();
+        android.util.DisplayMetrics metricas = contexto.getResources().getDisplayMetrics();
+        assertEquals(android.util.TypedValue.applyDimension(android.util.TypedValue.COMPLEX_UNIT_SP, 14, metricas),
+                ((TextView) fila.findViewById(R.id.filaTitulo)).getTextSize(), 0.5f);
+        assertEquals(android.util.TypedValue.applyDimension(android.util.TypedValue.COMPLEX_UNIT_SP, 12, metricas),
+                ((TextView) fila.findViewById(R.id.filaSubtitulo)).getTextSize(), 0.5f);
+    }
 }

@@ -10,7 +10,7 @@
     <color name="gh_line">#B9C9BD</color>
     <bool name="gh_barras_claras">true</bool>
     <string name="configurar_finca">Configurar finca</string>
-    <string name="editar_configuracion">Editar finca y perfil</string>
+    <string name="editar_configuracion">Datos de la finca</string>
     <string name="comienza_finca">Comienza con una finca</string>
     <string name="datos_locales">Estos datos se guardarán en el dispositivo. Puedes editarlos después.</string>
     <string name="nombre_administrador">Nombre del administrador *</string>
@@ -172,4 +172,8 @@
     <string name="programar_pesaje">Programar próximo pesaje</string>
     <string name="programar_pesaje_sub">Crear una tarea futura · Próximamente</string>
     <string name="contexto_animal">Animal %1$s · %2$s</string>
+    <string name="error_fecha_posterior">La fecha no puede ser posterior a otra fecha del registro.</string>
+    <string name="error_ingreso_despues_estado">El ingreso no puede ser posterior a la fecha del estado.</string>
+    <string name="nota_estado">Al marcar vendido o fallecido, se conservan los antecedentes y se dejan de programar nuevas actividades.</string>
+    <string name="nota_pesajes_anulados">Los registros anulados se conservan para consulta y no cuentan como último pesaje.</string>
 </resources>

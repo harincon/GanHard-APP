@@ -75,6 +75,7 @@ public class AnimalFormActivity extends BaseActivity {
             vista.guardar.setEnabled(false); // Se habilita al cargar el animal.
             vista.campoEstado.setVisibility(View.VISIBLE);
             vista.campoFechaEstado.setVisibility(View.VISIBLE);
+            vista.notaEstado.setVisibility(View.VISIBLE);
         } else if (!restaurado) {
             vista.ingreso.setText(FormatoFecha.aPantalla(ingresoInicial));
         }

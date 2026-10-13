@@ -66,8 +66,10 @@ final class FormatoFecha {
      */
     static String mascara(String texto) {
         if (texto == null) return "";
-        if (!texto.matches("[0-9]*")) return texto;
-        String d = texto.length() > 8 ? texto.substring(0, 8) : texto;
+        if (!texto.matches("[0-9/]*")) return texto;
+        for (int i = 0; i < texto.length(); i++) if (texto.charAt(i) == (char) 47 && i != 2 && i != 5) return texto;
+        String d = texto.replace("/", "");
+        if (d.length() > 8) d = d.substring(0, 8);
         if (d.length() <= 2) return d;
         if (d.length() <= 4) return d.substring(0, 2) + "/" + d.substring(2);
         return d.substring(0, 2) + "/" + d.substring(2, 4) + "/" + d.substring(4);

@@ -23,7 +23,7 @@ import java.util.Map;
 public class ConfiguracionActivity extends BaseActivity {
     private ActivityConfiguracionBinding vista;
     private EntradaConfiguracion original = new EntradaConfiguracion("", "", "", "", "");
-    private boolean restaurado, guardando;
+    private boolean restaurado, guardando, edicion;
     @Override protected void onCreate(Bundle estado) {
         super.onCreate(estado);
         vista = ActivityConfiguracionBinding.inflate(getLayoutInflater());
@@ -61,6 +61,7 @@ public class ConfiguracionActivity extends BaseActivity {
                 if (datos != null) {
                     original = new EntradaConfiguracion(datos.usuario.nombre, datos.usuario.correo, datos.finca.nombre,
                             datos.finca.ubicacion, datos.finca.areaHectareas == null ? "" : new DecimalFormat("0.##", DecimalFormatSymbols.getInstance(Locale.US)).format(datos.finca.areaHectareas));
+                    edicion = true;
                     vista.titulo.setText(R.string.editar_configuracion);
                     vista.toolbar.setTitle(R.string.editar_configuracion);
                     vista.guardar.setText(R.string.guardar_cambios);
@@ -98,7 +99,8 @@ public class ConfiguracionActivity extends BaseActivity {
             @Override public void exito(ConfiguracionLocal configuracion) {
                 if (!disponible()) return;
                 guardando = false;
-                startActivity(new Intent(ConfiguracionActivity.this, InicioActivity.class)
+                if (edicion) setResult(RESULT_OK);
+                else startActivity(new Intent(ConfiguracionActivity.this, InicioActivity.class)
                         .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP));
                 finish();
             }

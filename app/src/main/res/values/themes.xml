@@ -65,6 +65,7 @@
         <item name="android:background">@color/gh_surface</item>
         <item name="titleTextColor">@color/gh_text</item>
         <item name="subtitleTextColor">@color/gh_muted</item>
+        <item name="titleTextAppearance">@style/Gh.ToolbarTitulo</item>
     </style>
     <style name="Gh.Filtro" parent="Widget.Material3.CompoundButton.RadioButton">
         <item name="android:minHeight">48dp</item>
@@ -75,5 +76,10 @@
     <style name="Gh.Dato" parent="TextAppearance.Material3.BodyMedium">
         <item name="android:textColor">@color/gh_muted</item>
         <item name="android:textSize">14sp</item>
+    </style>
+    <style name="Gh.ToolbarTitulo" parent="TextAppearance.Material3.TitleMedium">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">@color/gh_text</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
     </style>
 </resources>

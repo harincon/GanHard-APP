@@ -69,6 +69,7 @@ public final class AnimalRepository {
             Animal animal = animalExistente(idAnimal);
             validar(entrada);
             aplicarDatos(animal, entrada);
+            verificarCoherencia(animal);
             guardarCambios(animal);
             return animal;
         }, callback);
@@ -95,6 +96,7 @@ public final class AnimalRepository {
                 animal.estado = estado;
                 animal.fechaEstado = fechaEstado.trim();
             }
+            verificarCoherencia(animal);
             guardarCambios(animal);
             return animal;
         }, callback);
@@ -172,6 +174,15 @@ public final class AnimalRepository {
         animal.observaciones = entrada.observaciones.isEmpty() ? null : entrada.observaciones;
         if (fechaDeEstadoSigueAlIngreso) animal.fechaEstado = entrada.fechaIngreso;
         animal.actualizadoEn = Tiempo.ahoraUtc();
+    }
+
+    /** La fecha del estado no puede quedar antes del ingreso: se rechaza un ingreso editado que la deje así. */
+    private static void verificarCoherencia(Animal animal) throws ErrorModelo {
+        if (animal.fechaEstado.compareTo(animal.fechaIngreso) < 0) {
+            Map<String, ErrorCampo> errores = new LinkedHashMap<>();
+            errores.put("fechaIngreso", new ErrorCampo(CodigoError.FECHA_POSTERIOR));
+            throw ErrorModelo.validacion(errores);
+        }
     }
 
     /** Escribe el animal y reclasifica sus pesajes en una transacción. */
