@@ -94,4 +94,12 @@
     <string name="estado_vendido">Vendido</string>
     <string name="estado_fallecido">Fallecido</string>
     <string name="sexo_y_estado">%1$s · %2$s</string>
+    <string name="ficha_animal">Ficha del animal</string>
+    <string name="sin_registrar">Sin registrar</string>
+    <string name="ultimo_peso_titulo">Último peso</string>
+    <string name="sexo_titulo_ficha">Sexo</string>
+    <string name="fecha_ingreso_ficha">Fecha de ingreso</string>
+    <string name="estado_titulo">Estado</string>
+    <string name="estado_desde">%1$s desde %2$s</string>
+    <string name="animal_no_encontrado">No se encontró el animal.</string>
 </resources>

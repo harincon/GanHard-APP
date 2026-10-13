@@ -20,4 +20,8 @@
         <item name="android:textColor">@color/gh_muted</item>
         <item name="android:paddingTop">4dp</item>
     </style>
+    <style name="Gh.Valor" parent="TextAppearance.Material3.BodyLarge">
+        <item name="android:textColor">@color/gh_text</item>
+        <item name="android:paddingBottom">12dp</item>
+    </style>
 </resources>

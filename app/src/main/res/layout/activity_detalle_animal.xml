@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/raiz" android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical" android:background="@color/gh_background">
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar" android:layout_width="match_parent" android:layout_height="?attr/actionBarSize"
+        android:background="@color/gh_surface" app:title="@string/ficha_animal" app:titleTextColor="@color/gh_text" />
+    <ProgressBar android:id="@+id/progreso" style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent" android:layout_height="4dp" android:indeterminate="true" />
+    <ScrollView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:fillViewport="true" android:clipToPadding="false">
+        <FrameLayout android:layout_width="match_parent" android:layout_height="wrap_content">
+            <LinearLayout android:id="@+id/contenido" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="vertical" android:padding="16dp" android:visibility="gone">
+                <TextView android:id="@+id/fichaCodigo" android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:textSize="28sp" android:textStyle="bold" android:textColor="@color/gh_text" />
+                <TextView android:id="@+id/fichaNombre" android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp" android:layout_marginBottom="16dp" android:textSize="18sp" android:textColor="@color/gh_muted" />
+                <com.google.android.material.card.MaterialCardView android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp" app:cardCornerRadius="12dp" app:cardElevation="0dp" app:strokeWidth="0dp" app:cardBackgroundColor="@color/gh_soft">
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp">
+                        <TextView style="@style/Gh.Etiqueta" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/ultimo_peso_titulo" />
+                        <TextView android:id="@+id/datoUltimoPeso" android:layout_width="match_parent" android:layout_height="wrap_content"
+                            android:textSize="22sp" android:textStyle="bold" android:textColor="@color/gh_primary" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+                <com.google.android.material.card.MaterialCardView android:layout_width="match_parent" android:layout_height="wrap_content"
+                    app:cardCornerRadius="12dp" app:cardElevation="0dp" app:strokeWidth="0dp" app:cardBackgroundColor="@color/gh_surface">
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp">
+                        <TextView style="@style/Gh.Etiqueta" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/sexo_titulo_ficha" />
+                        <TextView android:id="@+id/datoSexo" style="@style/Gh.Valor" android:layout_width="match_parent" android:layout_height="wrap_content" />
+                        <TextView style="@style/Gh.Etiqueta" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/raza" />
+                        <TextView android:id="@+id/datoRaza" style="@style/Gh.Valor" android:layout_width="match_parent" android:layout_height="wrap_content" />
+                        <TextView style="@style/Gh.Etiqueta" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/fecha_nacimiento" />
+                        <TextView android:id="@+id/datoNacimiento" style="@style/Gh.Valor" android:layout_width="match_parent" android:layout_height="wrap_content" />
+                        <TextView style="@style/Gh.Etiqueta" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/fecha_ingreso_ficha" />
+                        <TextView android:id="@+id/datoIngreso" style="@style/Gh.Valor" android:layout_width="match_parent" android:layout_height="wrap_content" />
+                        <TextView style="@style/Gh.Etiqueta" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/estado_titulo" />
+                        <TextView android:id="@+id/datoEstado" style="@style/Gh.Valor" android:layout_width="match_parent" android:layout_height="wrap_content" />
+                        <TextView style="@style/Gh.Etiqueta" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/observaciones_animal" />
+                        <TextView android:id="@+id/datoObservaciones" style="@style/Gh.Valor" android:layout_width="match_parent" android:layout_height="wrap_content" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
+            <LinearLayout android:id="@+id/estadoError" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="vertical" android:padding="24dp" android:gravity="center_horizontal" android:visibility="gone">
+                <TextView android:id="@+id/mensajeError" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center"
+                    android:textSize="16sp" android:textColor="@color/gh_muted" android:accessibilityLiveRegion="polite" />
+                <com.google.android.material.button.MaterialButton android:id="@+id/reintentar" style="@style/Widget.Material3.Button.TextButton"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content" android:minHeight="48dp" android:text="@string/reintentar" />
+            </LinearLayout>
+        </FrameLayout>
+    </ScrollView>
+</LinearLayout>

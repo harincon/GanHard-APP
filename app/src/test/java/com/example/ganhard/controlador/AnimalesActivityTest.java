@@ -211,4 +211,18 @@ public class AnimalesActivityTest {
         assertEquals(View.VISIBLE, pantalla.findViewById(R.id.estadoError).getVisibility());
         assertEquals(pantalla.getString(R.string.error_carga), textoDe(pantalla, R.id.mensajeError));
     }
+
+    @Test public void tocarUnaTarjetaAbreLaFicha() {
+        fincaConfigurada();
+        Animal animal = registrar("GH-001", "Lucero");
+        AnimalesActivity pantalla = abrir().get();
+        RecyclerView lista = pantalla.findViewById(R.id.lista);
+        AnimalAdapter adaptador = adaptador(pantalla);
+        AnimalAdapter.Fila fila = adaptador.onCreateViewHolder(lista, 0);
+        adaptador.onBindViewHolder(fila, 0);
+        fila.itemView.performClick();
+        Intent siguiente = shadowOf(pantalla).getNextStartedActivity();
+        assertEquals(DetalleAnimalActivity.class.getName(), siguiente.getComponent().getClassName());
+        assertEquals(animal.idAnimal, siguiente.getStringExtra(DetalleAnimalActivity.EXTRA_ID_ANIMAL));
+    }
 }

@@ -33,7 +33,8 @@ public class AnimalesActivity extends BaseActivity {
         setContentView(vista.getRoot());
         ajustarBarras(vista.getRoot());
         configurarToolbar(vista.toolbar, true);
-        adaptador = new AnimalAdapter(this, animal -> { /* La ficha se conecta en la tarea 10. */ });
+        adaptador = new AnimalAdapter(this, animal -> startActivity(new Intent(this, DetalleAnimalActivity.class)
+                .putExtra(DetalleAnimalActivity.EXTRA_ID_ANIMAL, animal.idAnimal)));
         vista.lista.setLayoutManager(new LinearLayoutManager(this));
         vista.lista.setAdapter(adaptador);
         vista.buscar.addTextChangedListener(new TextWatcher() {
