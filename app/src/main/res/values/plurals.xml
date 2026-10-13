@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="animales_activos">
+        <item quantity="one">%d animal activo</item>
+        <item quantity="other">%d animales activos</item>
+    </plurals>
+</resources>

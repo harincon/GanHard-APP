@@ -102,4 +102,11 @@
     <string name="estado_titulo">Estado</string>
     <string name="estado_desde">%1$s desde %2$s</string>
     <string name="animal_no_encontrado">No se encontró el animal.</string>
+    <string name="inventario_titulo">Inventario</string>
+    <string name="modulos_titulo">Módulos</string>
+    <string name="proximamente">Próximamente</string>
+    <string name="modulo_sanidad_pendiente">Sanidad · Próximamente</string>
+    <string name="modulo_tareas_pendiente">Tareas · Próximamente</string>
+    <string name="modulo_gastos_pendiente">Gastos · Próximamente</string>
+    <string name="modulo_configuracion">Configuración</string>
 </resources>
