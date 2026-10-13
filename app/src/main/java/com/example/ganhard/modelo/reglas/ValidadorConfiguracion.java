@@ -4,20 +4,20 @@ import java.math.BigDecimal;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-/** Reglas del Modelo, independientes de Android para poder probarlas. */
+/** Reglas del Modelo, independientes de Android para poder probarlas. Devuelve códigos, no textos. */
 public final class ValidadorConfiguracion {
     private ValidadorConfiguracion() {}
-    public static Map<String, String> validar(EntradaConfiguracion entrada) {
-        Map<String, String> errores = new LinkedHashMap<>();
-        obligatorio(errores, "nombre", entrada.nombre, 100, "Escribe el nombre del administrador.");
-        obligatorio(errores, "correo", entrada.correo, 150, "Escribe un correo de contacto.");
-        obligatorio(errores, "finca", entrada.finca, 100, "Escribe el nombre de la finca.");
+    public static Map<String, ErrorCampo> validar(EntradaConfiguracion entrada) {
+        Map<String, ErrorCampo> errores = new LinkedHashMap<>();
+        obligatorio(errores, "nombre", entrada.nombre, 100);
+        obligatorio(errores, "correo", entrada.correo, 150);
+        obligatorio(errores, "finca", entrada.finca, 100);
         if (!entrada.correo.isEmpty() && !entrada.correo.matches("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$")) {
-            errores.put("correo", "Revisa el formato del correo electrónico.");
+            errores.put("correo", new ErrorCampo(CodigoError.FORMATO));
         }
-        if (entrada.ubicacion.length() > 200) errores.put("ubicacion", "Usa un máximo de 200 caracteres.");
+        if (entrada.ubicacion.length() > 200) errores.put("ubicacion", new ErrorCampo(CodigoError.LONGITUD_MAXIMA, 200));
         try { area(entrada.area); }
-        catch (IllegalArgumentException ex) { errores.put("area", "Escribe un área positiva, con hasta 2 decimales y sin separadores de miles."); }
+        catch (IllegalArgumentException ex) { errores.put("area", new ErrorCampo(CodigoError.VALOR_INVALIDO)); }
         return errores;
     }
     public static Double area(String valor) {
@@ -27,8 +27,8 @@ public final class ValidadorConfiguracion {
         if (area.signum() <= 0) throw new IllegalArgumentException("Área no positiva");
         return area.doubleValue();
     }
-    private static void obligatorio(Map<String, String> errores, String campo, String valor, int maximo, String mensaje) {
-        if (valor.isEmpty()) errores.put(campo, mensaje);
-        else if (valor.length() > maximo) errores.put(campo, "Usa un máximo de " + maximo + " caracteres.");
+    private static void obligatorio(Map<String, ErrorCampo> errores, String campo, String valor, int maximo) {
+        if (valor.isEmpty()) errores.put(campo, new ErrorCampo(CodigoError.OBLIGATORIO));
+        else if (valor.length() > maximo) errores.put(campo, new ErrorCampo(CodigoError.LONGITUD_MAXIMA, maximo));
     }
 }

@@ -8,11 +8,9 @@ import com.example.ganhard.modelo.nucleo.Callback;
 import com.example.ganhard.modelo.nucleo.EjecutorModelo;
 import com.example.ganhard.modelo.nucleo.ErrorModelo;
 import com.example.ganhard.modelo.nucleo.Tiempo;
-import com.example.ganhard.modelo.reglas.CodigoError;
 import com.example.ganhard.modelo.reglas.EntradaConfiguracion;
 import com.example.ganhard.modelo.reglas.ErrorCampo;
 import com.example.ganhard.modelo.reglas.ValidadorConfiguracion;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -32,8 +30,8 @@ public final class ConfiguracionRepository {
 
     public void guardar(EntradaConfiguracion entrada, Callback<ConfiguracionLocal> callback) {
         ejecutor.ejecutar(() -> {
-            Map<String, String> errores = ValidadorConfiguracion.validar(entrada);
-            if (!errores.isEmpty()) throw ErrorModelo.validacion(comoCampos(errores));
+            Map<String, ErrorCampo> errores = ValidadorConfiguracion.validar(entrada);
+            if (!errores.isEmpty()) throw ErrorModelo.validacion(errores);
             ConfiguracionLocal existente = dao.cargar();
             Usuario usuario = existente == null ? new Usuario() : existente.usuario;
             Finca finca = existente == null ? new Finca() : existente.finca;
@@ -55,12 +53,5 @@ public final class ConfiguracionRepository {
             dao.guardar(usuario, finca);
             return new ConfiguracionLocal(usuario, finca);
         }, callback);
-    }
-
-    // Provisional: el validador aún devuelve textos; la tarea 3 lo cambia a códigos y elimina este adaptador.
-    private static Map<String, ErrorCampo> comoCampos(Map<String, String> errores) {
-        Map<String, ErrorCampo> campos = new LinkedHashMap<>();
-        for (String campo : errores.keySet()) campos.put(campo, new ErrorCampo(CodigoError.VALOR_INVALIDO));
-        return campos;
     }
 }

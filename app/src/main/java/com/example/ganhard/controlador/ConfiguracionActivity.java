@@ -10,10 +10,13 @@ import com.example.ganhard.modelo.ConfiguracionLocal;
 import com.example.ganhard.modelo.nucleo.Callback;
 import com.example.ganhard.modelo.nucleo.ErrorModelo;
 import com.example.ganhard.modelo.reglas.EntradaConfiguracion;
+import com.example.ganhard.modelo.reglas.ErrorCampo;
 import com.example.ganhard.modelo.reglas.ValidadorConfiguracion;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputLayout;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Locale;
 import java.util.Map;
 
 /** Controlador del formulario. Las reglas y consultas permanecen en el Modelo. */
@@ -56,7 +59,7 @@ public class ConfiguracionActivity extends BaseActivity {
                 if (!disponible()) return;
                 if (datos != null) {
                     original = new EntradaConfiguracion(datos.usuario.nombre, datos.usuario.correo, datos.finca.nombre,
-                            datos.finca.ubicacion, datos.finca.areaHectareas == null ? "" : new DecimalFormat("0.##").format(datos.finca.areaHectareas));
+                            datos.finca.ubicacion, datos.finca.areaHectareas == null ? "" : new DecimalFormat("0.##", DecimalFormatSymbols.getInstance(Locale.US)).format(datos.finca.areaHectareas));
                     vista.titulo.setText(R.string.editar_configuracion);
                     vista.toolbar.setTitle(R.string.editar_configuracion);
                     vista.guardar.setText(R.string.guardar_cambios);
@@ -76,9 +79,12 @@ public class ConfiguracionActivity extends BaseActivity {
     }
     private void guardar() {
         EntradaConfiguracion datos = entrada();
-        Map<String, String> errores = ValidadorConfiguracion.validar(datos);
+        Map<String, ErrorCampo> errores = ValidadorConfiguracion.validar(datos);
         Map<String, TextInputLayout> campos = campos();
-        for (Map.Entry<String, TextInputLayout> campo : campos.entrySet()) campo.getValue().setError(errores.get(campo.getKey()));
+        for (Map.Entry<String, TextInputLayout> campo : campos.entrySet()) {
+            ErrorCampo error = errores.get(campo.getKey());
+            campo.getValue().setError(error == null ? null : MensajesError.texto(this, campo.getKey(), error));
+        }
         if (!errores.isEmpty()) {
             TextInputLayout primero = campos.get(errores.keySet().iterator().next());
             if (primero != null && primero.getEditText() != null) primero.getEditText().requestFocus();

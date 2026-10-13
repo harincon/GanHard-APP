@@ -40,4 +40,17 @@
     <string name="descartar_mensaje">Tienes datos escritos que todavía no has guardado.</string>
     <string name="descartar">Descartar</string>
     <string name="seguir_editando">Seguir editando</string>
+    <string name="error_obligatorio">Completa este campo.</string>
+    <string name="error_longitud_maxima">Usa un máximo de %1$d caracteres.</string>
+    <string name="error_formato">Revisa el formato de este campo.</string>
+    <string name="error_valor_invalido">Revisa el valor escrito.</string>
+    <string name="error_fuera_de_rango">El valor está fuera del rango permitido.</string>
+    <string name="error_fecha_futura">La fecha no puede ser futura.</string>
+    <string name="error_fecha_anterior">La fecha no puede ser anterior a otra fecha del registro.</string>
+    <string name="error_duplicado">Ya existe un registro con este valor.</string>
+    <string name="error_nombre_obligatorio">Escribe el nombre del administrador.</string>
+    <string name="error_correo_obligatorio">Escribe un correo de contacto.</string>
+    <string name="error_finca_obligatoria">Escribe el nombre de la finca.</string>
+    <string name="error_correo_formato">Revisa el formato del correo electrónico.</string>
+    <string name="error_area_invalida">Escribe un área positiva, con hasta 2 decimales y sin separadores de miles.</string>
 </resources>

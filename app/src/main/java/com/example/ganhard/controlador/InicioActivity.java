@@ -10,6 +10,8 @@ import com.example.ganhard.modelo.ConfiguracionLocal;
 import com.example.ganhard.modelo.nucleo.Callback;
 import com.example.ganhard.modelo.nucleo.ErrorModelo;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Locale;
 
 /** Controlador de Inicio: solicita datos al Modelo y los presenta en la Vista XML. */
 public class InicioActivity extends BaseActivity {
@@ -51,7 +53,7 @@ public class InicioActivity extends BaseActivity {
                 vista.correo.setText(datos.usuario.correo);
                 vista.ubicacion.setText(datos.finca.ubicacion == null ? getString(R.string.ubicacion_sin_registrar) : datos.finca.ubicacion);
                 vista.area.setText(datos.finca.areaHectareas == null ? getString(R.string.area_sin_registrar)
-                        : getString(R.string.area_formato, new DecimalFormat("0.##").format(datos.finca.areaHectareas)));
+                        : getString(R.string.area_formato, new DecimalFormat("0.##", DecimalFormatSymbols.getInstance(Locale.US)).format(datos.finca.areaHectareas)));
                 vista.progreso.setVisibility(View.GONE);
                 vista.mensaje.setVisibility(View.GONE);
                 vista.editar.setEnabled(true);
