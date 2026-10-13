@@ -4,4 +4,16 @@
         <item quantity="one">%d animal activo</item>
         <item quantity="other">%d animales activos</item>
     </plurals>
+    <plurals name="activos_en_finca">
+        <item quantity="one">%d activo en la finca</item>
+        <item quantity="other">%d activos en la finca</item>
+    </plurals>
+    <plurals name="vendidos_en_finca">
+        <item quantity="one">%d vendido en la finca</item>
+        <item quantity="other">%d vendidos en la finca</item>
+    </plurals>
+    <plurals name="fallecidos_en_finca">
+        <item quantity="one">%d fallecido en la finca</item>
+        <item quantity="other">%d fallecidos en la finca</item>
+    </plurals>
 </resources>

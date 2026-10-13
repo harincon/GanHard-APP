@@ -42,9 +42,9 @@ public class AnimalesActivity extends BaseActivity {
             @Override public void onTextChanged(CharSequence s, int inicio, int antes, int cuenta) {}
             @Override public void afterTextChanged(Editable s) { programarConsulta(); }
         });
-        vista.filtros.setOnCheckedStateChangeListener((grupo, ids) -> consultar());
-        vista.agregar.setOnClickListener(v -> registrarAnimal());
-        vista.accionVacio.setOnClickListener(v -> { if (hayFiltros()) limpiarFiltros(); else registrarAnimal(); });
+        vista.filtros.setOnCheckedChangeListener((grupo, id) -> consultar());
+        vista.registrarAnimal.setOnClickListener(v -> startActivity(new Intent(this, AnimalFormActivity.class)));
+        vista.accionVacio.setOnClickListener(v -> limpiarBusqueda());
         vista.reintentar.setOnClickListener(v -> consultar());
     }
 
@@ -66,21 +66,19 @@ public class AnimalesActivity extends BaseActivity {
     private void consultar() {
         manejador.removeCallbacks(consulta);
         final int mia = ++peticion;
+        final String estado = estadoFiltro();
         vista.progreso.setVisibility(View.VISIBLE);
-        app().animales().buscar(textoBusqueda(), estadoFiltro(), new Callback<List<AnimalResumen>>() {
+        app().animales().buscar(textoBusqueda(), estado, new Callback<List<AnimalResumen>>() {
             @Override public void exito(List<AnimalResumen> animales) {
                 if (!disponible() || mia != peticion) return;
                 vista.progreso.setVisibility(View.INVISIBLE);
                 adaptador.mostrar(animales);
+                vista.contadorFiltro.setText(getResources().getQuantityString(plurales(estado), animales.size(), animales.size()));
                 boolean vacia = animales.isEmpty();
                 vista.estadoError.setVisibility(View.GONE);
                 vista.lista.setVisibility(vacia ? View.GONE : View.VISIBLE);
                 vista.estadoVacio.setVisibility(vacia ? View.VISIBLE : View.GONE);
-                if (vacia) {
-                    boolean filtrando = hayFiltros();
-                    vista.mensajeVacio.setText(filtrando ? R.string.sin_coincidencias : R.string.sin_animales);
-                    vista.accionVacio.setText(filtrando ? R.string.limpiar_busqueda : R.string.registrar_animal);
-                }
+                if (vacia) mostrarVacio(estado);
             }
             @Override public void error(ErrorModelo error) {
                 if (!disponible() || mia != peticion) return;
@@ -98,24 +96,35 @@ public class AnimalesActivity extends BaseActivity {
         });
     }
 
+    /** Con texto escrito el mensaje es de búsqueda y ofrece limpiarla; sin texto dice qué grupo está vacío. */
+    private void mostrarVacio(String estado) {
+        boolean buscando = !textoBusqueda().isEmpty();
+        if (buscando) vista.mensajeVacio.setText(R.string.sin_coincidencias);
+        else if (Animal.VENDIDO.equals(estado)) vista.mensajeVacio.setText(R.string.sin_animales_vendidos);
+        else if (Animal.FALLECIDO.equals(estado)) vista.mensajeVacio.setText(R.string.sin_animales_fallecidos);
+        else vista.mensajeVacio.setText(R.string.sin_animales_activos);
+        vista.accionVacio.setVisibility(buscando ? View.VISIBLE : View.GONE);
+    }
+
+    private static int plurales(String estado) {
+        if (Animal.VENDIDO.equals(estado)) return R.plurals.vendidos_en_finca;
+        if (Animal.FALLECIDO.equals(estado)) return R.plurals.fallecidos_en_finca;
+        return R.plurals.activos_en_finca;
+    }
+
     private String textoBusqueda() { return String.valueOf(vista.buscar.getText()).trim(); }
 
-    /** Estado elegido en los filtros; null significa todos. */
+    /** Estado elegido en el filtro; Activos es la opción con la que abre la pantalla. */
     private String estadoFiltro() {
-        int elegido = vista.filtros.getCheckedChipId();
-        if (elegido == R.id.chipActivos) return Animal.ACTIVO;
-        if (elegido == R.id.chipVendidos) return Animal.VENDIDO;
-        if (elegido == R.id.chipFallecidos) return Animal.FALLECIDO;
-        return null;
+        int elegido = vista.filtros.getCheckedRadioButtonId();
+        if (elegido == R.id.filtroVendidos) return Animal.VENDIDO;
+        if (elegido == R.id.filtroFallecidos) return Animal.FALLECIDO;
+        return Animal.ACTIVO;
     }
 
-    private boolean hayFiltros() { return !textoBusqueda().isEmpty() || estadoFiltro() != null; }
-
-    private void limpiarFiltros() {
+    private void limpiarBusqueda() {
         vista.buscar.setText("");
-        vista.chipTodos.setChecked(true);
+        vista.filtroActivos.setChecked(true);
         consultar();
     }
-
-    private void registrarAnimal() { startActivity(new Intent(this, AnimalFormActivity.class)); }
 }

@@ -3,52 +3,51 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/raiz" android:layout_width="match_parent" android:layout_height="match_parent"
     android:orientation="vertical" android:background="@color/gh_background">
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbar" android:layout_width="match_parent" android:layout_height="?attr/actionBarSize"
-        android:background="@color/gh_surface" app:title="@string/animales_titulo" app:titleTextColor="@color/gh_text" />
+    <com.google.android.material.appbar.MaterialToolbar android:id="@+id/toolbar" style="@style/Gh.Toolbar"
+        android:layout_width="match_parent" android:layout_height="wrap_content" app:title="@string/animales_titulo" />
     <ProgressBar android:id="@+id/progreso" style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="match_parent" android:layout_height="4dp" android:indeterminate="true" android:visibility="invisible" />
+    <com.google.android.material.textfield.TextInputLayout android:id="@+id/campoBuscar"
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox" android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/gh_margen" android:layout_marginEnd="@dimen/gh_margen" android:layout_marginTop="@dimen/gh_margen"
+        android:hint="@string/buscar_animales">
+        <com.google.android.material.textfield.TextInputEditText android:id="@+id/buscar" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:inputType="text" android:maxLines="1" android:imeOptions="actionSearch" android:importantForAutofill="no" />
+    </com.google.android.material.textfield.TextInputLayout>
+    <RadioGroup android:id="@+id/filtros" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal"
+        android:paddingStart="@dimen/gh_margen" android:paddingEnd="@dimen/gh_margen" android:contentDescription="@string/filtro_estado">
+        <com.google.android.material.radiobutton.MaterialRadioButton android:id="@+id/filtroActivos" style="@style/Gh.Filtro"
+            android:layout_width="wrap_content" android:layout_height="wrap_content" android:checked="true" android:text="@string/filtro_activos" />
+        <com.google.android.material.radiobutton.MaterialRadioButton android:id="@+id/filtroVendidos" style="@style/Gh.Filtro"
+            android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/filtro_vendidos" />
+        <com.google.android.material.radiobutton.MaterialRadioButton android:id="@+id/filtroFallecidos" style="@style/Gh.Filtro"
+            android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/filtro_fallecidos" />
+    </RadioGroup>
+    <TextView android:id="@+id/contadorFiltro" android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/gh_margen" android:layout_marginEnd="@dimen/gh_margen" android:layout_marginBottom="8dp"
+        android:textSize="12sp" android:textColor="@color/gh_muted" android:accessibilityLiveRegion="polite" />
     <FrameLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
-        <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical">
-            <com.google.android.material.textfield.TextInputLayout android:id="@+id/campoBuscar"
-                style="@style/Widget.Material3.TextInputLayout.OutlinedBox" android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:layout_margin="16dp" android:hint="@string/buscar_animales">
-                <com.google.android.material.textfield.TextInputEditText android:id="@+id/buscar" android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:inputType="text" android:maxLines="1" android:imeOptions="actionSearch" android:importantForAutofill="no" />
-            </com.google.android.material.textfield.TextInputLayout>
-            <HorizontalScrollView android:layout_width="match_parent" android:layout_height="wrap_content" android:scrollbars="none">
-                <com.google.android.material.chip.ChipGroup android:id="@+id/filtros" android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:paddingStart="16dp" android:paddingEnd="16dp" app:singleLine="true" app:singleSelection="true" app:selectionRequired="true">
-                    <com.google.android.material.chip.Chip android:id="@+id/chipTodos" style="@style/Widget.Material3.Chip.Filter" android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" android:minHeight="48dp" android:checked="true" android:text="@string/filtro_todos" />
-                    <com.google.android.material.chip.Chip android:id="@+id/chipActivos" style="@style/Widget.Material3.Chip.Filter" android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" android:minHeight="48dp" android:text="@string/filtro_activos" />
-                    <com.google.android.material.chip.Chip android:id="@+id/chipVendidos" style="@style/Widget.Material3.Chip.Filter" android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" android:minHeight="48dp" android:text="@string/filtro_vendidos" />
-                    <com.google.android.material.chip.Chip android:id="@+id/chipFallecidos" style="@style/Widget.Material3.Chip.Filter" android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" android:minHeight="48dp" android:text="@string/filtro_fallecidos" />
-                </com.google.android.material.chip.ChipGroup>
-            </HorizontalScrollView>
-            <FrameLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
-                <androidx.recyclerview.widget.RecyclerView android:id="@+id/lista" android:layout_width="match_parent" android:layout_height="match_parent"
-                    android:clipToPadding="false" android:paddingTop="8dp" android:paddingBottom="88dp" android:visibility="gone" />
-                <LinearLayout android:id="@+id/estadoVacio" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_gravity="center"
-                    android:orientation="vertical" android:padding="24dp" android:gravity="center_horizontal" android:visibility="gone">
-                    <TextView android:id="@+id/mensajeVacio" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center"
-                        android:textSize="16sp" android:textColor="@color/gh_muted" android:accessibilityLiveRegion="polite" />
-                    <com.google.android.material.button.MaterialButton android:id="@+id/accionVacio" android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp" android:minHeight="48dp" app:cornerRadius="24dp" />
-                </LinearLayout>
-                <LinearLayout android:id="@+id/estadoError" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_gravity="center"
-                    android:orientation="vertical" android:padding="24dp" android:gravity="center_horizontal" android:visibility="gone">
-                    <TextView android:id="@+id/mensajeError" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center"
-                        android:textSize="16sp" android:textColor="@color/gh_muted" android:accessibilityLiveRegion="polite" />
-                    <com.google.android.material.button.MaterialButton android:id="@+id/reintentar" style="@style/Widget.Material3.Button.TextButton"
-                        android:layout_width="wrap_content" android:layout_height="wrap_content" android:minHeight="48dp" android:text="@string/reintentar" />
-                </LinearLayout>
-            </FrameLayout>
+        <androidx.recyclerview.widget.RecyclerView android:id="@+id/lista" android:layout_width="match_parent" android:layout_height="match_parent"
+            android:clipToPadding="false" android:paddingTop="4dp" android:paddingBottom="8dp" android:visibility="gone" />
+        <LinearLayout android:id="@+id/estadoVacio" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_gravity="center"
+            android:orientation="vertical" android:padding="24dp" android:gravity="center_horizontal" android:visibility="gone">
+            <TextView android:id="@+id/mensajeVacio" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center"
+                android:textSize="16sp" android:textColor="@color/gh_muted" android:accessibilityLiveRegion="polite" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/accionVacio" style="@style/Gh.Boton.Tonal" android:layout_width="wrap_content"
+                android:layout_height="wrap_content" android:layout_marginTop="16dp" android:text="@string/limpiar_busqueda" android:visibility="gone" />
         </LinearLayout>
-        <com.google.android.material.floatingactionbutton.FloatingActionButton android:id="@+id/agregar" android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:layout_gravity="bottom|end" android:layout_margin="16dp" app:srcCompat="@drawable/ic_agregar" android:contentDescription="@string/agregar_animal" />
+        <LinearLayout android:id="@+id/estadoError" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_gravity="center"
+            android:orientation="vertical" android:padding="24dp" android:gravity="center_horizontal" android:visibility="gone">
+            <TextView android:id="@+id/mensajeError" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center"
+                android:textSize="16sp" android:textColor="@color/gh_muted" android:accessibilityLiveRegion="polite" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/reintentar" style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="wrap_content" android:layout_height="wrap_content" android:minHeight="48dp" android:text="@string/reintentar" />
+        </LinearLayout>
     </FrameLayout>
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="@dimen/gh_margen">
+        <com.google.android.material.button.MaterialButton android:id="@+id/registrarAnimal" style="@style/Gh.Boton"
+            android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/registrar_animal" />
+        <TextView android:id="@+id/notaAnimales" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp"
+            android:text="@string/nota_animales_inactivos" android:textSize="12sp" android:textColor="@color/gh_muted" />
+    </LinearLayout>
 </LinearLayout>

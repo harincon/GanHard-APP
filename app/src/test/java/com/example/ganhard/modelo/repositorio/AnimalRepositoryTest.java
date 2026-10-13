@@ -448,4 +448,27 @@ public class AnimalRepositoryTest {
         assertTrue(cambiarEstado(animal.idAnimal, Animal.VENDIDO, "2026-06-01").exito);
         assertEquals("2000-01-01T00:00:00.000Z", db.animalDao().porId(animal.idAnimal).actualizadoEn);
     }
+
+    @Test public void elResumenTraeLaRazaYLaFechaDelUltimoPesoVigente() {
+        fincaConfigurada();
+        Captura<Animal> captura = new Captura<>();
+        repositorio.registrar(new EntradaAnimal("GH-014", "Luna", "H", "853193c3-3b52-4d5f-a4df-f73be27e5da1", "", "2026-01-10", ""), captura);
+        Animal luna = captura.esperar().valor;
+        pesaje("p1", luna.idAnimal, "2026-09-25", "07:40:00", 242, 0);
+        pesaje("p2", luna.idAnimal, "2026-10-10", "08:15:00", 250, 0);
+        pesaje("p3", luna.idAnimal, "2026-10-11", "08:15:00", 999, 1);
+        AnimalResumen resumen = buscar(null, null).get(0);
+        assertEquals("Brahman", resumen.razaNombre);
+        assertEquals(Double.valueOf(250), resumen.ultimoPesoKg);
+        assertEquals("2026-10-10", resumen.ultimoPesoFecha);
+    }
+
+    @Test public void unAnimalSinRazaNiPesajesTraeNulos() {
+        fincaConfigurada();
+        registrar("GH-022", "Mora");
+        AnimalResumen resumen = buscar(null, null).get(0);
+        assertNull(resumen.razaNombre);
+        assertNull(resumen.ultimoPesoKg);
+        assertNull(resumen.ultimoPesoFecha);
+    }
 }

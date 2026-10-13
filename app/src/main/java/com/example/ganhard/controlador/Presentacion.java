@@ -26,6 +26,11 @@ final class Presentacion {
         return new DecimalFormat("0.##", DecimalFormatSymbols.getInstance(Locale.US)).format(peso);
     }
 
+    static String ultimoPesaje(Context contexto, Double peso, String fecha) {
+        return peso == null ? contexto.getString(R.string.sin_pesajes)
+                : contexto.getString(R.string.ultimo_pesaje_lista, kilos(peso), FormatoFecha.corta(fecha));
+    }
+
     static String ultimoPeso(Context contexto, Double peso) {
         return peso == null ? contexto.getString(R.string.sin_pesajes) : contexto.getString(R.string.ultimo_peso_formato, kilos(peso));
     }

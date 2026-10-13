@@ -9,5 +9,7 @@ public class AnimalResumen {
     public String nombre;
     public String sexo;
     public String estado;
+    @ColumnInfo(name = "raza_nombre") public String razaNombre;
     @ColumnInfo(name = "ultimo_peso_kg") public Double ultimoPesoKg;
+    @ColumnInfo(name = "ultimo_peso_fecha") public String ultimoPesoFecha;
 }

@@ -19,11 +19,11 @@ public final class AnimalAdapter extends RecyclerView.Adapter<AnimalAdapter.Fila
     }
 
     public static final class Fila extends RecyclerView.ViewHolder {
-        private final TextView codigo, nombre, detalle, peso;
+        private final TextView estado, titulo, detalle, peso;
         Fila(View vista) {
             super(vista);
-            codigo = vista.findViewById(R.id.itemCodigo);
-            nombre = vista.findViewById(R.id.itemNombre);
+            estado = vista.findViewById(R.id.itemEstado);
+            titulo = vista.findViewById(R.id.itemTitulo);
             detalle = vista.findViewById(R.id.itemDetalle);
             peso = vista.findViewById(R.id.itemPeso);
         }
@@ -50,10 +50,11 @@ public final class AnimalAdapter extends RecyclerView.Adapter<AnimalAdapter.Fila
 
     @Override public void onBindViewHolder(@NonNull Fila fila, int posicion) {
         AnimalResumen animal = animales.get(posicion);
-        fila.codigo.setText(animal.codigo);
-        fila.nombre.setText(animal.nombre == null ? contexto.getString(R.string.sin_nombre) : animal.nombre);
-        fila.detalle.setText(contexto.getString(R.string.sexo_y_estado, Presentacion.sexo(contexto, animal.sexo), Presentacion.estado(contexto, animal.estado)));
-        fila.peso.setText(Presentacion.ultimoPeso(contexto, animal.ultimoPesoKg));
+        fila.estado.setText(Presentacion.estado(contexto, animal.estado));
+        fila.titulo.setText(animal.nombre == null ? animal.codigo : contexto.getString(R.string.codigo_nombre, animal.codigo, animal.nombre));
+        String raza = animal.razaNombre == null ? contexto.getString(R.string.raza_sin_registrar) : animal.razaNombre;
+        fila.detalle.setText(contexto.getString(R.string.sexo_y_raza, Presentacion.sexo(contexto, animal.sexo), raza));
+        fila.peso.setText(Presentacion.ultimoPesaje(contexto, animal.ultimoPesoKg, animal.ultimoPesoFecha));
         fila.itemView.setOnClickListener(v -> escucha.alSeleccionar(animal));
     }
 

@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Looper;
 import android.view.View;
+import android.widget.RadioButton;
 import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.ganhard.GanHardApplication;
@@ -16,10 +17,11 @@ import com.example.ganhard.R;
 import com.example.ganhard.modelo.datos.GanHardDatabase;
 import com.example.ganhard.modelo.entidad.Animal;
 import com.example.ganhard.modelo.entidad.Finca;
+import com.example.ganhard.modelo.entidad.Pesaje;
 import com.example.ganhard.modelo.entidad.Usuario;
 import com.example.ganhard.modelo.reglas.EntradaAnimal;
+import com.example.ganhard.modelo.reglas.EntradaPesaje;
 import com.example.ganhard.pruebas.Captura;
-import com.google.android.material.chip.Chip;
 import com.google.android.material.textfield.TextInputEditText;
 import java.util.concurrent.TimeUnit;
 import org.junit.After;
@@ -38,6 +40,7 @@ import org.robolectric.shadows.ShadowLooper;
 @Config(sdk = 28)
 @LooperMode(LooperMode.Mode.PAUSED)
 public class AnimalesActivityTest {
+    private static final String BRAHMAN = "853193c3-3b52-4d5f-a4df-f73be27e5da1";
     private GanHardDatabase db;
     private GanHardApplication app;
 
@@ -59,11 +62,17 @@ public class AnimalesActivityTest {
         finca.nombre = "La Esperanza";
         db.configuracionDao().guardar(usuario, finca);
     }
-    private Animal registrar(String codigo, String nombre) {
+    private Animal registrar(String codigo, String nombre) { return registrar(codigo, nombre, "H", ""); }
+    private Animal registrar(String codigo, String nombre, String sexo, String idRaza) {
         Captura<Animal> captura = new Captura<>();
-        app.animales().registrar(new EntradaAnimal(codigo, nombre, "H", "", "", "2026-01-10", ""), captura);
+        app.animales().registrar(new EntradaAnimal(codigo, nombre, sexo, idRaza, "", "2026-01-10", ""), captura);
         captura.esperar();
         return captura.valor;
+    }
+    private void pesar(Animal animal, String fecha, String hora, String peso) {
+        Captura<Pesaje> captura = new Captura<>();
+        app.pesajes().registrar(animal.idAnimal, new EntradaPesaje(fecha, hora, peso, ""), captura);
+        assertTrue(captura.esperar().exito);
     }
     private void marcar(Animal animal, String estado) {
         Animal guardado = db.animalDao().porId(animal.idAnimal);
@@ -80,10 +89,21 @@ public class AnimalesActivityTest {
         ((TextInputEditText) pantalla.findViewById(R.id.buscar)).setText(texto);
         esperarBusqueda();
     }
+    private void elegirFiltro(AnimalesActivity pantalla, int id) {
+        ((RadioButton) pantalla.findViewById(id)).performClick();
+        shadowOf(Looper.getMainLooper()).idle();
+    }
     private AnimalAdapter adaptador(AnimalesActivity pantalla) {
         return (AnimalAdapter) ((RecyclerView) pantalla.findViewById(R.id.lista)).getAdapter();
     }
-    private String textoDe(AnimalesActivity pantalla, int id) { return ((TextView) pantalla.findViewById(id)).getText().toString(); }
+    private AnimalAdapter.Fila fila(AnimalesActivity pantalla, int posicion) {
+        RecyclerView lista = pantalla.findViewById(R.id.lista);
+        AnimalAdapter.Fila fila = adaptador(pantalla).onCreateViewHolder(lista, 0);
+        adaptador(pantalla).onBindViewHolder(fila, posicion);
+        return fila;
+    }
+    private String texto(View vista, int id) { return ((TextView) vista.findViewById(id)).getText().toString(); }
+    private String textoDe(AnimalesActivity pantalla, int id) { return texto(pantalla.findViewById(android.R.id.content), id); }
 
     @Test public void sinFincaConfiguradaAbreConfiguracion() {
         AnimalesActivity pantalla = abrir().get();
@@ -93,34 +113,105 @@ public class AnimalesActivityTest {
         assertTrue(pantalla.isFinishing());
     }
 
-    @Test public void listaVaciaMuestraMensajeYAccionParaRegistrar() {
+    @Test public void abreConActivosSeleccionadoYSoloMuestraActivos() {
+        fincaConfigurada();
+        registrar("GH-001", "Lucero");
+        marcar(registrar("GH-002", "Estrella"), Animal.VENDIDO);
+        AnimalesActivity pantalla = abrir().get();
+        assertTrue(((RadioButton) pantalla.findViewById(R.id.filtroActivos)).isChecked());
+        assertEquals(1, adaptador(pantalla).getItemCount());
+        assertEquals("GH-001 · Lucero", texto(fila(pantalla, 0).itemView, R.id.itemTitulo));
+    }
+
+    @Test public void yaNoHayOpcionTodosNiChipsNiBotonFlotante() {
+        fincaConfigurada();
+        AnimalesActivity pantalla = abrir().get();
+        for (String nombre : new String[]{"chipTodos", "chipActivos", "agregar"}) {
+            assertEquals(nombre, null, pantalla.findViewById(pantalla.getResources().getIdentifier(nombre, "id", pantalla.getPackageName())));
+        }
+    }
+
+    @Test public void elContadorUsaSingularPluralYCero() {
+        fincaConfigurada();
+        registrar("GH-001", "Uno");
+        AnimalesActivity pantalla = abrir().get();
+        assertEquals("1 activo en la finca", texto(pantalla.findViewById(R.id.contadorFiltro).getRootView(), R.id.contadorFiltro));
+        registrar("GH-002", "Dos");
+        buscar(pantalla, "");
+        pantalla.findViewById(R.id.filtroActivos).performClick();
+        ActivityController<AnimalesActivity> otra = abrir();
+        assertEquals("2 activos en la finca", texto(otra.get().findViewById(R.id.contadorFiltro).getRootView(), R.id.contadorFiltro));
+        elegirFiltro(otra.get(), R.id.filtroVendidos);
+        assertEquals("0 vendidos en la finca", texto(otra.get().findViewById(R.id.contadorFiltro).getRootView(), R.id.contadorFiltro));
+        elegirFiltro(otra.get(), R.id.filtroFallecidos);
+        assertEquals("0 fallecidos en la finca", texto(otra.get().findViewById(R.id.contadorFiltro).getRootView(), R.id.contadorFiltro));
+    }
+
+    @Test public void cambiarAVendidosYFallecidosMuestraEsosAnimales() {
+        fincaConfigurada();
+        registrar("GH-001", "Lucero");
+        marcar(registrar("GH-002", "Estrella"), Animal.VENDIDO);
+        marcar(registrar("GH-003", "Luna"), Animal.FALLECIDO);
+        AnimalesActivity pantalla = abrir().get();
+        elegirFiltro(pantalla, R.id.filtroVendidos);
+        assertEquals(1, adaptador(pantalla).getItemCount());
+        assertEquals("GH-002 · Estrella", texto(fila(pantalla, 0).itemView, R.id.itemTitulo));
+        assertEquals("1 vendido en la finca", textoDe(pantalla, R.id.contadorFiltro));
+        elegirFiltro(pantalla, R.id.filtroFallecidos);
+        assertEquals("GH-003 · Luna", texto(fila(pantalla, 0).itemView, R.id.itemTitulo));
+        elegirFiltro(pantalla, R.id.filtroActivos);
+        assertEquals("GH-001 · Lucero", texto(fila(pantalla, 0).itemView, R.id.itemTitulo));
+    }
+
+    @Test public void laTarjetaMuestraOverlineTituloRazaYUltimoPesaje() {
+        fincaConfigurada();
+        Animal luna = registrar("GH-014", "Luna", "H", BRAHMAN);
+        pesar(luna, "2026-10-10", "08:15", "250");
+        AnimalesActivity pantalla = abrir().get();
+        View tarjeta = fila(pantalla, 0).itemView;
+        assertEquals("Activo", texto(tarjeta, R.id.itemEstado));
+        assertEquals("GH-014 · Luna", texto(tarjeta, R.id.itemTitulo));
+        assertEquals("Hembra · Brahman", texto(tarjeta, R.id.itemDetalle));
+        assertEquals("Último pesaje: 250 kg · 10 oct 2026", texto(tarjeta, R.id.itemPeso));
+    }
+
+    @Test public void unAnimalSinNombreNiRazaNiPesajesSeMuestraCompleto() {
+        fincaConfigurada();
+        registrar("GH-022", "", "M", "");
+        AnimalesActivity pantalla = abrir().get();
+        View tarjeta = fila(pantalla, 0).itemView;
+        assertEquals("GH-022", texto(tarjeta, R.id.itemTitulo));
+        assertEquals("Macho · Raza sin registrar", texto(tarjeta, R.id.itemDetalle));
+        assertEquals(pantalla.getString(R.string.sin_pesajes), texto(tarjeta, R.id.itemPeso));
+    }
+
+    @Test public void sinAnimalesActivosDiceQueNoHayYElBotonDeRegistrarSigueDisponible() {
         fincaConfigurada();
         AnimalesActivity pantalla = abrir().get();
         assertEquals(View.VISIBLE, pantalla.findViewById(R.id.estadoVacio).getVisibility());
         assertEquals(View.GONE, pantalla.findViewById(R.id.lista).getVisibility());
-        assertEquals(pantalla.getString(R.string.sin_animales), textoDe(pantalla, R.id.mensajeVacio));
-        assertEquals(pantalla.getString(R.string.registrar_animal), textoDe(pantalla, R.id.accionVacio));
-        pantalla.findViewById(R.id.accionVacio).performClick();
+        assertEquals(pantalla.getString(R.string.sin_animales_activos), textoDe(pantalla, R.id.mensajeVacio));
+        assertEquals(View.GONE, pantalla.findViewById(R.id.accionVacio).getVisibility());
+        pantalla.findViewById(R.id.registrarAnimal).performClick();
         assertEquals(AnimalFormActivity.class.getName(), shadowOf(pantalla).getNextStartedActivity().getComponent().getClassName());
     }
 
-    @Test public void muestraLosAnimalesRegistrados() {
+    @Test public void sinVendidosNiFallecidosDiceQueNoHay() {
         fincaConfigurada();
         registrar("GH-001", "Lucero");
-        registrar("GH-002", null);
         AnimalesActivity pantalla = abrir().get();
-        assertEquals(View.GONE, pantalla.findViewById(R.id.estadoVacio).getVisibility());
-        AnimalAdapter adaptador = adaptador(pantalla);
-        assertEquals(2, adaptador.getItemCount());
-        RecyclerView lista = pantalla.findViewById(R.id.lista);
-        AnimalAdapter.Fila fila = adaptador.onCreateViewHolder(lista, 0);
-        adaptador.onBindViewHolder(fila, 0);
-        assertEquals("GH-001", ((TextView) fila.itemView.findViewById(R.id.itemCodigo)).getText().toString());
-        assertEquals("Lucero", ((TextView) fila.itemView.findViewById(R.id.itemNombre)).getText().toString());
-        assertEquals(pantalla.getString(R.string.sin_pesajes), ((TextView) fila.itemView.findViewById(R.id.itemPeso)).getText().toString());
-        AnimalAdapter.Fila sinNombre = adaptador.onCreateViewHolder(lista, 0);
-        adaptador.onBindViewHolder(sinNombre, 1);
-        assertEquals(pantalla.getString(R.string.sin_nombre), ((TextView) sinNombre.itemView.findViewById(R.id.itemNombre)).getText().toString());
+        elegirFiltro(pantalla, R.id.filtroVendidos);
+        assertEquals(pantalla.getString(R.string.sin_animales_vendidos), textoDe(pantalla, R.id.mensajeVacio));
+        elegirFiltro(pantalla, R.id.filtroFallecidos);
+        assertEquals(pantalla.getString(R.string.sin_animales_fallecidos), textoDe(pantalla, R.id.mensajeVacio));
+    }
+
+    @Test public void elBotonDeRegistrarEstaSiempreYLaNotaTambien() {
+        fincaConfigurada();
+        registrar("GH-001", "Lucero");
+        AnimalesActivity pantalla = abrir().get();
+        assertEquals(pantalla.getString(R.string.registrar_animal), textoDe(pantalla, R.id.registrarAnimal));
+        assertEquals(pantalla.getString(R.string.nota_animales_inactivos), textoDe(pantalla, R.id.notaAnimales));
     }
 
     @Test public void busquedaSinCoincidenciasMuestraMensajeYLimpiarRestauraLaLista() {
@@ -134,6 +225,7 @@ public class AnimalesActivityTest {
         pantalla.findViewById(R.id.accionVacio).performClick();
         esperarBusqueda();
         assertEquals("", textoDe(pantalla, R.id.buscar));
+        assertTrue(((RadioButton) pantalla.findViewById(R.id.filtroActivos)).isChecked());
         assertEquals(1, adaptador(pantalla).getItemCount());
         assertEquals(View.GONE, pantalla.findViewById(R.id.estadoVacio).getVisibility());
     }
@@ -159,21 +251,18 @@ public class AnimalesActivityTest {
         assertEquals(pantalla.getString(R.string.sin_coincidencias), textoDe(pantalla, R.id.mensajeVacio));
     }
 
-    @Test public void filtroDeEstadoOcultaLosVendidos() {
+    @Test public void busquedaYFiltroSeCombinan() {
         fincaConfigurada();
         registrar("GH-001", "Lucero");
-        marcar(registrar("GH-002", "Estrella"), Animal.VENDIDO);
+        marcar(registrar("GH-002", "Lucía"), Animal.VENDIDO);
         AnimalesActivity pantalla = abrir().get();
-        assertEquals(2, adaptador(pantalla).getItemCount());
-        ((Chip) pantalla.findViewById(R.id.chipActivos)).performClick();
-        shadowOf(Looper.getMainLooper()).idle();
+        buscar(pantalla, "lu");
         assertEquals(1, adaptador(pantalla).getItemCount());
-        ((Chip) pantalla.findViewById(R.id.chipVendidos)).performClick();
-        shadowOf(Looper.getMainLooper()).idle();
+        elegirFiltro(pantalla, R.id.filtroVendidos);
         assertEquals(1, adaptador(pantalla).getItemCount());
-        ((Chip) pantalla.findViewById(R.id.chipTodos)).performClick();
-        shadowOf(Looper.getMainLooper()).idle();
-        assertEquals(2, adaptador(pantalla).getItemCount());
+        assertEquals("GH-002 · Lucía", texto(fila(pantalla, 0).itemView, R.id.itemTitulo));
+        buscar(pantalla, "lucero");
+        assertEquals(0, adaptador(pantalla).getItemCount());
     }
 
     @Test public void volverDelRegistroRefrescaLaLista() {
@@ -188,11 +277,10 @@ public class AnimalesActivityTest {
 
     @Test public void rotarConservaElTextoDeBusquedaYElFiltro() {
         fincaConfigurada();
-        registrar("GH-001", "Lucero");
+        marcar(registrar("GH-001", "Lucero"), Animal.VENDIDO);
         ActivityController<AnimalesActivity> primera = abrir();
         buscar(primera.get(), "GH");
-        ((Chip) primera.get().findViewById(R.id.chipActivos)).performClick();
-        shadowOf(Looper.getMainLooper()).idle();
+        elegirFiltro(primera.get(), R.id.filtroVendidos);
         Bundle estado = new Bundle();
         primera.pause().saveInstanceState(estado).stop().destroy();
         ActivityController<AnimalesActivity> segunda = Robolectric.buildActivity(AnimalesActivity.class)
@@ -200,7 +288,7 @@ public class AnimalesActivityTest {
         shadowOf(Looper.getMainLooper()).idle();
         esperarBusqueda();
         assertEquals("GH", textoDe(segunda.get(), R.id.buscar));
-        assertTrue(((Chip) segunda.get().findViewById(R.id.chipActivos)).isChecked());
+        assertTrue(((RadioButton) segunda.get().findViewById(R.id.filtroVendidos)).isChecked());
         assertEquals(1, adaptador(segunda.get()).getItemCount());
     }
 
@@ -216,11 +304,7 @@ public class AnimalesActivityTest {
         fincaConfigurada();
         Animal animal = registrar("GH-001", "Lucero");
         AnimalesActivity pantalla = abrir().get();
-        RecyclerView lista = pantalla.findViewById(R.id.lista);
-        AnimalAdapter adaptador = adaptador(pantalla);
-        AnimalAdapter.Fila fila = adaptador.onCreateViewHolder(lista, 0);
-        adaptador.onBindViewHolder(fila, 0);
-        fila.itemView.performClick();
+        fila(pantalla, 0).itemView.performClick();
         Intent siguiente = shadowOf(pantalla).getNextStartedActivity();
         assertEquals(DetalleAnimalActivity.class.getName(), siguiente.getComponent().getClassName());
         assertEquals(animal.idAnimal, siguiente.getStringExtra(DetalleAnimalActivity.EXTRA_ID_ANIMAL));

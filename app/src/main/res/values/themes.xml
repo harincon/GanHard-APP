@@ -65,4 +65,10 @@
         <item name="titleTextColor">@color/gh_text</item>
         <item name="subtitleTextColor">@color/gh_muted</item>
     </style>
+    <style name="Gh.Filtro" parent="Widget.Material3.CompoundButton.RadioButton">
+        <item name="android:minHeight">48dp</item>
+        <item name="android:textColor">@color/gh_primary</item>
+        <item name="buttonTint">@color/gh_primary</item>
+        <item name="android:textSize">14sp</item>
+    </style>
 </resources>
