@@ -9,4 +9,7 @@ import java.util.List;
 public interface RazaDao {
     @Query("SELECT * FROM raza ORDER BY nombre")
     List<Raza> todas();
+
+    @Query("SELECT * FROM raza WHERE id_raza = :idRaza")
+    Raza porId(String idRaza);
 }

@@ -17,6 +17,7 @@ import com.example.ganhard.modelo.entidad.Usuario;
 public abstract class GanHardDatabase extends RoomDatabase {
     public abstract ConfiguracionDao configuracionDao();
     public abstract RazaDao razaDao();
+    public abstract AnimalDao animalDao();
 
     /** Constructor con las migraciones y la siembra de razas; con archivo nulo la base es en memoria. */
     public static Builder<GanHardDatabase> constructor(Context contexto, String archivo) {
