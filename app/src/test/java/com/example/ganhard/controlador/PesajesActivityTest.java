@@ -1,7 +1,8 @@
 package com.example.ganhard.controlador;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.robolectric.Shadows.shadowOf;
 
@@ -20,6 +21,7 @@ import com.example.ganhard.modelo.entidad.Usuario;
 import com.example.ganhard.modelo.reglas.EntradaAnimal;
 import com.example.ganhard.modelo.reglas.EntradaPesaje;
 import com.example.ganhard.pruebas.Captura;
+import com.google.android.material.appbar.MaterialToolbar;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -53,12 +55,15 @@ public class PesajesActivityTest {
         finca.idPropietario = usuario.idUsuario;
         finca.nombre = "La Esperanza";
         db.configuracionDao().guardar(usuario, finca);
-        Captura<Animal> captura = new Captura<>();
-        app.animales().registrar(new EntradaAnimal("GH-001", "Lucero", "H", "", "2025-03-01", "2026-01-10", ""), captura);
-        animal = captura.esperar().valor;
+        animal = registrar("GH-014", "Luna");
     }
     @After public void limpiar() { db.close(); }
 
+    private Animal registrar(String codigo, String nombre) {
+        Captura<Animal> captura = new Captura<>();
+        app.animales().registrar(new EntradaAnimal(codigo, nombre, "H", "", "2025-03-01", "2026-01-10", ""), captura);
+        return captura.esperar().valor;
+    }
     private void pesar(String fecha, String hora, String peso, String observaciones) {
         Captura<Pesaje> captura = new Captura<>();
         app.pesajes().registrar(animal.idAnimal, new EntradaPesaje(fecha, hora, peso, observaciones), captura);
@@ -80,7 +85,7 @@ public class PesajesActivityTest {
         adaptador(pantalla).onBindViewHolder(fila, posicion);
         return fila;
     }
-    private String texto(android.view.View vista, int id) { return ((TextView) vista.findViewById(id)).getText().toString(); }
+    private String texto(View vista, int id) { return ((TextView) vista.findViewById(id)).getText().toString(); }
 
     @Test public void unAnimalInexistenteOSinIdSeCierraConMensaje() {
         assertTrue(abrir(null).get().isFinishing());
@@ -89,37 +94,66 @@ public class PesajesActivityTest {
         assertEquals(ajeno.getString(R.string.animal_no_encontrado), ShadowToast.getTextOfLatestToast());
     }
 
-    @Test public void historialVacioMuestraAccionParaRegistrar() {
+    @Test public void elTituloUsaElNombreOElCodigo() {
+        PesajesActivity conNombre = abrir(animal.idAnimal).get();
+        assertEquals("Pesajes de Luna", String.valueOf(((MaterialToolbar) conNombre.findViewById(R.id.toolbar)).getTitle()));
+        Animal sinNombre = registrar("GH-022", "");
+        PesajesActivity sinNombrePantalla = abrir(sinNombre.idAnimal).get();
+        assertEquals("Pesajes de GH-022", String.valueOf(((MaterialToolbar) sinNombrePantalla.findViewById(R.id.toolbar)).getTitle()));
+    }
+
+    @Test public void laCabeceraDiceElCodigoYElOrden() {
+        PesajesActivity pantalla = abrir(animal.idAnimal).get();
+        assertEquals("GH-014 · Historial de peso", texto(pantalla.findViewById(R.id.raiz), R.id.pesajesCabecera));
+        assertEquals(pantalla.getString(R.string.pesajes_orden), texto(pantalla.findViewById(R.id.raiz), R.id.pesajesOrden));
+    }
+
+    @Test public void historialVacioMuestraMensajeYElBotonDeRegistrarSigueDisponible() {
         PesajesActivity pantalla = abrir(animal.idAnimal).get();
         assertEquals(View.VISIBLE, pantalla.findViewById(R.id.estadoVacio).getVisibility());
         assertEquals(View.GONE, pantalla.findViewById(R.id.lista).getVisibility());
         assertEquals(pantalla.getString(R.string.sin_pesajes_historial), texto(pantalla.findViewById(R.id.estadoVacio), R.id.mensajeVacio));
-        pantalla.findViewById(R.id.accionVacio).performClick();
+        pantalla.findViewById(R.id.registrarPesaje).performClick();
         Intent siguiente = shadowOf(pantalla).getNextStartedActivity();
         assertEquals(PesajeFormActivity.class.getName(), siguiente.getComponent().getClassName());
         assertEquals(animal.idAnimal, siguiente.getStringExtra(PesajeFormActivity.EXTRA_ID_ANIMAL));
     }
 
-    @Test public void muestraLosPesajesDelMasRecienteAlMasAntiguo() {
-        pesar("2026-02-01", "08:00", "400", "");
-        pesar("2026-03-01", "18:00", "425", "Después de la lluvia");
+    @Test public void lasTarjetasMuestranFechaConHora12hYSoloLaPrimeraDiceVigente() {
+        pesar("2026-09-10", "08:00", "235", "");
+        pesar("2026-09-25", "07:40", "242", "");
+        pesar("2026-10-10", "08:15", "250", "Después de la lluvia");
         PesajesActivity pantalla = abrir(animal.idAnimal).get();
-        assertEquals(2, adaptador(pantalla).getItemCount());
+        assertEquals(3, adaptador(pantalla).getItemCount());
         PesajeAdapter.Fila primera = fila(pantalla, 0);
-        assertEquals("425 kg", texto(primera.itemView, R.id.itemPeso));
-        assertEquals("2026-03-01 · 18:00", texto(primera.itemView, R.id.itemFechaHora));
+        assertEquals(View.VISIBLE, primera.itemView.findViewById(R.id.itemVigente).getVisibility());
+        assertEquals("Vigente", texto(primera.itemView, R.id.itemVigente));
+        assertEquals("250 kg", texto(primera.itemView, R.id.itemPeso));
+        assertEquals("10 oct 2026 · 8:15 a. m.", texto(primera.itemView, R.id.itemFechaHora));
         assertEquals("Después de la lluvia", texto(primera.itemView, R.id.itemObservaciones));
-        assertEquals(View.GONE, primera.itemView.findViewById(R.id.itemAntecedente).getVisibility());
         PesajeAdapter.Fila segunda = fila(pantalla, 1);
-        assertEquals("400 kg", texto(segunda.itemView, R.id.itemPeso));
+        assertEquals(View.GONE, segunda.itemView.findViewById(R.id.itemVigente).getVisibility());
+        assertEquals("242 kg", texto(segunda.itemView, R.id.itemPeso));
+        assertEquals("25 sep 2026 · 7:40 a. m.", texto(segunda.itemView, R.id.itemFechaHora));
         assertEquals(View.GONE, segunda.itemView.findViewById(R.id.itemObservaciones).getVisibility());
     }
 
-    @Test public void unAntecedenteMuestraSuMarcaYSinHora() {
+    @Test public void unAntecedenteSinHoraMuestraSuMarcaYSinHora() {
         pesar("2025-12-31", "", "380", "");
         PesajeAdapter.Fila fila = fila(abrir(animal.idAnimal).get(), 0);
         assertEquals(View.VISIBLE, fila.itemView.findViewById(R.id.itemAntecedente).getVisibility());
-        assertTrue(texto(fila.itemView, R.id.itemFechaHora).contains(RuntimeEnvironment.getApplication().getString(R.string.sin_hora)));
+        assertEquals("31 dic 2025 · " + RuntimeEnvironment.getApplication().getString(R.string.sin_hora), texto(fila.itemView, R.id.itemFechaHora));
+    }
+
+    @Test public void noHayBotonFlotanteYProgramarProximoPesajeEstaDeshabilitado() {
+        PesajesActivity pantalla = abrir(animal.idAnimal).get();
+        assertNull(pantalla.findViewById(pantalla.getResources().getIdentifier("agregar", "id", pantalla.getPackageName())));
+        FilaNavegacion programar = pantalla.findViewById(R.id.filaProgramar);
+        assertFalse(programar.isEnabled());
+        assertEquals(pantalla.getString(R.string.programar_pesaje), texto(programar, R.id.filaTitulo));
+        assertTrue(texto(programar, R.id.filaSubtitulo).contains(pantalla.getString(R.string.proximamente)));
+        programar.performClick();
+        assertNull(shadowOf(pantalla).getNextStartedActivity());
     }
 
     @Test public void volverDelFormularioRefrescaElHistorial() {
@@ -130,7 +164,6 @@ public class PesajesActivityTest {
         shadowOf(Looper.getMainLooper()).idle();
         assertEquals(1, adaptador(controlador.get()).getItemCount());
         assertEquals(View.GONE, controlador.get().findViewById(R.id.estadoVacio).getVisibility());
-        assertNotNull(shadowOf(controlador.get()));
     }
 
     @Test public void errorDeBaseDeDatosMuestraReintentar() {
@@ -138,11 +171,5 @@ public class PesajesActivityTest {
         PesajesActivity pantalla = abrir(animal.idAnimal).get();
         assertEquals(View.VISIBLE, pantalla.findViewById(R.id.estadoError).getVisibility());
         assertEquals(pantalla.getString(R.string.error_carga), texto(pantalla.findViewById(R.id.estadoError), R.id.mensajeError));
-    }
-
-    @Test public void elBotonDeAgregarAbreElFormulario() {
-        PesajesActivity pantalla = abrir(animal.idAnimal).get();
-        pantalla.findViewById(R.id.agregar).performClick();
-        assertEquals(PesajeFormActivity.class.getName(), shadowOf(pantalla).getNextStartedActivity().getComponent().getClassName());
     }
 }

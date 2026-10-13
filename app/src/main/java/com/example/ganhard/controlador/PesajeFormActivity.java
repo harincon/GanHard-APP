@@ -6,6 +6,7 @@ import android.widget.Toast;
 import androidx.activity.OnBackPressedCallback;
 import com.example.ganhard.R;
 import com.example.ganhard.databinding.ActivityPesajeFormBinding;
+import com.example.ganhard.modelo.ConfiguracionLocal;
 import com.example.ganhard.modelo.entidad.Animal;
 import com.example.ganhard.modelo.entidad.Pesaje;
 import com.example.ganhard.modelo.nucleo.Callback;
@@ -23,13 +24,16 @@ import java.time.format.DateTimeParseException;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.UUID;
 
-/** Controlador del registro de pesajes (RF08). Las reglas y los errores por campo los entrega el Modelo. */
+/**
+ * Controlador del registro de pesajes (RF08). La fecha se escribe dd/mm/aaaa y viaja al Modelo en ISO; las reglas y
+ * los errores por campo los entrega el Modelo.
+ */
 public class PesajeFormActivity extends BaseActivity {
     public static final String EXTRA_ID_ANIMAL = "id_animal";
     private static final String ESTADO_FECHA_INICIAL = "fecha_inicial";
     private static final String ESTADO_REGISTRO = "id_registro";
-    private static final String ESTADO_HORA_INICIAL = "hora_inicial";
 
     private ActivityPesajeFormBinding vista;
     private String idAnimal;
@@ -46,9 +50,9 @@ public class PesajeFormActivity extends BaseActivity {
         configurarToolbar(vista.toolbar, true);
         idAnimal = getIntent().getStringExtra(EXTRA_ID_ANIMAL);
         idRegistro = estado == null ? null : estado.getString(ESTADO_REGISTRO);
-        if (idRegistro == null) idRegistro = java.util.UUID.randomUUID().toString();
+        if (idRegistro == null) idRegistro = UUID.randomUUID().toString();
         if (estado == null) {
-            fechaInicial = Tiempo.hoy().toString();
+            fechaInicial = FormatoFecha.aPantalla(Tiempo.hoy().toString());
             LocalTime ahora = Tiempo.ahora().toLocalTime();
             horaInicial = String.format(Locale.US, "%02d:%02d", ahora.getHour(), ahora.getMinute());
             vista.fecha.setText(fechaInicial);
@@ -74,14 +78,31 @@ public class PesajeFormActivity extends BaseActivity {
         if (idAnimal == null) noEncontrado(); else cargarAnimal();
     }
 
+    /** Tarjeta de contexto: el animal al que se le registra el pesaje y la finca. */
     private void cargarAnimal() {
         app().animales().obtener(idAnimal, new Callback<Animal>() {
             @Override public void exito(Animal animal) {
-                if (disponible()) vista.toolbar.setSubtitle(animal.codigo);
+                if (!disponible()) return;
+                vista.contextoAnimal.setText(animal.nombre == null ? animal.codigo : getString(R.string.codigo_nombre, animal.codigo, animal.nombre));
+                String estado = Presentacion.estado(PesajeFormActivity.this, animal.estado).toLowerCase(Locale.ROOT);
+                cargarFinca(estado);
             }
             @Override public void error(ErrorModelo error) {
                 if (!disponible()) return;
                 if (error.tipo == ErrorModelo.Tipo.NO_ENCONTRADO) noEncontrado(); else mensaje(R.string.error_carga);
+            }
+        });
+    }
+
+    private void cargarFinca(String estado) {
+        repositorio().cargar(new Callback<ConfiguracionLocal>() {
+            @Override public void exito(ConfiguracionLocal datos) {
+                if (!disponible()) return;
+                String finca = datos == null ? "" : datos.finca.nombre;
+                vista.contextoDetalle.setText(getString(R.string.contexto_animal, estado, finca));
+            }
+            @Override public void error(ErrorModelo error) {
+                if (disponible()) vista.contextoDetalle.setText(getString(R.string.contexto_animal, estado, ""));
             }
         });
     }
@@ -138,7 +159,6 @@ public class PesajeFormActivity extends BaseActivity {
         if (destino != null && destino.getEditText() != null) destino.getEditText().requestFocus();
     }
 
-
     private void elegirHora() {
         LocalTime actual;
         try { actual = LocalTime.parse(texto(vista.hora).trim()); }
@@ -170,10 +190,12 @@ public class PesajeFormActivity extends BaseActivity {
         finish();
     }
 
+    private static final String ESTADO_HORA_INICIAL = "hora_inicial";
+
     @Override protected void onSaveInstanceState(Bundle estado) {
         estado.putString(ESTADO_FECHA_INICIAL, fechaInicial);
-        estado.putString(ESTADO_REGISTRO, idRegistro);
         estado.putString(ESTADO_HORA_INICIAL, horaInicial);
+        estado.putString(ESTADO_REGISTRO, idRegistro);
         super.onSaveInstanceState(estado);
     }
 }

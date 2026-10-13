@@ -31,9 +31,9 @@ public class PesajesActivity extends BaseActivity {
         adaptador = new PesajeAdapter(this);
         vista.lista.setLayoutManager(new LinearLayoutManager(this));
         vista.lista.setAdapter(adaptador);
-        vista.agregar.setOnClickListener(v -> registrar());
-        vista.accionVacio.setOnClickListener(v -> registrar());
+        vista.registrarPesaje.setOnClickListener(v -> registrar());
         vista.reintentar.setOnClickListener(v -> cargar());
+        vista.filaProgramar.setHabilitada(false);
         if (idAnimal == null) noEncontrado();
         else cargarAnimal();
     }
@@ -47,9 +47,11 @@ public class PesajesActivity extends BaseActivity {
     private void cargarAnimal() {
         app().animales().obtener(idAnimal, new Callback<Animal>() {
             @Override public void exito(Animal animal) {
-                if (disponible()) vista.toolbar.setSubtitle(animal.codigo);
+                if (!disponible()) return;
+                vista.toolbar.setTitle(getString(R.string.pesajes_de, animal.nombre == null ? animal.codigo : animal.nombre));
+                vista.pesajesCabecera.setText(getString(R.string.pesajes_cabecera, animal.codigo));
             }
-            @Override public void error(ErrorModelo error) { /* El historial informa el error; el código es solo contexto. */ }
+            @Override public void error(ErrorModelo error) { /* El historial informa el error; el nombre es solo contexto. */ }
         });
     }
 

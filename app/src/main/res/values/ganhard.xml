@@ -98,9 +98,9 @@
     <string name="pesajes_titulo">Pesajes</string>
     <string name="registrar_pesaje">Registrar pesaje</string>
     <string name="peso_kg_titulo">Peso (kg) *</string>
-    <string name="ayuda_peso">Hasta 2 decimales; coma o punto, sin separadores de miles.</string>
-    <string name="fecha_pesaje">Fecha del pesaje *</string>
-    <string name="hora_pesaje">Hora *</string>
+    <string name="ayuda_peso">Ingresa un valor mayor que cero (hasta 2 decimales).</string>
+    <string name="fecha_pesaje">Fecha de medición *</string>
+    <string name="hora_pesaje">Hora de medición *</string>
     <string name="ayuda_hora">Formato HH:MM. Solo un antecedente anterior al ingreso puede omitirla.</string>
     <string name="elegir_hora">Elegir hora</string>
     <string name="guardar_pesaje">Guardar pesaje</string>
@@ -174,4 +174,11 @@
     <string name="tareas_ficha_sub">Actividades programadas del animal · Próximamente</string>
     <string name="editar_datos">Editar datos y estado</string>
     <string name="editar_datos_sub">Activo, vendido o fallecido</string>
+    <string name="pesajes_de">Pesajes de %1$s</string>
+    <string name="pesajes_cabecera">%1$s · Historial de peso</string>
+    <string name="pesajes_orden">Más recientes primero · Fecha y hora de medición</string>
+    <string name="vigente">Vigente</string>
+    <string name="programar_pesaje">Programar próximo pesaje</string>
+    <string name="programar_pesaje_sub">Crear una tarea futura · Próximamente</string>
+    <string name="contexto_animal">Animal %1$s · %2$s</string>
 </resources>

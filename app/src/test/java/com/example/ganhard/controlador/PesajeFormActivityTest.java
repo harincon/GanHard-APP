@@ -13,7 +13,10 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Looper;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.TextView;
 import com.example.ganhard.GanHardApplication;
 import com.example.ganhard.R;
 import com.example.ganhard.modelo.datos.GanHardDatabase;
@@ -25,6 +28,8 @@ import com.example.ganhard.modelo.reglas.EntradaAnimal;
 import com.example.ganhard.pruebas.Captura;
 import com.google.android.material.textfield.TextInputLayout;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -60,7 +65,7 @@ public class PesajeFormActivityTest {
         finca.nombre = "La Esperanza";
         db.configuracionDao().guardar(usuario, finca);
         Captura<Animal> captura = new Captura<>();
-        app.animales().registrar(new EntradaAnimal("GH-001", "Lucero", "H", "", "2025-03-01", "2026-01-10", ""), captura);
+        app.animales().registrar(new EntradaAnimal("GH-014", "Luna", "H", "", "2025-03-01", "2026-01-10", ""), captura);
         animal = captura.esperar().valor;
     }
     @After public void limpiar() { db.close(); }
@@ -77,7 +82,7 @@ public class PesajeFormActivityTest {
         return controlador;
     }
     private void escribir(Activity pantalla, int id, String texto) { ((EditText) pantalla.findViewById(id)).setText(texto); }
-    private String texto(Activity pantalla, int id) { return ((EditText) pantalla.findViewById(id)).getText().toString(); }
+    private String texto(Activity pantalla, int id) { return ((TextView) pantalla.findViewById(id)).getText().toString(); }
     private String error(Activity pantalla, int idCampo) {
         CharSequence error = ((TextInputLayout) pantalla.findViewById(idCampo)).getError();
         return error == null ? null : error.toString();
@@ -93,6 +98,13 @@ public class PesajeFormActivityTest {
             return c.getInt(0);
         }
     }
+    private void recorrer(View vista, List<Integer> ids) {
+        ids.add(vista.getId());
+        if (vista instanceof ViewGroup) {
+            ViewGroup grupo = (ViewGroup) vista;
+            for (int i = 0; i < grupo.getChildCount(); i++) recorrer(grupo.getChildAt(i), ids);
+        }
+    }
 
     @Test public void unAnimalInexistenteOSinIdSeCierraConMensaje() {
         PesajeFormActivity sinId = Robolectric.buildActivity(PesajeFormActivity.class, intento(null)).create().start().resume().get();
@@ -103,10 +115,32 @@ public class PesajeFormActivityTest {
         assertEquals(ajeno.getString(R.string.animal_no_encontrado), ShadowToast.getTextOfLatestToast());
     }
 
-    @Test public void fechaYHoraComienzanEnElMomentoActual() {
+    @Test public void muestraLaTarjetaDeContextoConAnimalYFinca() {
         PesajeFormActivity pantalla = abrir().get();
-        assertEquals(Tiempo.hoy().toString(), texto(pantalla, R.id.fecha));
+        assertEquals("GH-014 · Luna", texto(pantalla, R.id.contextoAnimal));
+        assertEquals("Animal activo · La Esperanza", texto(pantalla, R.id.contextoDetalle));
+    }
+
+    @Test public void losCamposEstanEnElOrdenDelFigma() {
+        PesajeFormActivity pantalla = abrir().get();
+        List<Integer> ids = new ArrayList<>();
+        recorrer(pantalla.findViewById(R.id.raiz), ids);
+        assertTrue(ids.indexOf(R.id.contextoAnimal) < ids.indexOf(R.id.campoFecha));
+        assertTrue(ids.indexOf(R.id.campoFecha) < ids.indexOf(R.id.campoHora));
+        assertTrue(ids.indexOf(R.id.campoHora) < ids.indexOf(R.id.campoPeso));
+        assertTrue(ids.indexOf(R.id.campoPeso) < ids.indexOf(R.id.campoObservaciones));
+    }
+
+    @Test public void fechaYHoraComienzanEnElMomentoActualConFormatoDelDiseno() {
+        PesajeFormActivity pantalla = abrir().get();
+        assertEquals(FormatoFecha.aPantalla(Tiempo.hoy().toString()), texto(pantalla, R.id.fecha));
+        assertTrue(texto(pantalla, R.id.fecha).matches("^\\d{2}/\\d{2}/\\d{4}$"));
         assertTrue(texto(pantalla, R.id.hora).matches("^\\d{2}:\\d{2}$"));
+    }
+
+    @Test public void laAyudaDelPesoDiceQueDebeSerMayorQueCero() {
+        PesajeFormActivity pantalla = abrir().get();
+        assertEquals(pantalla.getString(R.string.ayuda_peso), String.valueOf(((TextInputLayout) pantalla.findViewById(R.id.campoPeso)).getHelperText()));
     }
 
     @Test public void pesoVacioMuestraErrorYNoGuarda() {
@@ -138,9 +172,9 @@ public class PesajeFormActivityTest {
         assertTrue(error(pantalla, R.id.campoPeso).contains("2000"));
     }
 
-    @Test public void pesoConComaSeGuardaYVuelve() {
+    @Test public void laFechaSeEscribeDdMmAaaaYSeGuardaEnIso() {
         PesajeFormActivity pantalla = abrir().get();
-        escribir(pantalla, R.id.fecha, "2026-02-01");
+        escribir(pantalla, R.id.fecha, "01/02/2026");
         escribir(pantalla, R.id.hora, "09:15");
         escribir(pantalla, R.id.peso, "450,5");
         guardar(pantalla);
@@ -155,9 +189,22 @@ public class PesajeFormActivityTest {
         }
     }
 
+    @Test public void unaFechaMalEscritaMuestraElErrorDeFormatoYConservaLoEscrito() {
+        PesajeFormActivity pantalla = abrir().get();
+        escribir(pantalla, R.id.fecha, "31/02/2026");
+        escribir(pantalla, R.id.peso, "450");
+        guardar(pantalla);
+        assertEquals(pantalla.getString(R.string.error_fecha_formato), error(pantalla, R.id.campoFecha));
+        assertEquals("31/02/2026", texto(pantalla, R.id.fecha));
+        assertEquals(0, contar());
+        escribir(pantalla, R.id.fecha, "5-3-2026");
+        guardar(pantalla);
+        assertEquals(pantalla.getString(R.string.error_fecha_formato), error(pantalla, R.id.campoFecha));
+    }
+
     @Test public void fechaFuturaMuestraElErrorDeLaFecha() {
         PesajeFormActivity pantalla = abrir().get();
-        escribir(pantalla, R.id.fecha, Tiempo.hoy().plusDays(1).toString());
+        escribir(pantalla, R.id.fecha, FormatoFecha.aPantalla(Tiempo.hoy().plusDays(1).toString()));
         escribir(pantalla, R.id.peso, "450");
         guardar(pantalla);
         assertEquals(pantalla.getString(R.string.error_fecha_futura), error(pantalla, R.id.campoFecha));
@@ -176,7 +223,7 @@ public class PesajeFormActivityTest {
 
     @Test public void unAntecedenteSePuedeGuardarSinHora() {
         PesajeFormActivity pantalla = abrir().get();
-        escribir(pantalla, R.id.fecha, "2025-12-31");
+        escribir(pantalla, R.id.fecha, "31/12/2025");
         escribir(pantalla, R.id.hora, "");
         escribir(pantalla, R.id.peso, "380");
         guardar(pantalla);
@@ -199,7 +246,7 @@ public class PesajeFormActivityTest {
 
     @Test public void rotarConservaElFormularioYNoDuplicaElPesaje() {
         ActivityController<PesajeFormActivity> primera = abrir();
-        escribir(primera.get(), R.id.fecha, "2026-02-01");
+        escribir(primera.get(), R.id.fecha, "01/02/2026");
         escribir(primera.get(), R.id.hora, "09:15");
         escribir(primera.get(), R.id.peso, "450,5");
         escribir(primera.get(), R.id.observaciones, "Báscula de la entrada");
@@ -211,9 +258,25 @@ public class PesajeFormActivityTest {
         shadowOf(Looper.getMainLooper()).idle();
         assertEquals("450,5", texto(segunda.get(), R.id.peso));
         assertEquals("Báscula de la entrada", texto(segunda.get(), R.id.observaciones));
-        assertEquals("2026-02-01", texto(segunda.get(), R.id.fecha));
+        assertEquals("01/02/2026", texto(segunda.get(), R.id.fecha));
         assertNull("La pantalla destruida no debe navegar", shadowOf(primera.get()).getNextStartedActivity());
         assertEquals(1, contar());
+    }
+
+    @Test public void rotarYVolverAGuardarNoDuplicaElPesaje() {
+        ActivityController<PesajeFormActivity> primera = abrir();
+        escribir(primera.get(), R.id.fecha, "01/02/2026");
+        escribir(primera.get(), R.id.hora, "09:15");
+        escribir(primera.get(), R.id.peso, "450,5");
+        primera.get().findViewById(R.id.guardar).performClick();
+        Bundle estado = new Bundle();
+        primera.pause().saveInstanceState(estado).stop().destroy();
+        ActivityController<PesajeFormActivity> segunda = Robolectric.buildActivity(PesajeFormActivity.class, intento(animal.idAnimal))
+                .create(estado).start().restoreInstanceState(estado).resume();
+        shadowOf(Looper.getMainLooper()).idle();
+        guardar(segunda.get());
+        assertEquals(1, contar());
+        assertTrue(segunda.get().isFinishing());
     }
 
     @Test public void cancelarSinCambiosCierraYConCambiosPideConfirmar() {
@@ -227,21 +290,5 @@ public class PesajeFormActivityTest {
         assertNotNull(ShadowDialog.getLatestDialog());
         assertTrue(ShadowDialog.getLatestDialog().isShowing());
         assertFalse(conCambios.isFinishing());
-    }
-
-    @Test public void rotarYVolverAGuardarNoDuplicaElPesaje() {
-        ActivityController<PesajeFormActivity> primera = abrir();
-        escribir(primera.get(), R.id.fecha, "2026-02-01");
-        escribir(primera.get(), R.id.hora, "09:15");
-        escribir(primera.get(), R.id.peso, "450,5");
-        primera.get().findViewById(R.id.guardar).performClick(); // el resultado llega a una pantalla ya destruida
-        Bundle estado = new Bundle();
-        primera.pause().saveInstanceState(estado).stop().destroy();
-        ActivityController<PesajeFormActivity> segunda = Robolectric.buildActivity(PesajeFormActivity.class, intento(animal.idAnimal))
-                .create(estado).start().restoreInstanceState(estado).resume();
-        shadowOf(Looper.getMainLooper()).idle();
-        guardar(segunda.get());
-        assertEquals(1, contar());
-        assertTrue(segunda.get().isFinishing());
     }
 }

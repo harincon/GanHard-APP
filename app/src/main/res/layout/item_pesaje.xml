@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent" android:layout_height="wrap_content"
-    android:layout_marginStart="16dp" android:layout_marginEnd="16dp" android:layout_marginBottom="8dp"
-    app:cardCornerRadius="12dp" app:cardElevation="0dp" app:strokeWidth="1dp" app:strokeColor="@color/gh_line" app:cardBackgroundColor="@color/gh_surface">
+    style="@style/Gh.Tarjeta" android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:layout_marginStart="@dimen/gh_margen" android:layout_marginEnd="@dimen/gh_margen" android:layout_marginBottom="12dp">
     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp">
+        <TextView android:id="@+id/itemVigente" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="@string/vigente" android:textAppearance="@style/Gh.Overline" />
         <TextView android:id="@+id/itemPeso" android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:textSize="22sp" android:textStyle="bold" android:textColor="@color/gh_primary" />
+            android:layout_marginTop="4dp" android:textAppearance="@style/Gh.Titulo" />
         <TextView android:id="@+id/itemFechaHora" android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:layout_marginTop="2dp" android:textSize="16sp" android:textColor="@color/gh_text" />
+            android:layout_marginTop="8dp" android:textSize="14sp" android:textColor="@color/gh_muted" />
         <TextView android:id="@+id/itemAntecedente" android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:layout_marginTop="4dp" android:text="@string/antecedente_marca" android:textSize="14sp" android:textColor="@color/gh_muted" />
+            android:layout_marginTop="2dp" android:text="@string/antecedente_marca" android:textSize="14sp" android:textColor="@color/gh_muted" />
         <TextView android:id="@+id/itemObservaciones" android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:layout_marginTop="4dp" android:textSize="14sp" android:textColor="@color/gh_muted" />
+            android:layout_marginTop="2dp" android:textSize="14sp" android:textColor="@color/gh_muted" />
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

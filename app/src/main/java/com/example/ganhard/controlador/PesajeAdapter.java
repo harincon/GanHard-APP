@@ -12,12 +12,13 @@ import com.example.ganhard.modelo.entidad.Pesaje;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Presenta el historial de pesajes; la lista es corta y se reemplaza completa en cada consulta. */
+/** Presenta el historial de pesajes; solo el más reciente se marca como vigente. */
 public final class PesajeAdapter extends RecyclerView.Adapter<PesajeAdapter.Fila> {
     public static final class Fila extends RecyclerView.ViewHolder {
-        private final TextView peso, fechaHora, observaciones, antecedente;
+        private final TextView vigente, peso, fechaHora, observaciones, antecedente;
         Fila(View vista) {
             super(vista);
+            vigente = vista.findViewById(R.id.itemVigente);
             peso = vista.findViewById(R.id.itemPeso);
             fechaHora = vista.findViewById(R.id.itemFechaHora);
             observaciones = vista.findViewById(R.id.itemObservaciones);
@@ -42,9 +43,9 @@ public final class PesajeAdapter extends RecyclerView.Adapter<PesajeAdapter.Fila
 
     @Override public void onBindViewHolder(@NonNull Fila fila, int posicion) {
         Pesaje pesaje = pesajes.get(posicion);
+        fila.vigente.setVisibility(posicion == 0 ? View.VISIBLE : View.GONE);
         fila.peso.setText(contexto.getString(R.string.peso_formato, Presentacion.kilos(pesaje.pesoKg)));
-        String hora = pesaje.hora == null ? contexto.getString(R.string.sin_hora) : pesaje.hora.substring(0, 5);
-        fila.fechaHora.setText(contexto.getString(R.string.fecha_hora_formato, pesaje.fecha, hora));
+        fila.fechaHora.setText(FormatoFecha.fechaYHora(pesaje.fecha, pesaje.hora, contexto.getString(R.string.sin_hora)));
         fila.observaciones.setText(pesaje.observaciones);
         fila.observaciones.setVisibility(pesaje.observaciones == null ? View.GONE : View.VISIBLE);
         fila.antecedente.setVisibility(pesaje.esAntecedente == 1 ? View.VISIBLE : View.GONE);
