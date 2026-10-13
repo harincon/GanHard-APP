@@ -136,4 +136,10 @@
     <string name="error_hora_obligatoria">Escribe la hora (HH:MM). Solo un antecedente anterior al ingreso puede omitirla.</string>
     <string name="error_hora_formato">Usa el formato HH:MM, por ejemplo 09:15.</string>
     <string name="error_hora_futura">La hora no puede ser futura.</string>
+    <string name="editar">Editar</string>
+    <string name="cambiar_estado">Cambiar estado</string>
+    <string name="aplicar">Aplicar</string>
+    <string name="estado_fecha">Fecha del cambio *</string>
+    <string name="animal_actualizado">Cambios de %1$s guardados.</string>
+    <string name="error_estado_antes_ingreso">La fecha no puede ser anterior al ingreso del animal.</string>
 </resources>

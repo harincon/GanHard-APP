@@ -286,4 +286,134 @@ public class AnimalRepositoryTest {
         assertEquals(10, razas.valor.size());
         assertEquals("Angus", razas.valor.get(0).nombre);
     }
+
+    private Captura<Animal> actualizar(String idAnimal, EntradaAnimal entrada) {
+        Captura<Animal> captura = new Captura<>();
+        repositorio.actualizar(idAnimal, entrada, captura);
+        return captura.esperar();
+    }
+    private Captura<Animal> cambiarEstado(String idAnimal, String estado, String fecha) {
+        Captura<Animal> captura = new Captura<>();
+        repositorio.cambiarEstado(idAnimal, estado, fecha, captura);
+        return captura.esperar();
+    }
+    private int antecedente(String idPesaje) {
+        try (Cursor c = db.getOpenHelper().getWritableDatabase().query("SELECT es_antecedente FROM pesaje WHERE id_pesaje = ?", new Object[]{idPesaje})) {
+            c.moveToFirst();
+            return c.getInt(0);
+        }
+    }
+
+    @Test public void editarConservaIdentidadYPesajes() {
+        fincaConfigurada();
+        Animal original = registrar("GH-001", "Lucero");
+        pesaje("p1", original.idAnimal, "2026-02-01", "08:00:00", 400, 0);
+        Captura<Animal> captura = actualizar(original.idAnimal, new EntradaAnimal("GH-001B", "Estrellita", "M", "", "2025-03-01", "2026-01-10", "Nota"));
+        assertTrue(captura.exito);
+        assertEquals(original.idAnimal, captura.valor.idAnimal);
+        assertEquals(original.idFinca, captura.valor.idFinca);
+        assertEquals(original.creadoEn, captura.valor.creadoEn);
+        assertEquals("GH-001B", captura.valor.codigo);
+        assertEquals("Estrellita", captura.valor.nombre);
+        assertEquals("M", captura.valor.sexo);
+        assertEquals("Nota", captura.valor.observaciones);
+        assertEquals(Animal.ACTIVO, captura.valor.estado);
+        assertEquals(1, contar("SELECT COUNT(*) FROM animal"));
+        assertEquals(1, contar("SELECT COUNT(*) FROM pesaje"));
+    }
+
+    @Test public void editarElCodigoAOtroExistenteEsDuplicadoYNoCambiaNada() {
+        fincaConfigurada();
+        registrar("GH-001", "Uno");
+        Animal segundo = registrar("GH-002", "Dos");
+        Captura<Animal> captura = actualizar(segundo.idAnimal, entrada(" gh-001 ", "Dos"));
+        assertEquals(ErrorModelo.Tipo.DUPLICADO, captura.error.tipo);
+        assertEquals(CodigoError.DUPLICADO, captura.error.campos.get("codigo").codigo);
+        assertEquals("GH-002", db.animalDao().porId(segundo.idAnimal).codigo);
+    }
+
+    @Test public void editarConservandoSuPropioCodigoAunqueCambieLaCapitalizacionNoEsDuplicado() {
+        fincaConfigurada();
+        Animal animal = registrar("GH-001", "Uno");
+        Captura<Animal> captura = actualizar(animal.idAnimal, entrada("gh-001 ", "Uno editado"));
+        assertTrue(captura.exito);
+        assertEquals("gh-001", captura.valor.codigo);
+    }
+
+    @Test public void editarUnAnimalInexistenteFallaConNoEncontrado() {
+        fincaConfigurada();
+        assertEquals(ErrorModelo.Tipo.NO_ENCONTRADO, actualizar("no-existe", entrada("GH-001", "Uno")).error.tipo);
+    }
+
+    @Test public void editarConDatosInvalidosNoEscribe() {
+        fincaConfigurada();
+        Animal animal = registrar("GH-001", "Uno");
+        Captura<Animal> captura = actualizar(animal.idAnimal, new EntradaAnimal("GH-001", "Otro nombre", "", "", "", "2026-01-10", ""));
+        assertEquals(ErrorModelo.Tipo.VALIDACION, captura.error.tipo);
+        assertEquals("Uno", db.animalDao().porId(animal.idAnimal).nombre);
+    }
+
+    @Test public void editarElIngresoRecalculaLosAntecedentesDeSusPesajes() {
+        fincaConfigurada();
+        Animal animal = registrar("GH-001", "Uno");
+        pesaje("p1", animal.idAnimal, "2026-01-05", "08:00:00", 380, 0);
+        pesaje("p2", animal.idAnimal, "2026-02-01", "08:00:00", 400, 0);
+        actualizar(animal.idAnimal, new EntradaAnimal("GH-001", "Uno", "H", "", "2025-03-01", "2026-03-01", ""));
+        assertEquals(1, antecedente("p1"));
+        assertEquals(1, antecedente("p2"));
+        actualizar(animal.idAnimal, new EntradaAnimal("GH-001", "Uno", "H", "", "2025-03-01", "2026-01-01", ""));
+        assertEquals(0, antecedente("p1"));
+        assertEquals(0, antecedente("p2"));
+    }
+
+    @Test public void editarElIngresoDeUnAnimalActivoMueveSuFechaDeEstado() {
+        fincaConfigurada();
+        Animal animal = registrar("GH-001", "Uno");
+        Captura<Animal> captura = actualizar(animal.idAnimal, new EntradaAnimal("GH-001", "Uno", "H", "", "", "2026-01-02", ""));
+        assertEquals("2026-01-02", captura.valor.fechaEstado);
+    }
+
+    @Test public void cambiarAVendidoConservaLaFichaYLosPesajes() {
+        fincaConfigurada();
+        Animal animal = registrar("GH-001", "Uno");
+        pesaje("p1", animal.idAnimal, "2026-02-01", "08:00:00", 400, 0);
+        Captura<Animal> captura = cambiarEstado(animal.idAnimal, Animal.VENDIDO, "2026-06-01");
+        assertTrue(captura.exito);
+        assertEquals(Animal.VENDIDO, captura.valor.estado);
+        assertEquals("2026-06-01", captura.valor.fechaEstado);
+        assertEquals("GH-001", captura.valor.codigo);
+        assertEquals(1, contar("SELECT COUNT(*) FROM pesaje"));
+    }
+
+    @Test public void cambiarElEstadoConFechaFuturaOAnteriorAlIngresoFallaYNoCambiaNada() {
+        fincaConfigurada();
+        Animal animal = registrar("GH-001", "Uno");
+        Captura<Animal> futura = cambiarEstado(animal.idAnimal, Animal.FALLECIDO, java.time.LocalDate.now().plusDays(1).toString());
+        assertEquals(CodigoError.FECHA_FUTURA, futura.error.campos.get("fechaEstado").codigo);
+        Captura<Animal> anterior = cambiarEstado(animal.idAnimal, Animal.FALLECIDO, "2026-01-09");
+        assertEquals(CodigoError.FECHA_ANTERIOR, anterior.error.campos.get("fechaEstado").codigo);
+        assertEquals(Animal.ACTIVO, db.animalDao().porId(animal.idAnimal).estado);
+    }
+
+    @Test public void cambiarAUnEstadoDesconocidoOUnAnimalInexistenteFalla() {
+        fincaConfigurada();
+        Animal animal = registrar("GH-001", "Uno");
+        Captura<Animal> desconocido = cambiarEstado(animal.idAnimal, "PERDIDO", "2026-06-01");
+        assertEquals(CodigoError.VALOR_INVALIDO, desconocido.error.campos.get("estado").codigo);
+        assertEquals(ErrorModelo.Tipo.NO_ENCONTRADO, cambiarEstado("no-existe", Animal.VENDIDO, "2026-06-01").error.tipo);
+    }
+
+    @Test public void elInventarioActivoSeActualizaTrasElCambioDeEstado() {
+        fincaConfigurada();
+        Animal uno = registrar("GH-001", "Uno");
+        registrar("GH-002", "Dos");
+        cambiarEstado(uno.idAnimal, Animal.FALLECIDO, "2026-06-01");
+        Captura<Integer> tras = new Captura<>();
+        repositorio.contarActivos(tras);
+        assertEquals(Integer.valueOf(1), tras.esperar().valor);
+        cambiarEstado(uno.idAnimal, Animal.ACTIVO, "2026-06-02");
+        Captura<Integer> vuelta = new Captura<>();
+        repositorio.contarActivos(vuelta);
+        assertEquals(Integer.valueOf(2), vuelta.esperar().valor);
+    }
 }

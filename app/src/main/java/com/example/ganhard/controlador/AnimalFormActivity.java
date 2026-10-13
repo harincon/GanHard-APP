@@ -17,28 +17,30 @@ import com.example.ganhard.modelo.nucleo.Tiempo;
 import com.example.ganhard.modelo.reglas.EntradaAnimal;
 import com.example.ganhard.modelo.reglas.ErrorCampo;
 import com.example.ganhard.modelo.reglas.ValidadorAnimal;
-import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
-import java.time.LocalDate;
-import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-/** Controlador del registro de animales (RF03): lee el formulario, valida y pide guardar al Modelo. */
+/**
+ * Controlador del formulario de animales: registra uno nuevo (RF03) o, con {@link #EXTRA_ID_ANIMAL}, edita
+ * el existente (RF06) sin crear otro registro. Valida y pide guardar al Modelo.
+ */
 public class AnimalFormActivity extends BaseActivity {
-    /** Reservado para la edición del animal (tarea 14); sin este extra la pantalla registra uno nuevo. */
     public static final String EXTRA_ID_ANIMAL = "id_animal";
     private static final String ESTADO_RAZA = "id_raza";
 
     private ActivityAnimalFormBinding vista;
     private final List<Raza> razas = new ArrayList<>();
+    private String idAnimal;
     private String idRaza = "";
     private String ingresoInicial;
-    private boolean guardando;
+    /** Datos del animal al abrir la edición; permite saber si hay cambios sin guardar. */
+    private EntradaAnimal original;
+    private boolean restaurado, razasCargadas, guardando;
 
     @Override protected void onCreate(Bundle estado) {
         super.onCreate(estado);
@@ -46,9 +48,17 @@ public class AnimalFormActivity extends BaseActivity {
         setContentView(vista.getRoot());
         ajustarBarras(vista.getRoot());
         configurarToolbar(vista.toolbar, true);
+        idAnimal = getIntent().getStringExtra(EXTRA_ID_ANIMAL);
+        restaurado = estado != null;
         ingresoInicial = Tiempo.hoy().toString();
-        if (estado == null) vista.ingreso.setText(ingresoInicial);
-        else idRaza = estado.getString(ESTADO_RAZA, "");
+        if (esEdicion()) {
+            vista.toolbar.setTitle(R.string.editar_animal);
+            vista.guardar.setText(R.string.guardar_cambios);
+            vista.guardar.setEnabled(false); // Se habilita al cargar el animal.
+        } else if (!restaurado) {
+            vista.ingreso.setText(ingresoInicial);
+        }
+        if (restaurado) idRaza = estado.getString(ESTADO_RAZA, "");
         vista.guardar.setOnClickListener(v -> guardar());
         vista.cancelar.setOnClickListener(v -> getOnBackPressedDispatcher().onBackPressed());
         vista.campoNacimiento.setEndIconOnClickListener(v -> elegirFecha(vista.nacimiento));
@@ -69,7 +79,10 @@ public class AnimalFormActivity extends BaseActivity {
         });
         verificarFinca();
         cargarRazas();
+        if (esEdicion()) cargarAnimal();
     }
+
+    private boolean esEdicion() { return idAnimal != null; }
 
     /** Sin finca configurada no hay a dónde asociar el animal: se lleva al usuario a configurarla. */
     private void verificarFinca() {
@@ -93,12 +106,54 @@ public class AnimalFormActivity extends BaseActivity {
                 nombres.add(getString(R.string.sin_raza));
                 for (Raza raza : razas) nombres.add(raza.nombre);
                 vista.raza.setAdapter(new ArrayAdapter<>(AnimalFormActivity.this, android.R.layout.simple_dropdown_item_1line, nombres));
-                for (Raza raza : razas) if (raza.idRaza.equals(idRaza)) vista.raza.setText(raza.nombre, false);
+                razasCargadas = true;
+                mostrarRazaElegida();
             }
             @Override public void error(ErrorModelo error) {
                 if (disponible()) mensaje(R.string.error_carga);
             }
         });
+    }
+
+    private void cargarAnimal() {
+        app().animales().obtener(idAnimal, new Callback<Animal>() {
+            @Override public void exito(Animal animal) {
+                if (!disponible()) return;
+                original = entradaDe(animal);
+                if (!restaurado) {
+                    vista.codigo.setText(original.codigo);
+                    vista.nombre.setText(original.nombre);
+                    vista.sexoHembra.setChecked(Animal.HEMBRA.equals(original.sexo));
+                    vista.sexoMacho.setChecked(Animal.MACHO.equals(original.sexo));
+                    vista.nacimiento.setText(original.fechaNacimiento);
+                    vista.ingreso.setText(original.fechaIngreso);
+                    vista.observaciones.setText(original.observaciones);
+                    idRaza = original.idRaza;
+                    mostrarRazaElegida();
+                }
+                vista.guardar.setEnabled(true);
+            }
+            @Override public void error(ErrorModelo error) {
+                if (!disponible()) return;
+                if (error.tipo == ErrorModelo.Tipo.NO_ENCONTRADO) {
+                    Toast.makeText(getApplicationContext(), R.string.animal_no_encontrado, Toast.LENGTH_SHORT).show();
+                    finish();
+                } else {
+                    mensaje(R.string.error_carga);
+                }
+            }
+        });
+    }
+
+    /** Muestra el nombre de la raza elegida cuando ya se conocen tanto la lista como la elección. */
+    private void mostrarRazaElegida() {
+        if (!razasCargadas) return;
+        for (Raza raza : razas) if (raza.idRaza.equals(idRaza)) vista.raza.setText(raza.nombre, false);
+    }
+
+    private static EntradaAnimal entradaDe(Animal animal) {
+        return new EntradaAnimal(animal.codigo, animal.nombre, animal.sexo, animal.idRaza,
+                animal.fechaNacimiento, animal.fechaIngreso, animal.observaciones);
     }
 
     private void guardar() {
@@ -110,11 +165,12 @@ public class AnimalFormActivity extends BaseActivity {
         guardando = true;
         ocupado(true);
         vista.mensaje.setVisibility(View.GONE);
-        app().animales().registrar(entrada, new Callback<Animal>() {
+        Callback<Animal> resultado = new Callback<Animal>() {
             @Override public void exito(Animal animal) {
                 if (!disponible()) return;
                 guardando = false;
-                Toast.makeText(getApplicationContext(), getString(R.string.animal_guardado, animal.codigo), Toast.LENGTH_SHORT).show();
+                int texto = esEdicion() ? R.string.animal_actualizado : R.string.animal_guardado;
+                Toast.makeText(getApplicationContext(), getString(texto, animal.codigo), Toast.LENGTH_SHORT).show();
                 setResult(RESULT_OK);
                 finish();
             }
@@ -130,7 +186,9 @@ public class AnimalFormActivity extends BaseActivity {
                     mensaje(R.string.error_guardado_animal);
                 }
             }
-        });
+        };
+        if (esEdicion()) app().animales().actualizar(idAnimal, entrada, resultado);
+        else app().animales().registrar(entrada, resultado);
     }
 
     private EntradaAnimal entrada() {
@@ -168,21 +226,16 @@ public class AnimalFormActivity extends BaseActivity {
         if (destino != null && destino.getEditText() != null) destino.getEditText().requestFocus();
     }
 
-    private void elegirFecha(TextInputEditText campo) {
-        LocalDate actual;
-        try { actual = LocalDate.parse(texto(campo).trim()); }
-        catch (DateTimeParseException ex) { actual = Tiempo.hoy(); }
-        MaterialDatePicker<Long> selector = MaterialDatePicker.Builder.datePicker()
-                .setTitleText(R.string.elegir_fecha).setSelection(Tiempo.aSelector(actual)).build();
-        selector.addOnPositiveButtonClickListener(seleccion -> campo.setText(Tiempo.fechaDeSelector(seleccion).toString()));
-        selector.show(getSupportFragmentManager(), "fecha");
-    }
-
     private boolean hayCambios() {
-        return !texto(vista.codigo).trim().isEmpty() || !texto(vista.nombre).trim().isEmpty()
-                || vista.sexoHembra.isChecked() || vista.sexoMacho.isChecked() || !idRaza.isEmpty()
-                || !texto(vista.nacimiento).trim().isEmpty() || !texto(vista.ingreso).trim().equals(ingresoInicial)
-                || !texto(vista.observaciones).trim().isEmpty();
+        EntradaAnimal actual = entrada();
+        if (esEdicion()) {
+            return original != null && !(actual.codigo.equals(original.codigo) && actual.nombre.equals(original.nombre)
+                    && actual.sexo.equals(original.sexo) && actual.idRaza.equals(original.idRaza)
+                    && actual.fechaNacimiento.equals(original.fechaNacimiento) && actual.fechaIngreso.equals(original.fechaIngreso)
+                    && actual.observaciones.equals(original.observaciones));
+        }
+        return !actual.codigo.isEmpty() || !actual.nombre.isEmpty() || !actual.sexo.isEmpty() || !actual.idRaza.isEmpty()
+                || !actual.fechaNacimiento.isEmpty() || !actual.fechaIngreso.equals(ingresoInicial) || !actual.observaciones.isEmpty();
     }
 
     private void ocupado(boolean ocupado) {

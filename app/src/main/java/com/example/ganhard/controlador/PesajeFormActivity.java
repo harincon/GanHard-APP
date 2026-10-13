@@ -13,13 +13,11 @@ import com.example.ganhard.modelo.nucleo.ErrorModelo;
 import com.example.ganhard.modelo.nucleo.Tiempo;
 import com.example.ganhard.modelo.reglas.EntradaPesaje;
 import com.example.ganhard.modelo.reglas.ErrorCampo;
-import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.android.material.timepicker.MaterialTimePicker;
 import com.google.android.material.timepicker.TimeFormat;
-import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
 import java.util.LinkedHashMap;
@@ -56,7 +54,7 @@ public class PesajeFormActivity extends BaseActivity {
         }
         vista.guardar.setOnClickListener(v -> guardar());
         vista.cancelar.setOnClickListener(v -> getOnBackPressedDispatcher().onBackPressed());
-        vista.campoFecha.setEndIconOnClickListener(v -> elegirFecha());
+        vista.campoFecha.setEndIconOnClickListener(v -> elegirFecha(vista.fecha));
         vista.campoHora.setEndIconOnClickListener(v -> elegirHora());
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override public void handleOnBackPressed() {
@@ -135,15 +133,6 @@ public class PesajeFormActivity extends BaseActivity {
         if (destino != null && destino.getEditText() != null) destino.getEditText().requestFocus();
     }
 
-    private void elegirFecha() {
-        LocalDate actual;
-        try { actual = LocalDate.parse(texto(vista.fecha).trim()); }
-        catch (DateTimeParseException ex) { actual = Tiempo.hoy(); }
-        MaterialDatePicker<Long> selector = MaterialDatePicker.Builder.datePicker()
-                .setTitleText(R.string.elegir_fecha).setSelection(Tiempo.aSelector(actual)).build();
-        selector.addOnPositiveButtonClickListener(seleccion -> vista.fecha.setText(Tiempo.fechaDeSelector(seleccion).toString()));
-        selector.show(getSupportFragmentManager(), "fecha");
-    }
 
     private void elegirHora() {
         LocalTime actual;

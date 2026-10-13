@@ -61,6 +61,10 @@ public final class MensajesError {
                 if (codigo == CodigoError.FORMATO) return contexto.getString(R.string.error_hora_formato);
                 if (codigo == CodigoError.FECHA_FUTURA) return contexto.getString(R.string.error_hora_futura);
                 break;
+            case "fechaEstado":
+                if (codigo == CodigoError.FORMATO) return contexto.getString(R.string.error_fecha_formato);
+                if (codigo == CodigoError.FECHA_ANTERIOR) return contexto.getString(R.string.error_estado_antes_ingreso);
+                break;
             case "peso":
                 if (codigo == CodigoError.OBLIGATORIO) return contexto.getString(R.string.error_peso_obligatorio);
                 if (codigo == CodigoError.VALOR_INVALIDO) return contexto.getString(R.string.error_peso_invalido);

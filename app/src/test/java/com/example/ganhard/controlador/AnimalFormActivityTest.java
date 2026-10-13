@@ -216,4 +216,86 @@ public class AnimalFormActivityTest {
         assertFalse(pantalla.isFinishing());
         assertEquals(0, contarAnimales());
     }
+
+    private ActivityController<AnimalFormActivity> abrirEditando(String idAnimal) {
+        Intent intento = new Intent().putExtra(AnimalFormActivity.EXTRA_ID_ANIMAL, idAnimal);
+        ActivityController<AnimalFormActivity> controlador = Robolectric.buildActivity(AnimalFormActivity.class, intento).create().start().resume();
+        shadowOf(Looper.getMainLooper()).idle();
+        return controlador;
+    }
+    private Animal registrarCompleto(String codigo, String nombre) {
+        Captura<Animal> captura = new Captura<>();
+        app.animales().registrar(new EntradaAnimal(codigo, nombre, "H", "4fda5aab-035d-4f2e-b1e1-c8159de431d4", "2025-03-01", "2026-01-10", "Compra reciente"), captura);
+        return captura.esperar().valor;
+    }
+
+    @Test public void enModoEdicionPrecargaLosDatosDelAnimal() {
+        fincaConfigurada();
+        Animal animal = registrarCompleto("GH-001", "Lucero");
+        AnimalFormActivity pantalla = abrirEditando(animal.idAnimal).get();
+        assertEquals("GH-001", texto(pantalla, R.id.codigo));
+        assertEquals("Lucero", texto(pantalla, R.id.nombre));
+        assertTrue(((RadioButton) pantalla.findViewById(R.id.sexoHembra)).isChecked());
+        assertEquals("Angus", ((AutoCompleteTextView) pantalla.findViewById(R.id.raza)).getText().toString());
+        assertEquals("2025-03-01", texto(pantalla, R.id.nacimiento));
+        assertEquals("2026-01-10", texto(pantalla, R.id.ingreso));
+        assertEquals("Compra reciente", texto(pantalla, R.id.observaciones));
+        assertEquals(pantalla.getString(R.string.editar_animal), String.valueOf(((com.google.android.material.appbar.MaterialToolbar) pantalla.findViewById(R.id.toolbar)).getTitle()));
+        assertEquals(pantalla.getString(R.string.guardar_cambios), ((android.widget.Button) pantalla.findViewById(R.id.guardar)).getText().toString());
+    }
+
+    @Test public void editarYGuardarActualizaElMismoRegistro() {
+        fincaConfigurada();
+        Animal animal = registrarCompleto("GH-001", "Lucero");
+        AnimalFormActivity pantalla = abrirEditando(animal.idAnimal).get();
+        escribir(pantalla, R.id.nombre, "Lucero editado");
+        guardar(pantalla);
+        assertTrue(pantalla.isFinishing());
+        assertEquals(Activity.RESULT_OK, shadowOf(pantalla).getResultCode());
+        assertEquals(1, contarAnimales());
+        Animal guardado = db.animalDao().porId(animal.idAnimal);
+        assertEquals("Lucero editado", guardado.nombre);
+        assertEquals("4fda5aab-035d-4f2e-b1e1-c8159de431d4", guardado.idRaza);
+        assertTrue(ShadowToast.getTextOfLatestToast().contains("GH-001"));
+    }
+
+    @Test public void editarAUnCodigoExistenteMuestraDuplicadoYConservaLoEscrito() {
+        fincaConfigurada();
+        registrarCompleto("GH-001", "Uno");
+        Animal segundo = registrarCompleto("GH-002", "Dos");
+        AnimalFormActivity pantalla = abrirEditando(segundo.idAnimal).get();
+        escribir(pantalla, R.id.codigo, "gh-001");
+        escribir(pantalla, R.id.nombre, "Dos editado");
+        guardar(pantalla);
+        assertEquals(pantalla.getString(R.string.error_codigo_duplicado), String.valueOf(error(pantalla, R.id.campoCodigo)));
+        assertEquals("Dos editado", texto(pantalla, R.id.nombre));
+        assertFalse(pantalla.isFinishing());
+        assertEquals("GH-002", db.animalDao().porId(segundo.idAnimal).codigo);
+    }
+
+    @Test public void editarUnAnimalInexistenteSeCierraConMensaje() {
+        fincaConfigurada();
+        AnimalFormActivity pantalla = abrirEditando("no-existe").get();
+        assertTrue(pantalla.isFinishing());
+        assertEquals(pantalla.getString(R.string.animal_no_encontrado), ShadowToast.getTextOfLatestToast());
+    }
+
+    @Test public void enEdicionCancelarSinTocarNadaNoPregunta() {
+        fincaConfigurada();
+        Animal animal = registrarCompleto("GH-001", "Lucero");
+        AnimalFormActivity pantalla = abrirEditando(animal.idAnimal).get();
+        pantalla.findViewById(R.id.cancelar).performClick();
+        assertTrue(pantalla.isFinishing());
+    }
+
+    @Test public void enEdicionCancelarConCambiosPideConfirmar() {
+        fincaConfigurada();
+        Animal animal = registrarCompleto("GH-001", "Lucero");
+        AnimalFormActivity pantalla = abrirEditando(animal.idAnimal).get();
+        escribir(pantalla, R.id.nombre, "Otro nombre");
+        pantalla.findViewById(R.id.cancelar).performClick();
+        shadowOf(Looper.getMainLooper()).idle();
+        assertTrue(ShadowDialog.getLatestDialog().isShowing());
+        assertFalse(pantalla.isFinishing());
+    }
 }

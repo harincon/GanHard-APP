@@ -1,6 +1,7 @@
 package com.example.ganhard.controlador;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.robolectric.Shadows.shadowOf;
 
@@ -160,5 +161,66 @@ public class DetalleAnimalActivityTest {
         Intent historial = shadowOf(pantalla).getNextStartedActivity();
         assertEquals(PesajesActivity.class.getName(), historial.getComponent().getClassName());
         assertEquals(animal.idAnimal, historial.getStringExtra(PesajesActivity.EXTRA_ID_ANIMAL));
+    }
+
+    private androidx.appcompat.app.AlertDialog abrirDialogoDeEstado(DetalleAnimalActivity pantalla) {
+        pantalla.findViewById(R.id.cambiarEstado).performClick();
+        shadowOf(Looper.getMainLooper()).idle();
+        return (androidx.appcompat.app.AlertDialog) org.robolectric.shadows.ShadowDialog.getLatestDialog();
+    }
+
+    @Test public void editarAbreElFormularioConElId() {
+        Animal animal = completo();
+        DetalleAnimalActivity pantalla = abrir(animal.idAnimal).get();
+        pantalla.findViewById(R.id.editar).performClick();
+        Intent edicion = shadowOf(pantalla).getNextStartedActivity();
+        assertEquals(AnimalFormActivity.class.getName(), edicion.getComponent().getClassName());
+        assertEquals(animal.idAnimal, edicion.getStringExtra(AnimalFormActivity.EXTRA_ID_ANIMAL));
+    }
+
+    @Test public void elDialogoDeEstadoParteDelEstadoActual() {
+        Animal animal = completo();
+        Animal vendido = db.animalDao().porId(animal.idAnimal);
+        vendido.estado = Animal.VENDIDO;
+        vendido.fechaEstado = "2026-06-01";
+        db.animalDao().actualizar(vendido);
+        androidx.appcompat.app.AlertDialog dialogo = abrirDialogoDeEstado(abrir(animal.idAnimal).get());
+        assertTrue(((android.widget.RadioButton) dialogo.findViewById(R.id.estadoVendido)).isChecked());
+    }
+
+    @Test public void cambiarElEstadoAVendidoLoMuestraEnLaFicha() {
+        Animal animal = completo();
+        DetalleAnimalActivity pantalla = abrir(animal.idAnimal).get();
+        androidx.appcompat.app.AlertDialog dialogo = abrirDialogoDeEstado(pantalla);
+        ((android.widget.RadioButton) dialogo.findViewById(R.id.estadoVendido)).setChecked(true);
+        dialogo.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).performClick();
+        shadowOf(Looper.getMainLooper()).idle();
+        assertEquals("Vendido desde " + com.example.ganhard.modelo.nucleo.Tiempo.hoy(), texto(pantalla, R.id.datoEstado));
+        assertFalse(dialogo.isShowing());
+    }
+
+    @Test public void unaFechaFuturaMuestraElErrorYMantieneElDialogo() {
+        Animal animal = completo();
+        DetalleAnimalActivity pantalla = abrir(animal.idAnimal).get();
+        androidx.appcompat.app.AlertDialog dialogo = abrirDialogoDeEstado(pantalla);
+        ((android.widget.RadioButton) dialogo.findViewById(R.id.estadoFallecido)).setChecked(true);
+        ((android.widget.EditText) dialogo.findViewById(R.id.estadoFecha)).setText(com.example.ganhard.modelo.nucleo.Tiempo.hoy().plusDays(1).toString());
+        dialogo.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).performClick();
+        shadowOf(Looper.getMainLooper()).idle();
+        assertTrue(dialogo.isShowing());
+        assertEquals(pantalla.getString(R.string.error_fecha_futura),
+                String.valueOf(((com.google.android.material.textfield.TextInputLayout) dialogo.findViewById(R.id.campoEstadoFecha)).getError()));
+        assertEquals("Activo desde 2026-01-10", texto(pantalla, R.id.datoEstado));
+    }
+
+    @Test public void cancelarElDialogoNoCambiaNada() {
+        Animal animal = completo();
+        DetalleAnimalActivity pantalla = abrir(animal.idAnimal).get();
+        androidx.appcompat.app.AlertDialog dialogo = abrirDialogoDeEstado(pantalla);
+        ((android.widget.RadioButton) dialogo.findViewById(R.id.estadoVendido)).setChecked(true);
+        dialogo.getButton(androidx.appcompat.app.AlertDialog.BUTTON_NEGATIVE).performClick();
+        shadowOf(Looper.getMainLooper()).idle();
+        assertFalse(dialogo.isShowing());
+        assertEquals("Activo desde 2026-01-10", texto(pantalla, R.id.datoEstado));
     }
 }
