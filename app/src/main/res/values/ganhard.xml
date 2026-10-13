@@ -77,4 +77,21 @@
     <string name="error_sexo_obligatorio">Elige el sexo del animal.</string>
     <string name="error_ingreso_obligatorio">Escribe la fecha de ingreso.</string>
     <string name="error_fecha_formato">Usa el formato AAAA-MM-DD.</string>
+    <string name="animales_titulo">Animales</string>
+    <string name="buscar_animales">Buscar por código o nombre</string>
+    <string name="filtro_todos">Todos</string>
+    <string name="filtro_activos">Activos</string>
+    <string name="filtro_vendidos">Vendidos</string>
+    <string name="filtro_fallecidos">Fallecidos</string>
+    <string name="sin_animales">Aún no hay animales registrados.</string>
+    <string name="sin_coincidencias">No hay animales que coincidan con tu búsqueda.</string>
+    <string name="limpiar_busqueda">Limpiar búsqueda</string>
+    <string name="agregar_animal">Agregar animal</string>
+    <string name="sin_nombre">Sin nombre</string>
+    <string name="sin_pesajes">Sin pesajes</string>
+    <string name="ultimo_peso_formato">Último peso: %1$s kg</string>
+    <string name="estado_activo">Activo</string>
+    <string name="estado_vendido">Vendido</string>
+    <string name="estado_fallecido">Fallecido</string>
+    <string name="sexo_y_estado">%1$s · %2$s</string>
 </resources>
