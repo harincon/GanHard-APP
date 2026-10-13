@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/raiz" android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical" android:background="@color/gh_background">
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar" android:layout_width="match_parent" android:layout_height="?attr/actionBarSize"
+        android:background="@color/gh_surface" app:title="@string/pesajes_titulo" app:titleTextColor="@color/gh_text" app:subtitleTextColor="@color/gh_muted" />
+    <ProgressBar android:id="@+id/progreso" style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent" android:layout_height="4dp" android:indeterminate="true" android:visibility="invisible" />
+    <FrameLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
+        <androidx.recyclerview.widget.RecyclerView android:id="@+id/lista" android:layout_width="match_parent" android:layout_height="match_parent"
+            android:clipToPadding="false" android:paddingTop="16dp" android:paddingBottom="88dp" android:visibility="gone" />
+        <LinearLayout android:id="@+id/estadoVacio" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_gravity="center"
+            android:orientation="vertical" android:padding="24dp" android:gravity="center_horizontal" android:visibility="gone">
+            <TextView android:id="@+id/mensajeVacio" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center"
+                android:text="@string/sin_pesajes_historial" android:textSize="16sp" android:textColor="@color/gh_muted" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/accionVacio" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:layout_marginTop="16dp" android:minHeight="48dp" android:text="@string/registrar_pesaje" app:cornerRadius="24dp" />
+        </LinearLayout>
+        <LinearLayout android:id="@+id/estadoError" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_gravity="center"
+            android:orientation="vertical" android:padding="24dp" android:gravity="center_horizontal" android:visibility="gone">
+            <TextView android:id="@+id/mensajeError" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center"
+                android:textSize="16sp" android:textColor="@color/gh_muted" android:accessibilityLiveRegion="polite" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/reintentar" style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="wrap_content" android:layout_height="wrap_content" android:minHeight="48dp" android:text="@string/reintentar" />
+        </LinearLayout>
+        <com.google.android.material.floatingactionbutton.FloatingActionButton android:id="@+id/agregar" android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end" android:layout_margin="16dp" app:srcCompat="@drawable/ic_agregar" android:contentDescription="@string/registrar_pesaje" />
+    </FrameLayout>
+</LinearLayout>

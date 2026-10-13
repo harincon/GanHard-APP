@@ -140,4 +140,25 @@ public class DetalleAnimalActivityTest {
         assertEquals("GH-001", texto(segunda.get(), R.id.fichaCodigo));
         assertEquals("Angus", texto(segunda.get(), R.id.datoRaza));
     }
+
+    @Test public void fichaMuestraElUltimoPesoRealYSuFecha() {
+        Animal animal = completo();
+        Captura<com.example.ganhard.modelo.entidad.Pesaje> captura = new Captura<>();
+        app.pesajes().registrar(animal.idAnimal, new com.example.ganhard.modelo.reglas.EntradaPesaje("2026-03-01", "09:00", "420,5", ""), captura);
+        captura.esperar();
+        assertEquals("420.5 kg · 2026-03-01", texto(abrir(animal.idAnimal).get(), R.id.datoUltimoPeso));
+    }
+
+    @Test public void registrarPesajeYVerPesosAbrenSusPantallas() {
+        Animal animal = completo();
+        DetalleAnimalActivity pantalla = abrir(animal.idAnimal).get();
+        pantalla.findViewById(R.id.registrarPesaje).performClick();
+        Intent registro = shadowOf(pantalla).getNextStartedActivity();
+        assertEquals(PesajeFormActivity.class.getName(), registro.getComponent().getClassName());
+        assertEquals(animal.idAnimal, registro.getStringExtra(PesajeFormActivity.EXTRA_ID_ANIMAL));
+        pantalla.findViewById(R.id.verPesos).performClick();
+        Intent historial = shadowOf(pantalla).getNextStartedActivity();
+        assertEquals(PesajesActivity.class.getName(), historial.getComponent().getClassName());
+        assertEquals(animal.idAnimal, historial.getStringExtra(PesajesActivity.EXTRA_ID_ANIMAL));
+    }
 }

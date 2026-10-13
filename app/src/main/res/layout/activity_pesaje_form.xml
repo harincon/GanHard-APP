@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/raiz" android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical" android:background="@color/gh_background">
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar" android:layout_width="match_parent" android:layout_height="?attr/actionBarSize"
+        android:background="@color/gh_surface" app:title="@string/registrar_pesaje" app:titleTextColor="@color/gh_text" app:subtitleTextColor="@color/gh_muted" />
+    <ProgressBar android:id="@+id/progreso" style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent" android:layout_height="4dp" android:indeterminate="true" android:visibility="invisible" />
+    <ScrollView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"
+        android:fillViewport="true" android:clipToPadding="false">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp">
+            <com.google.android.material.textfield.TextInputLayout android:id="@+id/campoPeso"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:hint="@string/peso_kg_titulo" app:helperText="@string/ayuda_peso" android:layout_marginBottom="12dp">
+                <com.google.android.material.textfield.TextInputEditText android:id="@+id/peso" android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:inputType="numberDecimal" android:digits="0123456789.," android:maxLength="9" android:maxLines="1" android:imeOptions="actionNext" android:importantForAutofill="no" />
+            </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputLayout android:id="@+id/campoFecha"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:hint="@string/fecha_pesaje" app:helperText="@string/ayuda_fecha" app:endIconMode="custom"
+                app:endIconDrawable="@drawable/ic_calendario" app:endIconContentDescription="@string/elegir_fecha" android:layout_marginBottom="12dp">
+                <com.google.android.material.textfield.TextInputEditText android:id="@+id/fecha" android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:inputType="date" android:maxLength="10" android:maxLines="1" android:imeOptions="actionNext" android:importantForAutofill="no" />
+            </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputLayout android:id="@+id/campoHora"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:hint="@string/hora_pesaje" app:helperText="@string/ayuda_hora" app:endIconMode="custom"
+                app:endIconDrawable="@drawable/ic_reloj" app:endIconContentDescription="@string/elegir_hora" android:layout_marginBottom="12dp">
+                <com.google.android.material.textfield.TextInputEditText android:id="@+id/hora" android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:inputType="time" android:maxLength="8" android:maxLines="1" android:imeOptions="actionNext" android:importantForAutofill="no" />
+            </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputLayout android:id="@+id/campoObservaciones"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:hint="@string/observaciones_animal" app:counterEnabled="true" app:counterMaxLength="500" android:layout_marginBottom="24dp">
+                <com.google.android.material.textfield.TextInputEditText android:id="@+id/observaciones" android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:inputType="textMultiLine|textCapSentences" android:minLines="2" android:gravity="top" android:importantForAutofill="no" />
+            </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.button.MaterialButton android:id="@+id/guardar" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:minHeight="48dp" android:text="@string/guardar_pesaje" app:cornerRadius="24dp" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/cancelar" style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="48dp" android:text="@string/cancelar" />
+            <TextView android:id="@+id/mensaje" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp"
+                android:textColor="@color/gh_muted" android:textSize="14sp" android:accessibilityLiveRegion="polite" android:visibility="gone" />
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>
