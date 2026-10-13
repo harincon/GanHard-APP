@@ -25,14 +25,6 @@
         <item name="android:windowLightStatusBar">@bool/gh_barras_claras</item>
     </style>
     <style name="Theme.GanHard" parent="Theme.GanHard.Base" />
-    <style name="Gh.Etiqueta" parent="TextAppearance.Material3.BodyLarge">
-        <item name="android:textColor">@color/gh_muted</item>
-        <item name="android:paddingTop">4dp</item>
-    </style>
-    <style name="Gh.Valor" parent="TextAppearance.Material3.BodyLarge">
-        <item name="android:textColor">@color/gh_text</item>
-        <item name="android:paddingBottom">12dp</item>
-    </style>
     <!-- Sistema de diseño del Figma: botones píldora, tarjetas, etiquetas verdes y barra superior. -->
     <style name="Gh.Boton" parent="Widget.Material3.Button">
         <item name="android:minHeight">@dimen/gh_alto_boton</item>
