@@ -15,3 +15,6 @@
 local.properties
 
 .superpowers
+
+# Planes de trabajo internos (no se suben)
+docs/superpowers/
