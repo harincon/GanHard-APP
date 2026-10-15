@@ -1,36 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/raiz" android:layout_width="match_parent" android:layout_height="match_parent"
     android:orientation="vertical" android:background="@color/gh_background">
     <com.google.android.material.appbar.MaterialToolbar android:id="@+id/toolbar" style="@style/Gh.Toolbar"
         android:layout_width="match_parent" android:layout_height="wrap_content" app:title="@string/ficha_animal" />
     <ProgressBar android:id="@+id/progreso" style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="match_parent" android:layout_height="4dp" android:indeterminate="true" />
+        android:layout_width="match_parent" android:layout_height="4dp" android:indeterminate="true" tools:visibility="invisible" />
     <ScrollView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:fillViewport="true" android:clipToPadding="false">
         <FrameLayout android:layout_width="match_parent" android:layout_height="wrap_content">
             <LinearLayout android:id="@+id/contenido" android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:orientation="vertical" android:padding="@dimen/gh_margen" android:visibility="gone">
+                android:orientation="vertical" android:padding="@dimen/gh_margen" android:visibility="gone" tools:visibility="visible">
                 <com.google.android.material.card.MaterialCardView style="@style/Gh.Tarjeta" android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:layout_marginBottom="12dp">
                     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp">
-                        <TextView android:id="@+id/fichaEstado" android:layout_width="match_parent" android:layout_height="wrap_content" android:textAppearance="@style/Gh.Overline" />
-                        <TextView android:id="@+id/fichaTitulo" android:layout_width="match_parent" android:layout_height="wrap_content"
+                        <TextView android:id="@+id/fichaEstado" tools:text="ACTIVO" android:layout_width="match_parent" android:layout_height="wrap_content" android:textAppearance="@style/Gh.Overline" />
+                        <TextView android:id="@+id/fichaTitulo" tools:text="GH-001 &#183; Canela" android:layout_width="match_parent" android:layout_height="wrap_content"
                             android:layout_marginTop="4dp" android:textAppearance="@style/Gh.Titulo" />
-                        <TextView android:id="@+id/fichaRaza" style="@style/Gh.Dato" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" />
-                        <TextView android:id="@+id/fichaIngreso" style="@style/Gh.Dato" android:layout_width="match_parent" android:layout_height="wrap_content" />
-                        <TextView android:id="@+id/fichaNacimiento" style="@style/Gh.Dato" android:layout_width="match_parent" android:layout_height="wrap_content" />
+                        <TextView android:id="@+id/fichaRaza" tools:text="Hembra &#183; Girolando" style="@style/Gh.Dato" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" />
+                        <TextView android:id="@+id/fichaIngreso" tools:text="Ingreso: 14 oct 2026" style="@style/Gh.Dato" android:layout_width="match_parent" android:layout_height="wrap_content" />
+                        <TextView android:id="@+id/fichaNacimiento" tools:text="Nacimiento: 8 mar 2024" style="@style/Gh.Dato" android:layout_width="match_parent" android:layout_height="wrap_content" />
                         <TextView android:id="@+id/fichaEstadoDesde" style="@style/Gh.Dato" android:layout_width="match_parent" android:layout_height="wrap_content" android:visibility="gone" />
-                        <TextView android:id="@+id/fichaObservaciones" style="@style/Gh.Dato" android:layout_width="match_parent" android:layout_height="wrap_content" android:visibility="gone" />
+                        <TextView android:id="@+id/fichaObservaciones" tools:text="Observaciones: Vaca de cria lechera" tools:visibility="visible" style="@style/Gh.Dato" android:layout_width="match_parent" android:layout_height="wrap_content" android:visibility="gone" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
                 <com.google.android.material.card.MaterialCardView style="@style/Gh.Tarjeta" android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp">
                     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp">
                         <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/peso_registrado_titulo" android:textAppearance="@style/Gh.Overline" />
-                        <TextView android:id="@+id/pesoKilos" android:layout_width="match_parent" android:layout_height="wrap_content"
+                        <TextView android:id="@+id/pesoKilos" tools:text="312.5 kg" android:layout_width="match_parent" android:layout_height="wrap_content"
                             android:layout_marginTop="4dp" android:textAppearance="@style/Gh.Titulo" />
-                        <TextView android:id="@+id/pesoDetalle" style="@style/Gh.Dato" android:layout_width="match_parent" android:layout_height="wrap_content"
+                        <TextView android:id="@+id/pesoDetalle" tools:text="Ultimo pesaje &#183; 14 oct 2026, 10:44 p. m." tools:visibility="visible" style="@style/Gh.Dato" android:layout_width="match_parent" android:layout_height="wrap_content"
                             android:layout_marginTop="8dp" android:visibility="gone" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
