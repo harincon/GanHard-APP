@@ -61,24 +61,11 @@ public final class AnimalRepository {
     }
 
     /**
-     * Actualiza los datos editables (RF06) sin crear otro registro: conserva id, finca, estado, fecha de alta
-     * y los pesajes. Si cambia el ingreso, los pesajes se vuelven a clasificar como antecedente o no.
-     */
-    public void actualizar(String idAnimal, EntradaAnimal entrada, Callback<Animal> callback) {
-        ejecutor.ejecutar(() -> {
-            Animal animal = animalExistente(idAnimal);
-            validar(entrada);
-            aplicarDatos(animal, entrada);
-            verificarCoherencia(animal);
-            guardarCambios(animal);
-            return animal;
-        }, callback);
-    }
-
-    /**
-     * Actualiza los datos y el estado (RF06, RF07) en una sola operación. Si el estado y la fecha son los que el
-     * animal ya tiene, el estado no se toca; si cambian, deben ser válidos (estado conocido; fecha no futura ni
-     * anterior al ingreso, ya con el ingreso nuevo) o no se escribe nada.
+     * Único camino para modificar un animal: actualiza los datos editables (RF06) y el estado activo, vendido o
+     * fallecido con su fecha efectiva (RF07) sin crear otro registro; conserva id, finca, fecha de alta y pesajes.
+     * Si el estado y la fecha son los que el animal ya tiene, el estado no se toca; si cambian, deben ser válidos
+     * (estado conocido; fecha no futura ni anterior al ingreso, ya con el ingreso nuevo) o no se escribe nada.
+     * Si cambia el ingreso, los pesajes se vuelven a clasificar como antecedente o no.
      */
     public void actualizar(String idAnimal, EntradaAnimal entrada, String estado, String fechaEstado, Callback<Animal> callback) {
         ejecutor.ejecutar(() -> {
@@ -98,29 +85,6 @@ public final class AnimalRepository {
             }
             verificarCoherencia(animal);
             guardarCambios(animal);
-            return animal;
-        }, callback);
-    }
-
-    /**
-     * Marca el animal como activo, vendido o fallecido (RF07) con su fecha efectiva; conserva ficha y pesajes.
-     * Repetir el estado y la fecha que ya tiene no cambia nada.
-     */
-    public void cambiarEstado(String idAnimal, String estado, String fechaEstado, Callback<Animal> callback) {
-        ejecutor.ejecutar(() -> {
-            Animal animal = animalExistente(idAnimal);
-            if (estado != null && fechaEstado != null && estado.equals(animal.estado) && fechaEstado.trim().equals(animal.fechaEstado)) {
-                return animal;
-            }
-            Map<String, ErrorCampo> errores = new LinkedHashMap<>();
-            if (estado == null || !ESTADOS.contains(estado)) errores.put("estado", new ErrorCampo(CodigoError.VALOR_INVALIDO));
-            ErrorCampo fecha = ValidadorAnimal.fechaEstado(fechaEstado, animal, Tiempo.hoy());
-            if (fecha != null) errores.put("fechaEstado", fecha);
-            if (!errores.isEmpty()) throw ErrorModelo.validacion(errores);
-            animal.estado = estado;
-            animal.fechaEstado = fechaEstado.trim();
-            animal.actualizadoEn = Tiempo.ahoraUtc();
-            db.animalDao().actualizar(animal);
             return animal;
         }, callback);
     }
@@ -210,21 +174,14 @@ public final class AnimalRepository {
     }
 
     private static Animal nuevo(String idAnimal, EntradaAnimal entrada, String idFinca) {
-        String ahora = Tiempo.ahoraUtc();
         Animal animal = new Animal();
         animal.idAnimal = idAnimal;
         animal.idFinca = idFinca;
-        animal.idRaza = entrada.idRaza.isEmpty() ? null : entrada.idRaza;
-        animal.codigo = ValidadorAnimal.normalizarCodigo(entrada.codigo);
-        animal.nombre = entrada.nombre.isEmpty() ? null : entrada.nombre;
-        animal.sexo = entrada.sexo;
-        animal.fechaNacimiento = entrada.fechaNacimiento.isEmpty() ? null : entrada.fechaNacimiento;
-        animal.fechaIngreso = entrada.fechaIngreso;
+        aplicarDatos(animal, entrada);
+        // Un animal nuevo entra activo desde su fecha de ingreso.
         animal.estado = Animal.ACTIVO;
         animal.fechaEstado = entrada.fechaIngreso;
-        animal.observaciones = entrada.observaciones.isEmpty() ? null : entrada.observaciones;
-        animal.creadoEn = ahora;
-        animal.actualizadoEn = ahora;
+        animal.creadoEn = animal.actualizadoEn;
         return animal;
     }
 

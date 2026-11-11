@@ -66,14 +66,6 @@ public final class PesajeRepository {
         }, callback);
     }
 
-    /** El pesaje vigente más reciente, o null si el animal no tiene pesajes. */
-    public void ultimo(String idAnimal, Callback<Pesaje> callback) {
-        ejecutor.ejecutar(() -> {
-            animalExistente(idAnimal);
-            return db.pesajeDao().ultimo(idAnimal);
-        }, callback);
-    }
-
     private Animal animalExistente(String idAnimal) throws ErrorModelo {
         Animal animal = db.animalDao().porId(idAnimal);
         if (animal == null) throw ErrorModelo.noEncontrado("animal");

@@ -18,10 +18,6 @@ public abstract class PesajeDao {
             + "ORDER BY fecha DESC, COALESCE(hora, '') DESC, creado_en DESC")
     public abstract List<Pesaje> historial(String idAnimal);
 
-    @Query("SELECT * FROM pesaje WHERE id_animal = :idAnimal AND anulado = 0 "
-            + "ORDER BY fecha DESC, COALESCE(hora, '') DESC, creado_en DESC LIMIT 1")
-    public abstract Pesaje ultimo(String idAnimal);
-
     /** Tras editar el ingreso del animal, reclasifica sus pesajes: anteriores al ingreso son antecedente. */
     @Query("UPDATE pesaje SET es_antecedente = CASE WHEN fecha < :ingreso THEN 1 ELSE 0 END WHERE id_animal = :idAnimal")
     public abstract void recalcularAntecedentes(String idAnimal, String ingreso);

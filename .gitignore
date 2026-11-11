@@ -15,3 +15,7 @@
 local.properties
 
 
+
+# Las pruebas se quedan solo en local; no se suben al repositorio.
+/app/src/test/
+/app/src/androidTest/

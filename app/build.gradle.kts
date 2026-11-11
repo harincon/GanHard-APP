@@ -9,7 +9,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.ganhard"
+        applicationId = "com.ganhard.app"
         minSdk = 24
         targetSdk = 37
         versionCode = 1

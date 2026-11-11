@@ -4,9 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
-import android.widget.TextView;
 import android.widget.Toast;
-import androidx.activity.OnBackPressedCallback;
 import com.example.ganhard.R;
 import com.example.ganhard.databinding.ActivityAnimalFormBinding;
 import com.example.ganhard.modelo.ConfiguracionLocal;
@@ -18,8 +16,6 @@ import com.example.ganhard.modelo.nucleo.Tiempo;
 import com.example.ganhard.modelo.reglas.EntradaAnimal;
 import com.example.ganhard.modelo.reglas.ErrorCampo;
 import com.example.ganhard.modelo.reglas.ValidadorAnimal;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,7 +29,7 @@ import java.util.UUID;
  * el existente (RF06) y su estado (RF07) sin crear otro registro. Las fechas se escriben dd/mm/aaaa y se
  * entregan al Modelo en ISO; valida y pide guardar al Modelo.
  */
-public class AnimalFormActivity extends BaseActivity {
+public class AnimalFormActivity extends FormularioActivity {
     public static final String EXTRA_ID_ANIMAL = "id_animal";
     private static final String ESTADO_RAZA = "id_raza";
     private static final String ESTADO_REGISTRO = "id_registro";
@@ -49,7 +45,7 @@ public class AnimalFormActivity extends BaseActivity {
     /** Datos y estado del animal al abrir la edición; permiten saber si hay cambios sin guardar. */
     private EntradaAnimal original;
     private String estadoOriginal = "", fechaEstadoOriginal = "";
-    private boolean restaurado, razasCargadas, guardando;
+    private boolean restaurado, razasCargadas;
     /** En edición, indica que los campos ya recibieron los datos del animal (aunque la pantalla se haya recreado). */
     private boolean formularioCargado;
 
@@ -59,6 +55,7 @@ public class AnimalFormActivity extends BaseActivity {
         setContentView(vista.getRoot());
         ajustarBarras(vista.getRoot());
         configurarToolbar(vista.toolbar, true);
+        prepararFormulario(vista.progreso, vista.guardar, vista.mensaje);
         idAnimal = getIntent().getStringExtra(EXTRA_ID_ANIMAL);
         restaurado = estado != null;
         formularioCargado = restaurado && estado.getBoolean(ESTADO_CARGADO, false);
@@ -95,16 +92,6 @@ public class AnimalFormActivity extends BaseActivity {
         // Al elegir otro estado la fecha propone hoy; al volver al estado original, su fecha.
         vista.estado.setOnItemClickListener((adaptador, fila, posicion, id) ->
                 vista.fechaEstado.setText(estadoCodigo().equals(estadoOriginal) ? FormatoFecha.aPantalla(fechaEstadoOriginal) : FormatoFecha.aPantalla(Tiempo.hoy().toString())));
-        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
-            @Override public void handleOnBackPressed() {
-                if (guardando) return;
-                if (!hayCambios()) { finish(); return; }
-                new MaterialAlertDialogBuilder(AnimalFormActivity.this)
-                        .setTitle(R.string.descartar_titulo).setMessage(R.string.descartar_mensaje)
-                        .setPositiveButton(R.string.descartar, (dialogo, boton) -> finish())
-                        .setNegativeButton(R.string.seguir_editando, null).show();
-            }
-        });
         verificarFinca();
         cargarRazas();
         if (esEdicion()) cargarAnimal();
@@ -192,11 +179,8 @@ public class AnimalFormActivity extends BaseActivity {
         if (guardando) return;
         EntradaAnimal entrada = entrada();
         Map<String, ErrorCampo> errores = ValidadorAnimal.validar(entrada, Tiempo.hoy());
-        mostrarErrores(errores);
-        if (!errores.isEmpty()) { enfocar(errores.keySet().iterator().next()); return; }
-        guardando = true;
-        ocupado(true);
-        vista.mensaje.setVisibility(View.GONE);
+        if (mostrarErrores(errores)) return;
+        empezarGuardado();
         Callback<Animal> resultado = new Callback<Animal>() {
             @Override public void exito(Animal animal) {
                 if (!disponible()) return;
@@ -208,15 +192,9 @@ public class AnimalFormActivity extends BaseActivity {
             }
             @Override public void error(ErrorModelo error) {
                 if (!disponible()) return;
-                guardando = false;
-                ocupado(false);
+                terminarGuardado();
                 if (error.tipo == ErrorModelo.Tipo.NO_ENCONTRADO) { irAConfiguracion(); return; }
-                if (!error.campos.isEmpty()) {
-                    mostrarErrores(error.campos);
-                    enfocar(error.campos.keySet().iterator().next());
-                } else {
-                    mensaje(R.string.error_guardado_animal);
-                }
+                mostrarError(error, R.string.error_guardado_animal);
             }
         };
         if (esEdicion()) app().animales().actualizar(idAnimal, entrada, estadoCodigo(), FormatoFecha.aIso(texto(vista.fechaEstado)), resultado);
@@ -243,9 +221,7 @@ public class AnimalFormActivity extends BaseActivity {
         return "";
     }
 
-    private static String texto(TextView campo) { return String.valueOf(campo.getText()); }
-
-    private Map<String, TextInputLayout> campos() {
+    @Override protected Map<String, TextInputLayout> campos() {
         Map<String, TextInputLayout> campos = new LinkedHashMap<>();
         campos.put("codigo", vista.campoCodigo);
         campos.put("nombre", vista.campoNombre);
@@ -259,19 +235,7 @@ public class AnimalFormActivity extends BaseActivity {
         return campos;
     }
 
-    private void mostrarErrores(Map<String, ErrorCampo> errores) {
-        for (Map.Entry<String, TextInputLayout> campo : campos().entrySet()) {
-            ErrorCampo error = errores.get(campo.getKey());
-            campo.getValue().setError(error == null ? null : MensajesError.texto(this, campo.getKey(), error));
-        }
-    }
-
-    private void enfocar(String campo) {
-        TextInputLayout destino = campos().get(campo);
-        if (destino != null && destino.getEditText() != null) destino.getEditText().requestFocus();
-    }
-
-    private boolean hayCambios() {
+    @Override protected boolean hayCambios() {
         EntradaAnimal actual = entrada();
         if (esEdicion()) {
             return original != null && !(actual.codigo.equals(original.codigo) && actual.nombre.equals(original.nombre)
@@ -282,17 +246,6 @@ public class AnimalFormActivity extends BaseActivity {
         }
         return !actual.codigo.isEmpty() || !actual.nombre.isEmpty() || !actual.sexo.isEmpty() || !actual.idRaza.isEmpty()
                 || !actual.fechaNacimiento.isEmpty() || !actual.fechaIngreso.equals(ingresoInicial) || !actual.observaciones.isEmpty();
-    }
-
-    private void ocupado(boolean ocupado) {
-        vista.progreso.setVisibility(ocupado ? View.VISIBLE : View.INVISIBLE);
-        vista.guardar.setEnabled(!ocupado);
-        for (TextInputLayout campo : campos().values()) campo.setEnabled(!ocupado);
-    }
-
-    private void mensaje(int recurso) {
-        vista.mensaje.setText(recurso);
-        vista.mensaje.setVisibility(View.VISIBLE);
     }
 
     private void irAConfiguracion() {
