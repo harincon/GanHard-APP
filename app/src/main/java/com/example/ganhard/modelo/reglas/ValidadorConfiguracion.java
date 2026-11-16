@@ -9,15 +9,15 @@ public final class ValidadorConfiguracion {
     private ValidadorConfiguracion() {}
     public static Map<String, ErrorCampo> validar(EntradaConfiguracion entrada) {
         Map<String, ErrorCampo> errores = new LinkedHashMap<>();
-        obligatorio(errores, "nombre", entrada.nombre, 100);
-        obligatorio(errores, "correo", entrada.correo, 150);
-        obligatorio(errores, "finca", entrada.finca, 100);
+        obligatorio(errores, Campos.NOMBRE, entrada.nombre, 100);
+        obligatorio(errores, Campos.CORREO, entrada.correo, 150);
+        obligatorio(errores, Campos.FINCA, entrada.finca, 100);
         if (!entrada.correo.isEmpty() && !entrada.correo.matches("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$")) {
-            errores.put("correo", new ErrorCampo(CodigoError.FORMATO));
+            errores.put(Campos.CORREO, new ErrorCampo(CodigoError.FORMATO));
         }
-        if (entrada.ubicacion.length() > 200) errores.put("ubicacion", new ErrorCampo(CodigoError.LONGITUD_MAXIMA, 200));
+        if (entrada.ubicacion.length() > 200) errores.put(Campos.UBICACION, new ErrorCampo(CodigoError.LONGITUD_MAXIMA, 200));
         try { area(entrada.area); }
-        catch (IllegalArgumentException ex) { errores.put("area", new ErrorCampo(CodigoError.VALOR_INVALIDO)); }
+        catch (IllegalArgumentException ex) { errores.put(Campos.AREA, new ErrorCampo(CodigoError.VALOR_INVALIDO)); }
         return errores;
     }
     public static Double area(String valor) {

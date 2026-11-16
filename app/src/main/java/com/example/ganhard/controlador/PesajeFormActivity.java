@@ -10,6 +10,7 @@ import com.example.ganhard.modelo.entidad.Pesaje;
 import com.example.ganhard.modelo.nucleo.Callback;
 import com.example.ganhard.modelo.nucleo.ErrorModelo;
 import com.example.ganhard.modelo.nucleo.Tiempo;
+import com.example.ganhard.modelo.reglas.Campos;
 import com.example.ganhard.modelo.reglas.EntradaPesaje;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.android.material.timepicker.MaterialTimePicker;
@@ -117,10 +118,10 @@ public class PesajeFormActivity extends FormularioActivity {
 
     @Override protected Map<String, TextInputLayout> campos() {
         Map<String, TextInputLayout> campos = new LinkedHashMap<>();
-        campos.put("fecha", vista.campoFecha);
-        campos.put("hora", vista.campoHora);
-        campos.put("peso", vista.campoPeso);
-        campos.put("observaciones", vista.campoObservaciones);
+        campos.put(Campos.FECHA, vista.campoFecha);
+        campos.put(Campos.HORA, vista.campoHora);
+        campos.put(Campos.PESO, vista.campoPeso);
+        campos.put(Campos.OBSERVACIONES, vista.campoObservaciones);
         return campos;
     }
 

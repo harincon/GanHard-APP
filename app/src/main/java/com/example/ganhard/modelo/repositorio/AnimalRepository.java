@@ -4,11 +4,13 @@ import android.database.sqlite.SQLiteConstraintException;
 import com.example.ganhard.modelo.datos.AnimalResumen;
 import com.example.ganhard.modelo.datos.GanHardDatabase;
 import com.example.ganhard.modelo.entidad.Animal;
+import com.example.ganhard.modelo.entidad.HistorialCambio;
 import com.example.ganhard.modelo.entidad.Raza;
 import com.example.ganhard.modelo.nucleo.Callback;
 import com.example.ganhard.modelo.nucleo.EjecutorModelo;
 import com.example.ganhard.modelo.nucleo.ErrorModelo;
 import com.example.ganhard.modelo.nucleo.Tiempo;
+import com.example.ganhard.modelo.reglas.Campos;
 import com.example.ganhard.modelo.reglas.CodigoError;
 import com.example.ganhard.modelo.reglas.EntradaAnimal;
 import com.example.ganhard.modelo.reglas.ErrorCampo;
@@ -21,20 +23,24 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
+import org.json.JSONObject;
 
 /**
  * Apoyo del Modelo para animales. Todo corre en el hilo del {@link EjecutorModelo}, que atiende una operación
  * a la vez; por eso resolver la finca y escribir dentro de una misma tarea no admite interferencias.
+ * Cada escritura pasa por {@link RegistroCambios}, que la guarda junto con su entrada de historial.
  */
 public final class AnimalRepository {
     private static final List<String> ESTADOS = Arrays.asList(Animal.ACTIVO, Animal.VENDIDO, Animal.FALLECIDO);
 
     private final GanHardDatabase db;
     private final EjecutorModelo ejecutor;
+    private final RegistroCambios registro;
 
     public AnimalRepository(GanHardDatabase db, EjecutorModelo ejecutor) {
         this.db = db;
         this.ejecutor = ejecutor;
+        this.registro = new RegistroCambios(db);
     }
 
     public void registrar(EntradaAnimal entrada, Callback<Animal> callback) {
@@ -51,8 +57,10 @@ public final class AnimalRepository {
             if (existente != null) return existente;
             validar(entrada);
             Animal animal = nuevo(idAnimal, entrada, idFincaActiva());
+            HistorialCambio creacion = registro.preparar(HistorialCambio.ANIMAL, idAnimal, HistorialCambio.CREAR,
+                    null, ValoresCambio.de(animal), null, null, animal.creadoEn);
             try {
-                db.animalDao().insertar(animal);
+                registro.guardar(() -> db.animalDao().insertar(animal), creacion);
             } catch (SQLiteConstraintException ex) {
                 throw errorDeRestriccion(ex);
             }
@@ -66,25 +74,49 @@ public final class AnimalRepository {
      * Si el estado y la fecha son los que el animal ya tiene, el estado no se toca; si cambian, deben ser válidos
      * (estado conocido; fecha no futura ni anterior al ingreso, ya con el ingreso nuevo) o no se escribe nada.
      * Si cambia el ingreso, los pesajes se vuelven a clasificar como antecedente o no.
+     * En el historial queda una entrada por los datos que cambiaron y otra por el estado, si cambió; cuando no
+     * cambia nada, no se escribe nada.
      */
     public void actualizar(String idAnimal, EntradaAnimal entrada, String estado, String fechaEstado, Callback<Animal> callback) {
         ejecutor.ejecutar(() -> {
             Animal animal = animalExistente(idAnimal);
+            JSONObject datosAntes = ValoresCambio.de(animal), estadoAntes = ValoresCambio.estado(animal);
             validar(entrada);
             boolean estadoSinCambio = estado != null && fechaEstado != null
                     && estado.equals(animal.estado) && fechaEstado.trim().equals(animal.fechaEstado);
             aplicarDatos(animal, entrada);
             if (!estadoSinCambio) {
                 Map<String, ErrorCampo> errores = new LinkedHashMap<>();
-                if (estado == null || !ESTADOS.contains(estado)) errores.put("estado", new ErrorCampo(CodigoError.VALOR_INVALIDO));
+                if (estado == null || !ESTADOS.contains(estado)) errores.put(Campos.ESTADO, new ErrorCampo(CodigoError.VALOR_INVALIDO));
                 ErrorCampo fecha = ValidadorAnimal.fechaEstado(fechaEstado, animal, Tiempo.hoy());
-                if (fecha != null) errores.put("fechaEstado", fecha);
+                if (fecha != null) errores.put(Campos.FECHA_ESTADO, fecha);
                 if (!errores.isEmpty()) throw ErrorModelo.validacion(errores);
                 animal.estado = estado;
                 animal.fechaEstado = fechaEstado.trim();
             }
             verificarCoherencia(animal);
-            guardarCambios(animal);
+
+            JSONObject[] datos = ValoresCambio.diferencia(datosAntes, ValoresCambio.de(animal));
+            if (datos == null && estadoSinCambio) return animal;
+            String ahora = Tiempo.ahoraUtc();
+            List<HistorialCambio> cambios = new ArrayList<>();
+            if (datos != null) {
+                cambios.add(registro.preparar(HistorialCambio.ANIMAL, idAnimal, HistorialCambio.EDITAR, datos[0], datos[1], null, null, ahora));
+            }
+            // Si el estado no se tocó, su fecha solo pudo moverse siguiendo al ingreso, y eso ya consta en los datos.
+            if (!estadoSinCambio) {
+                cambios.add(registro.preparar(HistorialCambio.ANIMAL, idAnimal, HistorialCambio.CAMBIAR_ESTADO,
+                        estadoAntes, ValoresCambio.estado(animal), null, animal.fechaEstado, ahora));
+            }
+            animal.actualizadoEn = ahora;
+            try {
+                registro.guardar(() -> {
+                    db.animalDao().actualizar(animal);
+                    db.pesajeDao().recalcularAntecedentes(animal.idAnimal, animal.fechaIngreso);
+                }, cambios.toArray(new HistorialCambio[0]));
+            } catch (SQLiteConstraintException ex) {
+                throw errorDeRestriccion(ex);
+            }
             return animal;
         }, callback);
     }
@@ -121,7 +153,7 @@ public final class AnimalRepository {
     private void validar(EntradaAnimal entrada) throws ErrorModelo {
         Map<String, ErrorCampo> errores = ValidadorAnimal.validar(entrada, Tiempo.hoy());
         if (!entrada.idRaza.isEmpty() && db.razaDao().porId(entrada.idRaza) == null) {
-            errores.put("idRaza", new ErrorCampo(CodigoError.VALOR_INVALIDO));
+            errores.put(Campos.ID_RAZA, new ErrorCampo(CodigoError.VALOR_INVALIDO));
         }
         if (!errores.isEmpty()) throw ErrorModelo.validacion(errores);
     }
@@ -137,39 +169,26 @@ public final class AnimalRepository {
         animal.fechaIngreso = entrada.fechaIngreso;
         animal.observaciones = entrada.observaciones.isEmpty() ? null : entrada.observaciones;
         if (fechaDeEstadoSigueAlIngreso) animal.fechaEstado = entrada.fechaIngreso;
-        animal.actualizadoEn = Tiempo.ahoraUtc();
     }
 
     /** La fecha del estado no puede quedar antes del ingreso: se rechaza un ingreso editado que la deje así. */
     private static void verificarCoherencia(Animal animal) throws ErrorModelo {
         if (animal.fechaEstado.compareTo(animal.fechaIngreso) < 0) {
             Map<String, ErrorCampo> errores = new LinkedHashMap<>();
-            errores.put("fechaIngreso", new ErrorCampo(CodigoError.FECHA_POSTERIOR));
+            errores.put(Campos.FECHA_INGRESO, new ErrorCampo(CodigoError.FECHA_POSTERIOR));
             throw ErrorModelo.validacion(errores);
-        }
-    }
-
-    /** Escribe el animal y reclasifica sus pesajes en una transacción. */
-    private void guardarCambios(Animal animal) throws ErrorModelo {
-        try {
-            db.runInTransaction(() -> {
-                db.animalDao().actualizar(animal);
-                db.pesajeDao().recalcularAntecedentes(animal.idAnimal, animal.fechaIngreso);
-            });
-        } catch (SQLiteConstraintException ex) {
-            throw errorDeRestriccion(ex);
         }
     }
 
     private Animal animalExistente(String idAnimal) throws ErrorModelo {
         Animal animal = db.animalDao().porId(idAnimal);
-        if (animal == null) throw ErrorModelo.noEncontrado("animal");
+        if (animal == null) throw ErrorModelo.noEncontrado(ErrorModelo.ANIMAL);
         return animal;
     }
 
     private String idFincaActiva() throws ErrorModelo {
         String idFinca = db.configuracionDao().idFincaActiva();
-        if (idFinca == null) throw ErrorModelo.noEncontrado("finca");
+        if (idFinca == null) throw ErrorModelo.noEncontrado(ErrorModelo.FINCA);
         return idFinca;
     }
 
@@ -181,14 +200,15 @@ public final class AnimalRepository {
         // Un animal nuevo entra activo desde su fecha de ingreso.
         animal.estado = Animal.ACTIVO;
         animal.fechaEstado = entrada.fechaIngreso;
-        animal.creadoEn = animal.actualizadoEn;
+        animal.creadoEn = Tiempo.ahoraUtc();
+        animal.actualizadoEn = animal.creadoEn;
         return animal;
     }
 
     /** Solo la unicidad (finca, código) cuenta como duplicado; una referencia inválida es otro tipo de fallo. */
     private static ErrorModelo errorDeRestriccion(SQLiteConstraintException ex) {
         boolean repetido = ex.getMessage() != null && ex.getMessage().toUpperCase(Locale.ROOT).contains("UNIQUE");
-        return repetido ? ErrorModelo.duplicado("codigo") : ErrorModelo.baseDeDatos(ex);
+        return repetido ? ErrorModelo.duplicado(Campos.CODIGO) : ErrorModelo.baseDeDatos(ex);
     }
 
     /** Minúsculas y sin tildes, para que "Lucía" coincida con "lucia" y "LUCÍA". */

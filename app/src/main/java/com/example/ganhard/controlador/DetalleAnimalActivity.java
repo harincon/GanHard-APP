@@ -34,6 +34,7 @@ public class DetalleAnimalActivity extends BaseActivity {
         vista.registrarPesaje.setOnClickListener(v -> abrir(PesajeFormActivity.class));
         vista.filaHistorial.setOnClickListener(v -> abrir(PesajesActivity.class));
         vista.filaEditar.setOnClickListener(v -> abrir(AnimalFormActivity.class));
+        vista.filaCambios.setOnClickListener(v -> abrir(HistorialActivity.class));
         vista.filaSanidad.setHabilitada(false);
         vista.filaTareas.setHabilitada(false);
         if (idAnimal == null) noEncontrado();

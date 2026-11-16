@@ -2,6 +2,7 @@ package com.example.ganhard.controlador;
 
 import android.content.Context;
 import com.example.ganhard.R;
+import com.example.ganhard.modelo.reglas.Campos;
 import com.example.ganhard.modelo.reglas.CodigoError;
 import com.example.ganhard.modelo.reglas.ErrorCampo;
 import com.example.ganhard.modelo.reglas.ValidadorPesaje;
@@ -22,6 +23,7 @@ public final class MensajesError {
             case FECHA_ANTERIOR: return contexto.getString(R.string.error_fecha_anterior);
             case FECHA_POSTERIOR: return contexto.getString(R.string.error_fecha_posterior);
             case DUPLICADO: return contexto.getString(R.string.error_duplicado);
+            case SIN_CAMBIOS: return contexto.getString(R.string.error_sin_cambios);
             default: return contexto.getString(R.string.error_valor_invalido);
         }
     }
@@ -35,39 +37,40 @@ public final class MensajesError {
     private static String especifico(Context contexto, String campo, ErrorCampo error) {
         CodigoError codigo = error.codigo;
         switch (campo) {
-            case "nombre": if (codigo == CodigoError.OBLIGATORIO) return contexto.getString(R.string.error_nombre_obligatorio); break;
-            case "finca": if (codigo == CodigoError.OBLIGATORIO) return contexto.getString(R.string.error_finca_obligatoria); break;
-            case "correo":
+            case Campos.NOMBRE: if (codigo == CodigoError.OBLIGATORIO) return contexto.getString(R.string.error_nombre_obligatorio); break;
+            case Campos.FINCA: if (codigo == CodigoError.OBLIGATORIO) return contexto.getString(R.string.error_finca_obligatoria); break;
+            case Campos.CORREO:
                 if (codigo == CodigoError.OBLIGATORIO) return contexto.getString(R.string.error_correo_obligatorio);
                 if (codigo == CodigoError.FORMATO) return contexto.getString(R.string.error_correo_formato);
                 break;
-            case "area": if (codigo == CodigoError.VALOR_INVALIDO) return contexto.getString(R.string.error_area_invalida); break;
-            case "codigo":
+            case Campos.AREA: if (codigo == CodigoError.VALOR_INVALIDO) return contexto.getString(R.string.error_area_invalida); break;
+            case Campos.CODIGO:
                 if (codigo == CodigoError.OBLIGATORIO) return contexto.getString(R.string.error_codigo_obligatorio);
                 if (codigo == CodigoError.DUPLICADO) return contexto.getString(R.string.error_codigo_duplicado);
                 break;
-            case "sexo": if (codigo == CodigoError.OBLIGATORIO) return contexto.getString(R.string.error_sexo_obligatorio); break;
-            case "fechaIngreso":
+            case Campos.SEXO: if (codigo == CodigoError.OBLIGATORIO) return contexto.getString(R.string.error_sexo_obligatorio); break;
+            case Campos.FECHA_INGRESO:
                 if (codigo == CodigoError.OBLIGATORIO) return contexto.getString(R.string.error_ingreso_obligatorio);
                 if (codigo == CodigoError.FECHA_POSTERIOR) return contexto.getString(R.string.error_ingreso_despues_estado);
                 if (codigo == CodigoError.FORMATO) return contexto.getString(R.string.error_fecha_formato);
                 break;
-            case "fechaNacimiento": if (codigo == CodigoError.FORMATO) return contexto.getString(R.string.error_fecha_formato); break;
-            case "fecha":
+            case Campos.FECHA_NACIMIENTO: if (codigo == CodigoError.FORMATO) return contexto.getString(R.string.error_fecha_formato); break;
+            case Campos.FECHA:
                 if (codigo == CodigoError.OBLIGATORIO) return contexto.getString(R.string.error_fecha_pesaje_obligatoria);
                 if (codigo == CodigoError.FORMATO) return contexto.getString(R.string.error_fecha_formato);
                 if (codigo == CodigoError.FECHA_ANTERIOR) return contexto.getString(R.string.error_fecha_antes_nacimiento);
                 break;
-            case "hora":
+            case Campos.HORA:
                 if (codigo == CodigoError.OBLIGATORIO) return contexto.getString(R.string.error_hora_obligatoria);
                 if (codigo == CodigoError.FORMATO) return contexto.getString(R.string.error_hora_formato);
                 if (codigo == CodigoError.FECHA_FUTURA) return contexto.getString(R.string.error_hora_futura);
                 break;
-            case "fechaEstado":
+            case Campos.FECHA_ESTADO:
                 if (codigo == CodigoError.FORMATO) return contexto.getString(R.string.error_fecha_formato);
                 if (codigo == CodigoError.FECHA_ANTERIOR) return contexto.getString(R.string.error_estado_antes_ingreso);
                 break;
-            case "peso":
+            case Campos.MOTIVO: if (codigo == CodigoError.OBLIGATORIO) return contexto.getString(R.string.error_motivo_obligatorio); break;
+            case Campos.PESO:
                 if (codigo == CodigoError.OBLIGATORIO) return contexto.getString(R.string.error_peso_obligatorio);
                 if (codigo == CodigoError.VALOR_INVALIDO) return contexto.getString(R.string.error_peso_invalido);
                 if (codigo == CodigoError.FORMATO) return contexto.getString(R.string.error_peso_decimales);

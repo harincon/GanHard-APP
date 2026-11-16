@@ -12,8 +12,12 @@ import com.example.ganhard.modelo.entidad.Pesaje;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Presenta el historial de pesajes; solo el más reciente se marca como vigente. */
+/** Presenta el historial de pesajes; solo el más reciente se marca como vigente. Al tocar uno se abre su corrección. */
 public final class PesajeAdapter extends RecyclerView.Adapter<PesajeAdapter.Fila> {
+    public interface Escucha {
+        void alSeleccionar(Pesaje pesaje);
+    }
+
     public static final class Fila extends RecyclerView.ViewHolder {
         private final TextView vigente, peso, fechaHora, observaciones, antecedente;
         Fila(View vista) {
@@ -27,9 +31,13 @@ public final class PesajeAdapter extends RecyclerView.Adapter<PesajeAdapter.Fila
     }
 
     private final Context contexto;
+    private final Escucha escucha;
     private final List<Pesaje> pesajes = new ArrayList<>();
 
-    public PesajeAdapter(Context contexto) { this.contexto = contexto; }
+    public PesajeAdapter(Context contexto, Escucha escucha) {
+        this.contexto = contexto;
+        this.escucha = escucha;
+    }
 
     public void mostrar(List<Pesaje> nuevos) {
         pesajes.clear();
@@ -49,6 +57,7 @@ public final class PesajeAdapter extends RecyclerView.Adapter<PesajeAdapter.Fila
         fila.observaciones.setText(pesaje.observaciones);
         fila.observaciones.setVisibility(pesaje.observaciones == null ? View.GONE : View.VISIBLE);
         fila.antecedente.setVisibility(pesaje.esAntecedente == 1 ? View.VISIBLE : View.GONE);
+        fila.itemView.setOnClickListener(v -> escucha.alSeleccionar(pesaje));
     }
 
     @Override public int getItemCount() { return pesajes.size(); }

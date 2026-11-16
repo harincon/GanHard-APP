@@ -32,6 +32,12 @@
             android:exported="false" />
         <activity android:name=".controlador.PesajeFormActivity"
             android:exported="false" android:windowSoftInputMode="adjustResize" />
+        <activity android:name=".controlador.PesajeCorreccionActivity"
+            android:exported="false" android:windowSoftInputMode="adjustResize" />
+        <activity android:name=".controlador.PesajeAnulacionActivity"
+            android:exported="false" android:windowSoftInputMode="adjustResize" />
+        <activity android:name=".controlador.HistorialActivity"
+            android:exported="false" />
         <activity android:name=".controlador.AnimalesActivity"
             android:exported="false" android:windowSoftInputMode="adjustResize" />
         <activity android:name=".controlador.AnimalFormActivity"

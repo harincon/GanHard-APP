@@ -28,7 +28,8 @@ public class PesajesActivity extends BaseActivity {
         ajustarBarras(vista.getRoot());
         configurarToolbar(vista.toolbar, true);
         idAnimal = getIntent().getStringExtra(EXTRA_ID_ANIMAL);
-        adaptador = new PesajeAdapter(this);
+        adaptador = new PesajeAdapter(this, pesaje -> startActivity(new Intent(this, PesajeCorreccionActivity.class)
+                .putExtra(PesajeCorreccionActivity.EXTRA_ID_PESAJE, pesaje.idPesaje)));
         vista.lista.setLayoutManager(new LinearLayoutManager(this));
         vista.lista.setAdapter(adaptador);
         vista.registrarPesaje.setOnClickListener(v -> registrar());

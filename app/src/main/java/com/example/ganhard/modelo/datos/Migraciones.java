@@ -1,8 +1,12 @@
 package com.example.ganhard.modelo.datos;
 
+import android.database.Cursor;
 import androidx.annotation.NonNull;
 import androidx.room.migration.Migration;
 import androidx.sqlite.db.SupportSQLiteDatabase;
+import java.util.UUID;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /** Migraciones del esquema. Nunca se usa una migración destructiva. */
 public final class Migraciones {
@@ -28,6 +32,71 @@ public final class Migraciones {
                     + "FOREIGN KEY(`id_animal`) REFERENCES `animal`(`id_animal`) ON UPDATE NO ACTION ON DELETE RESTRICT )");
             db.execSQL("CREATE INDEX IF NOT EXISTS `index_pesaje_id_animal_fecha_hora` ON `pesaje` (`id_animal`, `fecha`, `hora`)");
             CatalogoRazas.insertar(db);
+        }
+    };
+
+    /**
+     * Agrega el historial de cambios y registra como creados los animales y pesajes que ya existían, con su fecha
+     * de alta. Los valores son los actuales de cada registro: lo editado antes de esta versión no se conoce.
+     * El JSON se arma aquí, con nombres de columna fijos, para que la migración no dependa de clases que cambien.
+     */
+    public static final Migration V2_V3 = new Migration(2, 3) {
+        private final String[] datosAnimal = {"codigo", "nombre", "sexo", "id_raza", "fecha_nacimiento", "fecha_ingreso", "observaciones"};
+
+        @Override public void migrate(@NonNull SupportSQLiteDatabase db) {
+            db.execSQL("CREATE TABLE IF NOT EXISTS `historial_cambio` (`id_historial_cambio` TEXT NOT NULL, `id_usuario` TEXT NOT NULL, "
+                    + "`id_finca` TEXT, `entidad` TEXT NOT NULL, `id_registro` TEXT NOT NULL, `accion` TEXT NOT NULL, "
+                    + "`registrado_en` TEXT NOT NULL, `recibido_en` TEXT, `fecha_efectiva` TEXT, `motivo` TEXT, `valores_anteriores` TEXT, "
+                    + "`valores_nuevos` TEXT NOT NULL, PRIMARY KEY(`id_historial_cambio`), "
+                    + "FOREIGN KEY(`id_usuario`) REFERENCES `usuario`(`id_usuario`) ON UPDATE NO ACTION ON DELETE RESTRICT , "
+                    + "FOREIGN KEY(`id_finca`) REFERENCES `finca`(`id_finca`) ON UPDATE NO ACTION ON DELETE RESTRICT )");
+            db.execSQL("CREATE INDEX IF NOT EXISTS `index_historial_cambio_id_finca_registrado_en` ON `historial_cambio` (`id_finca`, `registrado_en`)");
+            db.execSQL("CREATE INDEX IF NOT EXISTS `index_historial_cambio_entidad_id_registro` ON `historial_cambio` (`entidad`, `id_registro`)");
+            db.execSQL("CREATE INDEX IF NOT EXISTS `index_historial_cambio_id_usuario` ON `historial_cambio` (`id_usuario`)");
+            try {
+                registrarAnimales(db);
+                registrarPesajes(db);
+            } catch (JSONException ex) {
+                throw new IllegalStateException("No se pudo registrar el historial de los datos existentes", ex);
+            }
+        }
+
+        private void registrarAnimales(SupportSQLiteDatabase db) throws JSONException {
+            try (Cursor c = db.query("SELECT a.id_animal, a.id_finca, f.id_propietario, a.creado_en, a.actualizado_en, a.estado, a.fecha_estado, "
+                    + "a.codigo, a.nombre, a.sexo, a.id_raza, a.fecha_nacimiento, a.fecha_ingreso, a.observaciones "
+                    + "FROM animal a JOIN finca f ON f.id_finca = a.id_finca")) {
+                while (c.moveToNext()) {
+                    JSONObject datos = new JSONObject();
+                    for (int i = 0; i < datosAnimal.length; i++) {
+                        if (!c.isNull(7 + i)) datos.put(datosAnimal[i], c.getString(7 + i));
+                    }
+                    insertar(db, c.getString(2), c.getString(1), "animal", c.getString(0), "CREAR", c.getString(3), null, datos);
+                    if (!"ACTIVO".equals(c.getString(5))) {
+                        JSONObject estado = new JSONObject().put("estado", c.getString(5)).put("fecha_estado", c.getString(6));
+                        insertar(db, c.getString(2), c.getString(1), "animal", c.getString(0), "CAMBIAR_ESTADO", c.getString(4), c.getString(6), estado);
+                    }
+                }
+            }
+        }
+
+        private void registrarPesajes(SupportSQLiteDatabase db) throws JSONException {
+            try (Cursor c = db.query("SELECT p.id_pesaje, a.id_finca, f.id_propietario, p.creado_en, p.fecha, p.hora, p.peso_kg, p.observaciones "
+                    + "FROM pesaje p JOIN animal a ON a.id_animal = p.id_animal JOIN finca f ON f.id_finca = a.id_finca")) {
+                while (c.moveToNext()) {
+                    JSONObject datos = new JSONObject().put("fecha", c.getString(4));
+                    if (!c.isNull(5)) datos.put("hora", c.getString(5));
+                    datos.put("peso_kg", c.getDouble(6));
+                    if (!c.isNull(7)) datos.put("observaciones", c.getString(7));
+                    insertar(db, c.getString(2), c.getString(1), "pesaje", c.getString(0), "CREAR", c.getString(3), null, datos);
+                }
+            }
+        }
+
+        private void insertar(SupportSQLiteDatabase db, String idUsuario, String idFinca, String entidad, String idRegistro,
+                              String accion, String registradoEn, String fechaEfectiva, JSONObject nuevos) {
+            db.execSQL("INSERT INTO historial_cambio (id_historial_cambio, id_usuario, id_finca, entidad, id_registro, accion, "
+                            + "registrado_en, fecha_efectiva, valores_nuevos) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    new Object[]{UUID.randomUUID().toString(), idUsuario, idFinca, entidad, idRegistro, accion, registradoEn, fechaEfectiva, nuevos.toString()});
         }
     };
 }

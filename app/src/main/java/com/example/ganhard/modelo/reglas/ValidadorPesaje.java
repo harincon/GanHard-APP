@@ -13,6 +13,7 @@ public final class ValidadorPesaje {
     /** Tope práctico para detectar errores de digitación; el diccionario solo limita a DECIMAL(8,2). */
     public static final int PESO_MAXIMO_KG = 2000;
     public static final int OBSERVACIONES_MAXIMO = 500;
+    public static final int MOTIVO_MAXIMO = 500;
     private static final BigDecimal MAXIMO = new BigDecimal(PESO_MAXIMO_KG);
 
     private ValidadorPesaje() {}
@@ -23,36 +24,43 @@ public final class ValidadorPesaje {
 
         LocalDate fecha = null;
         if (entrada.fecha.isEmpty()) {
-            errores.put("fecha", new ErrorCampo(CodigoError.OBLIGATORIO));
+            errores.put(Campos.FECHA, new ErrorCampo(CodigoError.OBLIGATORIO));
         } else {
             fecha = Fechas.fecha(entrada.fecha);
-            if (fecha == null) errores.put("fecha", new ErrorCampo(CodigoError.FORMATO));
-            else if (fecha.isAfter(hoy)) errores.put("fecha", new ErrorCampo(CodigoError.FECHA_FUTURA));
+            if (fecha == null) errores.put(Campos.FECHA, new ErrorCampo(CodigoError.FORMATO));
+            else if (fecha.isAfter(hoy)) errores.put(Campos.FECHA, new ErrorCampo(CodigoError.FECHA_FUTURA));
             else {
                 LocalDate nacimiento = Fechas.fecha(animal.fechaNacimiento);
-                if (nacimiento != null && fecha.isBefore(nacimiento)) errores.put("fecha", new ErrorCampo(CodigoError.FECHA_ANTERIOR));
+                if (nacimiento != null && fecha.isBefore(nacimiento)) errores.put(Campos.FECHA, new ErrorCampo(CodigoError.FECHA_ANTERIOR));
             }
         }
 
         if (entrada.hora.isEmpty()) {
             // Solo un antecedente anterior al ingreso puede omitir la hora.
-            if (!esAntecedente(entrada.fecha, animal)) errores.put("hora", new ErrorCampo(CodigoError.OBLIGATORIO));
+            if (!esAntecedente(entrada.fecha, animal)) errores.put(Campos.HORA, new ErrorCampo(CodigoError.OBLIGATORIO));
         } else {
             LocalTime hora = Fechas.hora(entrada.hora);
-            if (hora == null) errores.put("hora", new ErrorCampo(CodigoError.FORMATO));
+            if (hora == null) errores.put(Campos.HORA, new ErrorCampo(CodigoError.FORMATO));
             else if (fecha != null && fecha.equals(hoy) && hora.isAfter(ahora.toLocalTime())) {
-                errores.put("hora", new ErrorCampo(CodigoError.FECHA_FUTURA));
+                errores.put(Campos.HORA, new ErrorCampo(CodigoError.FECHA_FUTURA));
             }
         }
 
         ErrorCampo peso = errorPeso(entrada.pesoKg);
-        if (peso != null) errores.put("peso", peso);
+        if (peso != null) errores.put(Campos.PESO, peso);
         if (entrada.observaciones.length() > OBSERVACIONES_MAXIMO) {
-            errores.put("observaciones", new ErrorCampo(CodigoError.LONGITUD_MAXIMA, OBSERVACIONES_MAXIMO));
+            errores.put(Campos.OBSERVACIONES, new ErrorCampo(CodigoError.LONGITUD_MAXIMA, OBSERVACIONES_MAXIMO));
         }
         return errores;
     }
 
+    /** Motivo de una corrección o anulación (RN06): obligatorio y de hasta 500 caracteres. Null si es válido. */
+    public static ErrorCampo motivo(String motivo) {
+        String texto = motivo == null ? "" : motivo.trim();
+        if (texto.isEmpty()) return new ErrorCampo(CodigoError.OBLIGATORIO);
+        if (texto.length() > MOTIVO_MAXIMO) return new ErrorCampo(CodigoError.LONGITUD_MAXIMA, MOTIVO_MAXIMO);
+        return null;
+    }
     /** Peso en kg; acepta coma o punto decimal. Lanza IllegalArgumentException si no es válido. */
     public static Double peso(String valor) {
         String texto = valor == null ? "" : valor.trim();

@@ -49,6 +49,9 @@
     <style name="Gh.Tarjeta.Suave" parent="Gh.Tarjeta">
         <item name="cardBackgroundColor">@color/gh_soft</item>
     </style>
+    <style name="Gh.Tarjeta.Aviso" parent="Gh.Tarjeta">
+        <item name="cardBackgroundColor">@color/gh_aviso</item>
+    </style>
     <style name="Gh.Overline" parent="TextAppearance.Material3.LabelSmall">
         <item name="android:textColor">@color/gh_primary</item>
         <item name="android:textAllCaps">true</item>

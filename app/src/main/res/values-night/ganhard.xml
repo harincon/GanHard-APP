@@ -8,5 +8,7 @@
     <color name="gh_on_primary">#12351E</color>
     <color name="gh_soft">#283E2E</color>
     <color name="gh_line">#64796B</color>
+    <color name="gh_aviso">#3D3013</color>
+    <color name="gh_on_aviso">#F2D48A</color>
     <bool name="gh_barras_claras">false</bool>
 </resources>

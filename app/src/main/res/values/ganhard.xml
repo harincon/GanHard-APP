@@ -8,6 +8,8 @@
     <color name="gh_on_primary">#FFFFFF</color>
     <color name="gh_soft">#E5F1E7</color>
     <color name="gh_line">#B9C9BD</color>
+    <color name="gh_aviso">#FFF1CC</color>
+    <color name="gh_on_aviso">#7A5200</color>
     <bool name="gh_barras_claras">true</bool>
     <string name="configurar_finca">Configurar finca</string>
     <string name="editar_configuracion">Datos de la finca</string>
@@ -41,6 +43,8 @@
     <string name="error_fecha_futura">La fecha no puede ser futura.</string>
     <string name="error_fecha_anterior">La fecha no puede ser anterior a otra fecha del registro.</string>
     <string name="error_duplicado">Ya existe un registro con este valor.</string>
+    <string name="error_sin_cambios">No hay cambios que guardar.</string>
+    <string name="error_motivo_obligatorio">Escribe el motivo.</string>
     <string name="error_nombre_obligatorio">Escribe el nombre del administrador.</string>
     <string name="error_correo_obligatorio">Escribe un correo de contacto.</string>
     <string name="error_finca_obligatoria">Escribe el nombre de la finca.</string>
@@ -128,7 +132,7 @@
     <string name="sub_sanidad">Actividades realizadas por animal · Próximamente</string>
     <string name="sub_tareas">Actividades programadas · Próximamente</string>
     <string name="sub_gastos">Egresos y total del periodo · Próximamente</string>
-    <string name="sub_historial">Responsables y correcciones · Próximamente</string>
+    <string name="sub_historial">Responsables y correcciones</string>
     <string name="sub_sincronizacion">Envíos y cambios por revisar · Próximamente</string>
     <string name="sub_configuracion">Perfil, finca y apariencia</string>
     <string name="ajustes_rol">Administrador · Perfil local</string>
@@ -175,5 +179,65 @@
     <string name="error_fecha_posterior">La fecha no puede ser posterior a otra fecha del registro.</string>
     <string name="error_ingreso_despues_estado">El ingreso no puede ser posterior a la fecha del estado.</string>
     <string name="nota_estado">Al marcar vendido o fallecido, se conservan los antecedentes y se dejan de programar nuevas actividades.</string>
-    <string name="nota_pesajes_anulados">Los registros anulados se conservan para consulta y no cuentan como último pesaje.</string>
+    <string name="nota_pesajes_anulados">Toca un pesaje para corregirlo o anularlo. Los anulados se conservan en el Historial de cambios y no cuentan como último pesaje.</string>
+
+    <!-- Etapa 3: corrección y anulación de pesajes -->
+    <string name="corregir_pesaje">Corregir pesaje</string>
+    <string name="medicion_del">Medición del %1$s</string>
+    <string name="peso_corregido">Peso corregido (kg) *</string>
+    <string name="motivo_correccion">Motivo de la corrección *</string>
+    <string name="nota_correccion">Se conservarán el valor anterior, el nuevo valor, la fecha y el responsable en el historial.</string>
+    <string name="guardar_correccion">Guardar corrección</string>
+    <string name="anular_este_pesaje">Anular este pesaje</string>
+    <string name="anular_este_pesaje_sub">Conservarlo sin incluirlo en los cálculos</string>
+    <string name="anular_pesaje">Anular pesaje</string>
+    <string name="anulacion_detalle">%1$s kg · %2$s</string>
+    <string name="aviso_anulacion_titulo">El registro se conservará</string>
+    <string name="aviso_anulacion_texto">Se marcará como anulado y dejará de incluirse en los cálculos.</string>
+    <string name="motivo_anulacion">Motivo de anulación *</string>
+    <string name="confirmar_anulacion">Confirmar anulación</string>
+    <string name="nota_anulacion">Podrás consultar el registro anulado y su motivo en el historial.</string>
+    <string name="pesaje_corregido">Pesaje corregido.</string>
+    <string name="pesaje_anulado">Pesaje anulado.</string>
+    <string name="pesaje_no_encontrado">No se encontró el pesaje.</string>
+    <string name="error_correccion">No se pudo guardar la corrección. Intenta nuevamente.</string>
+    <string name="error_anulacion">No se pudo anular el pesaje. Intenta nuevamente.</string>
+
+    <!-- Etapa 3: historial de cambios -->
+    <string name="historial_orden">Consulta de cambios · Más recientes primero</string>
+    <string name="historial_vacio">Aún no hay cambios registrados.</string>
+    <string name="historial_consulta_titulo">Historial de consulta</string>
+    <string name="historial_consulta_texto">No restaura versiones automáticamente. Para corregir un dato, abre su registro.</string>
+    <string name="historial_creacion">Creación</string>
+    <string name="historial_edicion">Edición</string>
+    <string name="historial_estado">Estado</string>
+    <string name="historial_anulacion">Anulación</string>
+    <string name="historial_otro">Cambio</string>
+    <string name="titulo_animal_registrado">Animal registrado</string>
+    <string name="titulo_animal_editado">Animal editado</string>
+    <string name="titulo_estado_cambiado">Estado cambiado</string>
+    <string name="titulo_pesaje_registrado">Pesaje registrado</string>
+    <string name="titulo_pesaje_corregido">Pesaje corregido</string>
+    <string name="titulo_pesaje_anulado">Pesaje anulado</string>
+    <string name="titulo_cambio">Cambio registrado</string>
+    <string name="historial_antes_campo">Antes · %1$s: %2$s</string>
+    <string name="historial_ahora_campo">Ahora · %1$s: %2$s</string>
+    <string name="historial_antes">Antes: %1$s</string>
+    <string name="historial_ahora">Ahora: %1$s</string>
+    <string name="historial_desde">Desde: %1$s</string>
+    <string name="historial_motivo">Motivo: %1$s</string>
+    <string name="campo_codigo">Código</string>
+    <string name="campo_nombre">Nombre</string>
+    <string name="campo_sexo">Sexo</string>
+    <string name="campo_raza">Raza</string>
+    <string name="campo_nacimiento">Nacimiento</string>
+    <string name="campo_ingreso">Ingreso</string>
+    <string name="campo_observaciones">Observaciones</string>
+    <string name="campo_fecha">Fecha</string>
+    <string name="campo_hora">Hora</string>
+    <string name="campo_peso">Peso</string>
+    <string name="campo_estado">Estado</string>
+    <string name="campo_fecha_estado">Fecha del estado</string>
+    <string name="historial_cambios_ficha">Historial de cambios</string>
+    <string name="historial_cambios_ficha_sub">Responsables y correcciones</string>
 </resources>

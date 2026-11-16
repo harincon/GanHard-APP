@@ -8,6 +8,7 @@ import com.example.ganhard.databinding.ActivityConfiguracionBinding;
 import com.example.ganhard.modelo.ConfiguracionLocal;
 import com.example.ganhard.modelo.nucleo.Callback;
 import com.example.ganhard.modelo.nucleo.ErrorModelo;
+import com.example.ganhard.modelo.reglas.Campos;
 import com.example.ganhard.modelo.reglas.EntradaConfiguracion;
 import com.example.ganhard.modelo.reglas.ValidadorConfiguracion;
 import com.google.android.material.textfield.TextInputLayout;
@@ -86,8 +87,8 @@ public class ConfiguracionActivity extends FormularioActivity {
     }
     @Override protected Map<String, TextInputLayout> campos() {
         Map<String, TextInputLayout> campos = new java.util.LinkedHashMap<>();
-        campos.put("nombre", vista.campoNombre); campos.put("correo", vista.campoCorreo); campos.put("finca", vista.campoFinca);
-        campos.put("ubicacion", vista.campoUbicacion); campos.put("area", vista.campoArea);
+        campos.put(Campos.NOMBRE, vista.campoNombre); campos.put(Campos.CORREO, vista.campoCorreo); campos.put(Campos.FINCA, vista.campoFinca);
+        campos.put(Campos.UBICACION, vista.campoUbicacion); campos.put(Campos.AREA, vista.campoArea);
         return campos;
     }
     @Override protected boolean hayCambios() {

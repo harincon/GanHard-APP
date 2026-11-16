@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/raiz" android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical" android:background="@color/gh_background">
+    <com.google.android.material.appbar.MaterialToolbar android:id="@+id/toolbar" style="@style/Gh.Toolbar"
+        android:layout_width="match_parent" android:layout_height="wrap_content" app:title="@string/modulo_historial" />
+    <ProgressBar android:id="@+id/progreso" style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent" android:layout_height="4dp" android:indeterminate="true" android:visibility="invisible" />
+    <TextView android:id="@+id/historialCabecera" android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/gh_margen" android:layout_marginEnd="@dimen/gh_margen" android:layout_marginTop="@dimen/gh_margen"
+        android:textAppearance="@style/Gh.Titulo" />
+    <TextView android:id="@+id/historialOrden" android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/gh_margen" android:layout_marginEnd="@dimen/gh_margen" android:layout_marginTop="4dp" android:layout_marginBottom="12dp"
+        android:text="@string/historial_orden" android:textSize="12sp" android:textColor="@color/gh_muted" />
+    <FrameLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
+        <androidx.recyclerview.widget.RecyclerView android:id="@+id/lista" android:layout_width="match_parent" android:layout_height="match_parent"
+            android:clipToPadding="false" android:paddingBottom="8dp" android:visibility="gone" />
+        <LinearLayout android:id="@+id/estadoVacio" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_gravity="center"
+            android:orientation="vertical" android:padding="24dp" android:gravity="center_horizontal" android:visibility="gone">
+            <TextView android:id="@+id/mensajeVacio" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center"
+                android:text="@string/historial_vacio" android:textSize="16sp" android:textColor="@color/gh_muted" />
+        </LinearLayout>
+        <LinearLayout android:id="@+id/estadoError" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_gravity="center"
+            android:orientation="vertical" android:padding="24dp" android:gravity="center_horizontal" android:visibility="gone">
+            <TextView android:id="@+id/mensajeError" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center"
+                android:textSize="16sp" android:textColor="@color/gh_muted" android:accessibilityLiveRegion="polite" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/reintentar" style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="wrap_content" android:layout_height="wrap_content" android:minHeight="48dp" android:text="@string/reintentar" />
+        </LinearLayout>
+    </FrameLayout>
+    <com.google.android.material.card.MaterialCardView style="@style/Gh.Tarjeta.Suave" android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_margin="@dimen/gh_margen">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp">
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/historial_consulta_titulo"
+                android:textSize="14sp" android:textStyle="bold" android:textColor="@color/gh_primary" />
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="4dp"
+                android:text="@string/historial_consulta_texto" android:textSize="12sp" android:textColor="@color/gh_muted" />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+</LinearLayout>

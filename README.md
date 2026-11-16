@@ -8,11 +8,12 @@ Java y XML (Android Views), arquitectura MVC, base de datos local con Room.
 
 - Perfil del administrador y datos de la finca.
 - Registro, búsqueda, ficha y edición de animales, con estado activo, vendido o fallecido.
-- Registro e historial de pesajes por animal.
+- Registro e historial de pesajes por animal, con corrección y anulación con motivo.
+- Historial de cambios de la finca y de cada animal: quién, cuándo, qué cambió y por qué.
 - Inicio con el total de animales activos.
 - Tema claro, oscuro o el del sistema.
 
-Sanidad, Tareas, Gastos, Historial de cambios y Sincronización aparecen en el menú como "Próximamente".
+Sanidad, Tareas, Gastos y Sincronización aparecen en el menú como "Próximamente".
 
 ## Estructura
 
@@ -20,7 +21,7 @@ Sanidad, Tareas, Gastos, Historial de cambios y Sincronización aparecen en el m
 app/src/main/java/com/example/ganhard/
 ├── controlador/   Pantallas (Activity) y apoyos de la vista
 └── modelo/
-    ├── entidad/      Usuario, Finca, Raza, Animal, Pesaje
+    ├── entidad/      Usuario, Finca, Raza, Animal, Pesaje, HistorialCambio
     ├── datos/        Base Room, DAO y migraciones
     ├── repositorio/  Operaciones de guardado y consulta
     └── reglas/       Validaciones

@@ -16,30 +16,30 @@ public final class ValidadorAnimal {
 
     public static Map<String, ErrorCampo> validar(EntradaAnimal entrada, LocalDate hoy) {
         Map<String, ErrorCampo> errores = new LinkedHashMap<>();
-        if (entrada.codigo.isEmpty()) errores.put("codigo", new ErrorCampo(CodigoError.OBLIGATORIO));
-        else if (entrada.codigo.length() > CODIGO_MAXIMO) errores.put("codigo", new ErrorCampo(CodigoError.LONGITUD_MAXIMA, CODIGO_MAXIMO));
-        if (entrada.nombre.length() > NOMBRE_MAXIMO) errores.put("nombre", new ErrorCampo(CodigoError.LONGITUD_MAXIMA, NOMBRE_MAXIMO));
-        if (entrada.sexo.isEmpty()) errores.put("sexo", new ErrorCampo(CodigoError.OBLIGATORIO));
-        else if (!Animal.HEMBRA.equals(entrada.sexo) && !Animal.MACHO.equals(entrada.sexo)) errores.put("sexo", new ErrorCampo(CodigoError.VALOR_INVALIDO));
+        if (entrada.codigo.isEmpty()) errores.put(Campos.CODIGO, new ErrorCampo(CodigoError.OBLIGATORIO));
+        else if (entrada.codigo.length() > CODIGO_MAXIMO) errores.put(Campos.CODIGO, new ErrorCampo(CodigoError.LONGITUD_MAXIMA, CODIGO_MAXIMO));
+        if (entrada.nombre.length() > NOMBRE_MAXIMO) errores.put(Campos.NOMBRE, new ErrorCampo(CodigoError.LONGITUD_MAXIMA, NOMBRE_MAXIMO));
+        if (entrada.sexo.isEmpty()) errores.put(Campos.SEXO, new ErrorCampo(CodigoError.OBLIGATORIO));
+        else if (!Animal.HEMBRA.equals(entrada.sexo) && !Animal.MACHO.equals(entrada.sexo)) errores.put(Campos.SEXO, new ErrorCampo(CodigoError.VALOR_INVALIDO));
 
         LocalDate nacimiento = null;
         if (!entrada.fechaNacimiento.isEmpty()) {
             nacimiento = Fechas.fecha(entrada.fechaNacimiento);
-            if (nacimiento == null) errores.put("fechaNacimiento", new ErrorCampo(CodigoError.FORMATO));
-            else if (nacimiento.isAfter(hoy)) errores.put("fechaNacimiento", new ErrorCampo(CodigoError.FECHA_FUTURA));
+            if (nacimiento == null) errores.put(Campos.FECHA_NACIMIENTO, new ErrorCampo(CodigoError.FORMATO));
+            else if (nacimiento.isAfter(hoy)) errores.put(Campos.FECHA_NACIMIENTO, new ErrorCampo(CodigoError.FECHA_FUTURA));
         }
         if (entrada.fechaIngreso.isEmpty()) {
-            errores.put("fechaIngreso", new ErrorCampo(CodigoError.OBLIGATORIO));
+            errores.put(Campos.FECHA_INGRESO, new ErrorCampo(CodigoError.OBLIGATORIO));
         } else {
             LocalDate ingreso = Fechas.fecha(entrada.fechaIngreso);
-            if (ingreso == null) errores.put("fechaIngreso", new ErrorCampo(CodigoError.FORMATO));
-            else if (ingreso.isAfter(hoy)) errores.put("fechaIngreso", new ErrorCampo(CodigoError.FECHA_FUTURA));
-            else if (nacimiento != null && !errores.containsKey("fechaNacimiento") && ingreso.isBefore(nacimiento)) {
-                errores.put("fechaIngreso", new ErrorCampo(CodigoError.FECHA_ANTERIOR));
+            if (ingreso == null) errores.put(Campos.FECHA_INGRESO, new ErrorCampo(CodigoError.FORMATO));
+            else if (ingreso.isAfter(hoy)) errores.put(Campos.FECHA_INGRESO, new ErrorCampo(CodigoError.FECHA_FUTURA));
+            else if (nacimiento != null && !errores.containsKey(Campos.FECHA_NACIMIENTO) && ingreso.isBefore(nacimiento)) {
+                errores.put(Campos.FECHA_INGRESO, new ErrorCampo(CodigoError.FECHA_ANTERIOR));
             }
         }
         if (entrada.observaciones.length() > OBSERVACIONES_MAXIMO) {
-            errores.put("observaciones", new ErrorCampo(CodigoError.LONGITUD_MAXIMA, OBSERVACIONES_MAXIMO));
+            errores.put(Campos.OBSERVACIONES, new ErrorCampo(CodigoError.LONGITUD_MAXIMA, OBSERVACIONES_MAXIMO));
         }
         return errores;
     }

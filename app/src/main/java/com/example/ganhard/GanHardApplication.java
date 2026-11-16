@@ -7,6 +7,7 @@ import com.example.ganhard.modelo.datos.GanHardDatabase;
 import com.example.ganhard.modelo.nucleo.EjecutorModelo;
 import com.example.ganhard.modelo.repositorio.AnimalRepository;
 import com.example.ganhard.modelo.repositorio.ConfiguracionRepository;
+import com.example.ganhard.modelo.repositorio.HistorialRepository;
 import com.example.ganhard.modelo.repositorio.PesajeRepository;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -17,6 +18,7 @@ public class GanHardApplication extends Application {
     private ConfiguracionRepository configuracion;
     private AnimalRepository animales;
     private PesajeRepository pesajes;
+    private HistorialRepository historial;
     @Override public void onCreate() {
         super.onCreate();
         PreferenciaTema.aplicar(this);
@@ -28,9 +30,11 @@ public class GanHardApplication extends Application {
         configuracion = new ConfiguracionRepository(database.configuracionDao(), ejecutor);
         animales = new AnimalRepository(database, ejecutor);
         pesajes = new PesajeRepository(database, ejecutor);
+        historial = new HistorialRepository(database, ejecutor);
     }
     public EjecutorModelo ejecutor() { return ejecutor; }
     public ConfiguracionRepository configuracion() { return configuracion; }
     public AnimalRepository animales() { return animales; }
     public PesajeRepository pesajes() { return pesajes; }
+    public HistorialRepository historial() { return historial; }
 }

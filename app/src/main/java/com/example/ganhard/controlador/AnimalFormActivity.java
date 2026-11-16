@@ -13,9 +13,8 @@ import com.example.ganhard.modelo.entidad.Raza;
 import com.example.ganhard.modelo.nucleo.Callback;
 import com.example.ganhard.modelo.nucleo.ErrorModelo;
 import com.example.ganhard.modelo.nucleo.Tiempo;
+import com.example.ganhard.modelo.reglas.Campos;
 import com.example.ganhard.modelo.reglas.EntradaAnimal;
-import com.example.ganhard.modelo.reglas.ErrorCampo;
-import com.example.ganhard.modelo.reglas.ValidadorAnimal;
 import com.google.android.material.textfield.TextInputLayout;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -155,8 +154,7 @@ public class AnimalFormActivity extends FormularioActivity {
             @Override public void error(ErrorModelo error) {
                 if (!disponible()) return;
                 if (error.tipo == ErrorModelo.Tipo.NO_ENCONTRADO) {
-                    Toast.makeText(getApplicationContext(), R.string.animal_no_encontrado, Toast.LENGTH_SHORT).show();
-                    finish();
+                    animalNoEncontrado();
                 } else {
                     mensaje(R.string.error_carga);
                 }
@@ -178,8 +176,6 @@ public class AnimalFormActivity extends FormularioActivity {
     private void guardar() {
         if (guardando) return;
         EntradaAnimal entrada = entrada();
-        Map<String, ErrorCampo> errores = ValidadorAnimal.validar(entrada, Tiempo.hoy());
-        if (mostrarErrores(errores)) return;
         empezarGuardado();
         Callback<Animal> resultado = new Callback<Animal>() {
             @Override public void exito(Animal animal) {
@@ -193,7 +189,11 @@ public class AnimalFormActivity extends FormularioActivity {
             @Override public void error(ErrorModelo error) {
                 if (!disponible()) return;
                 terminarGuardado();
-                if (error.tipo == ErrorModelo.Tipo.NO_ENCONTRADO) { irAConfiguracion(); return; }
+                if (error.tipo == ErrorModelo.Tipo.NO_ENCONTRADO) {
+                    // Sin finca se configura primero; si lo que falta es el animal, ya no hay qué editar.
+                    if (ErrorModelo.FINCA.equals(error.faltante)) irAConfiguracion(); else animalNoEncontrado();
+                    return;
+                }
                 mostrarError(error, R.string.error_guardado_animal);
             }
         };
@@ -223,15 +223,15 @@ public class AnimalFormActivity extends FormularioActivity {
 
     @Override protected Map<String, TextInputLayout> campos() {
         Map<String, TextInputLayout> campos = new LinkedHashMap<>();
-        campos.put("codigo", vista.campoCodigo);
-        campos.put("nombre", vista.campoNombre);
-        campos.put("sexo", vista.campoSexo);
-        campos.put("idRaza", vista.campoRaza);
-        campos.put("fechaNacimiento", vista.campoNacimiento);
-        campos.put("fechaIngreso", vista.campoIngreso);
-        campos.put("estado", vista.campoEstado);
-        campos.put("fechaEstado", vista.campoFechaEstado);
-        campos.put("observaciones", vista.campoObservaciones);
+        campos.put(Campos.CODIGO, vista.campoCodigo);
+        campos.put(Campos.NOMBRE, vista.campoNombre);
+        campos.put(Campos.SEXO, vista.campoSexo);
+        campos.put(Campos.ID_RAZA, vista.campoRaza);
+        campos.put(Campos.FECHA_NACIMIENTO, vista.campoNacimiento);
+        campos.put(Campos.FECHA_INGRESO, vista.campoIngreso);
+        campos.put(Campos.ESTADO, vista.campoEstado);
+        campos.put(Campos.FECHA_ESTADO, vista.campoFechaEstado);
+        campos.put(Campos.OBSERVACIONES, vista.campoObservaciones);
         return campos;
     }
 
@@ -246,6 +246,11 @@ public class AnimalFormActivity extends FormularioActivity {
         }
         return !actual.codigo.isEmpty() || !actual.nombre.isEmpty() || !actual.sexo.isEmpty() || !actual.idRaza.isEmpty()
                 || !actual.fechaNacimiento.isEmpty() || !actual.fechaIngreso.equals(ingresoInicial) || !actual.observaciones.isEmpty();
+    }
+
+    private void animalNoEncontrado() {
+        Toast.makeText(getApplicationContext(), R.string.animal_no_encontrado, Toast.LENGTH_SHORT).show();
+        finish();
     }
 
     private void irAConfiguracion() {

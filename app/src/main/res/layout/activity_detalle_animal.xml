@@ -43,6 +43,8 @@
                     android:layout_marginBottom="8dp" app:titulo="@string/modulo_sanidad" app:subtitulo="@string/sanidad_ficha_sub" />
                 <com.example.ganhard.controlador.FilaNavegacion android:id="@+id/filaTareas" android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:layout_marginBottom="8dp" app:titulo="@string/tareas_ficha" app:subtitulo="@string/tareas_ficha_sub" />
+                <com.example.ganhard.controlador.FilaNavegacion android:id="@+id/filaCambios" android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp" app:titulo="@string/historial_cambios_ficha" app:subtitulo="@string/historial_cambios_ficha_sub" />
                 <com.example.ganhard.controlador.FilaNavegacion android:id="@+id/filaEditar" android:layout_width="match_parent" android:layout_height="wrap_content"
                     app:titulo="@string/editar_datos" app:subtitulo="@string/editar_datos_sub" />
             </LinearLayout>
