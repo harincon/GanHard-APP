@@ -70,6 +70,9 @@ public final class MensajesError {
                 if (codigo == CodigoError.FECHA_ANTERIOR) return contexto.getString(R.string.error_estado_antes_ingreso);
                 break;
             case Campos.MOTIVO: if (codigo == CodigoError.OBLIGATORIO) return contexto.getString(R.string.error_motivo_obligatorio); break;
+            case Campos.ID_ANIMAL: if (codigo == CodigoError.OBLIGATORIO) return contexto.getString(R.string.error_animal_obligatorio); break;
+            case Campos.TIPO: if (codigo == CodigoError.OBLIGATORIO) return contexto.getString(R.string.error_tipo_obligatorio); break;
+            case Campos.DESCRIPCION: if (codigo == CodigoError.OBLIGATORIO) return contexto.getString(R.string.error_descripcion_obligatoria); break;
             case Campos.PESO:
                 if (codigo == CodigoError.OBLIGATORIO) return contexto.getString(R.string.error_peso_obligatorio);
                 if (codigo == CodigoError.VALOR_INVALIDO) return contexto.getString(R.string.error_peso_invalido);

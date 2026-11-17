@@ -25,7 +25,8 @@ public class MenuActivity extends BaseActivity {
         vista.filaAnimales.setOnClickListener(v -> startActivity(new Intent(this, AnimalesActivity.class)));
         vista.filaConfiguracion.setOnClickListener(v -> startActivity(new Intent(this, AjustesActivity.class)));
         vista.filaHistorial.setOnClickListener(v -> startActivity(new Intent(this, HistorialActivity.class)));
-        for (FilaNavegacion pendiente : new FilaNavegacion[]{vista.filaSanidad, vista.filaTareas, vista.filaGastos, vista.filaSincronizacion}) {
+        vista.filaSanidad.setOnClickListener(v -> startActivity(new Intent(this, SanidadActivity.class)));
+        for (FilaNavegacion pendiente : new FilaNavegacion[]{vista.filaTareas, vista.filaGastos, vista.filaSincronizacion}) {
             pendiente.setHabilitada(false);
         }
     }

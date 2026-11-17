@@ -10,12 +10,12 @@ public final class ErrorModelo extends Exception {
     public enum Tipo { VALIDACION, DUPLICADO, NO_ENCONTRADO, BASE_DE_DATOS }
 
     /** Lo que puede faltar en un error NO_ENCONTRADO. */
-    public static final String FINCA = "finca", ANIMAL = "animal", PESAJE = "pesaje";
+    public static final String FINCA = "finca", ANIMAL = "animal", PESAJE = "pesaje", EVENTO = "evento_sanitario";
 
     public final Tipo tipo;
     /** Errores por campo, con las mismas claves que usa la Vista; vacío si el error no es de un campo. */
     public final Map<String, ErrorCampo> campos;
-    /** En NO_ENCONTRADO, qué faltó (FINCA, ANIMAL o PESAJE); nulo en los demás tipos. */
+    /** En NO_ENCONTRADO, qué faltó (FINCA, ANIMAL, PESAJE o EVENTO); nulo en los demás tipos. */
     public final String faltante;
 
     private ErrorModelo(Tipo tipo, String mensaje, Throwable causa, Map<String, ErrorCampo> campos, String faltante) {

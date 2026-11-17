@@ -3,6 +3,7 @@ package com.example.ganhard.controlador;
 import android.content.Context;
 import com.example.ganhard.R;
 import com.example.ganhard.modelo.entidad.Animal;
+import com.example.ganhard.modelo.entidad.EventoSanitario;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
@@ -21,6 +22,18 @@ final class Presentacion {
         return contexto.getString(Animal.MACHO.equals(sexo) ? R.string.sexo_macho : R.string.sexo_hembra);
     }
 
+    /** Nombre visible del tipo de actividad sanitaria; un tipo que esta versión no conoce se muestra tal cual. */
+    static String tipoSanidad(Context contexto, String tipo) {
+        if (tipo == null) return "";
+        switch (tipo) {
+            case EventoSanitario.VACUNACION: return contexto.getString(R.string.sanidad_vacunacion);
+            case EventoSanitario.DESPARASITACION: return contexto.getString(R.string.sanidad_desparasitacion);
+            case EventoSanitario.REVISION: return contexto.getString(R.string.sanidad_revision);
+            case EventoSanitario.TRATAMIENTO: return contexto.getString(R.string.sanidad_tratamiento);
+            case EventoSanitario.OTRO: return contexto.getString(R.string.sanidad_otro);
+            default: return tipo;
+        }
+    }
     /** Número sin ceros sobrantes y con punto decimal, el mismo formato que acepta el formulario. */
     static String kilos(Double peso) {
         return new DecimalFormat("0.##", DecimalFormatSymbols.getInstance(Locale.US)).format(peso);

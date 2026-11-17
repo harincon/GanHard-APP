@@ -99,4 +99,16 @@ public final class Migraciones {
                     new Object[]{UUID.randomUUID().toString(), idUsuario, idFinca, entidad, idRegistro, accion, registradoEn, fechaEfectiva, nuevos.toString()});
         }
     };
+
+    /** Agrega las actividades sanitarias; no toca lo existente. */
+    public static final Migration V3_V4 = new Migration(3, 4) {
+        @Override public void migrate(@NonNull SupportSQLiteDatabase db) {
+            db.execSQL("CREATE TABLE IF NOT EXISTS `evento_sanitario` (`id_evento_sanitario` TEXT NOT NULL, `id_animal` TEXT NOT NULL, "
+                    + "`tipo` TEXT NOT NULL, `fecha` TEXT NOT NULL, `descripcion` TEXT NOT NULL, `producto` TEXT, `observaciones` TEXT, "
+                    + "`es_antecedente` INTEGER NOT NULL, `anulado` INTEGER NOT NULL, `anulado_en` TEXT, `motivo_anulacion` TEXT, "
+                    + "`creado_en` TEXT NOT NULL, `actualizado_en` TEXT NOT NULL, `version` INTEGER NOT NULL, PRIMARY KEY(`id_evento_sanitario`), "
+                    + "FOREIGN KEY(`id_animal`) REFERENCES `animal`(`id_animal`) ON UPDATE NO ACTION ON DELETE RESTRICT )");
+            db.execSQL("CREATE INDEX IF NOT EXISTS `index_evento_sanitario_id_animal_fecha` ON `evento_sanitario` (`id_animal`, `fecha`)");
+        }
+    };
 }

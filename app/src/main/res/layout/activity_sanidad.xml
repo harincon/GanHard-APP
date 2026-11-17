@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/raiz" android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical" android:background="@color/gh_background">
+    <com.google.android.material.appbar.MaterialToolbar android:id="@+id/toolbar" style="@style/Gh.Toolbar"
+        android:layout_width="match_parent" android:layout_height="wrap_content" app:title="@string/modulo_sanidad" />
+    <ProgressBar android:id="@+id/progreso" style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent" android:layout_height="4dp" android:indeterminate="true" android:visibility="invisible" />
+    <com.google.android.material.textfield.TextInputLayout android:id="@+id/campoFiltroAnimal"
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu" android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/gh_margen" android:layout_marginEnd="@dimen/gh_margen" android:layout_marginTop="12dp" android:hint="@string/filtro_animal">
+        <com.google.android.material.textfield.MaterialAutoCompleteTextView android:id="@+id/filtroAnimal" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:inputType="none" android:importantForAutofill="no" />
+    </com.google.android.material.textfield.TextInputLayout>
+    <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/gh_margen" android:layout_marginEnd="@dimen/gh_margen" android:layout_marginTop="16dp" android:layout_marginBottom="12dp"
+        android:text="@string/actividades_realizadas" android:textAppearance="@style/Gh.Titulo" />
+    <FrameLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
+        <androidx.recyclerview.widget.RecyclerView android:id="@+id/lista" android:layout_width="match_parent" android:layout_height="match_parent"
+            android:clipToPadding="false" android:paddingBottom="8dp" android:visibility="gone" />
+        <LinearLayout android:id="@+id/estadoVacio" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_gravity="center"
+            android:orientation="vertical" android:padding="24dp" android:gravity="center_horizontal" android:visibility="gone">
+            <TextView android:id="@+id/mensajeVacio" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center"
+                android:text="@string/sanidad_vacia" android:textSize="16sp" android:textColor="@color/gh_muted" />
+        </LinearLayout>
+        <LinearLayout android:id="@+id/estadoError" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_gravity="center"
+            android:orientation="vertical" android:padding="24dp" android:gravity="center_horizontal" android:visibility="gone">
+            <TextView android:id="@+id/mensajeError" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center"
+                android:textSize="16sp" android:textColor="@color/gh_muted" android:accessibilityLiveRegion="polite" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/reintentar" style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="wrap_content" android:layout_height="wrap_content" android:minHeight="48dp" android:text="@string/reintentar" />
+        </LinearLayout>
+    </FrameLayout>
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="@dimen/gh_margen">
+        <com.google.android.material.button.MaterialButton android:id="@+id/registrarActividad" style="@style/Gh.Boton"
+            android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/registrar_actividad_sanitaria" />
+        <com.example.ganhard.controlador.FilaNavegacion android:id="@+id/filaProgramar" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="12dp" app:titulo="@string/programar_actividad" app:subtitulo="@string/programar_actividad_sub" />
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp"
+            android:text="@string/nota_sanidad" android:textSize="12sp" android:textColor="@color/gh_muted" />
+    </LinearLayout>
+</LinearLayout>

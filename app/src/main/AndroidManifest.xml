@@ -34,10 +34,14 @@
             android:exported="false" android:windowSoftInputMode="adjustResize" />
         <activity android:name=".controlador.PesajeCorreccionActivity"
             android:exported="false" android:windowSoftInputMode="adjustResize" />
-        <activity android:name=".controlador.PesajeAnulacionActivity"
+        <activity android:name=".controlador.AnulacionActivity"
             android:exported="false" android:windowSoftInputMode="adjustResize" />
         <activity android:name=".controlador.HistorialActivity"
             android:exported="false" />
+        <activity android:name=".controlador.SanidadActivity"
+            android:exported="false" />
+        <activity android:name=".controlador.SanidadFormActivity"
+            android:exported="false" android:windowSoftInputMode="adjustResize" />
         <activity android:name=".controlador.AnimalesActivity"
             android:exported="false" android:windowSoftInputMode="adjustResize" />
         <activity android:name=".controlador.AnimalFormActivity"

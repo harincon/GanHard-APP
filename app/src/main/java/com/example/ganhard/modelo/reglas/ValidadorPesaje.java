@@ -13,7 +13,7 @@ public final class ValidadorPesaje {
     /** Tope práctico para detectar errores de digitación; el diccionario solo limita a DECIMAL(8,2). */
     public static final int PESO_MAXIMO_KG = 2000;
     public static final int OBSERVACIONES_MAXIMO = 500;
-    public static final int MOTIVO_MAXIMO = 500;
+    public static final int MOTIVO_MAXIMO = ValidadorMotivo.MAXIMO;
     private static final BigDecimal MAXIMO = new BigDecimal(PESO_MAXIMO_KG);
 
     private ValidadorPesaje() {}
@@ -55,12 +55,7 @@ public final class ValidadorPesaje {
     }
 
     /** Motivo de una corrección o anulación (RN06): obligatorio y de hasta 500 caracteres. Null si es válido. */
-    public static ErrorCampo motivo(String motivo) {
-        String texto = motivo == null ? "" : motivo.trim();
-        if (texto.isEmpty()) return new ErrorCampo(CodigoError.OBLIGATORIO);
-        if (texto.length() > MOTIVO_MAXIMO) return new ErrorCampo(CodigoError.LONGITUD_MAXIMA, MOTIVO_MAXIMO);
-        return null;
-    }
+    public static ErrorCampo motivo(String motivo) { return ValidadorMotivo.validar(motivo); }
     /** Peso en kg; acepta coma o punto decimal. Lanza IllegalArgumentException si no es válido. */
     public static Double peso(String valor) {
         String texto = valor == null ? "" : valor.trim();

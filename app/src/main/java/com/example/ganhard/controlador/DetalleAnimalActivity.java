@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.Toast;
 import com.example.ganhard.R;
 import com.example.ganhard.databinding.ActivityDetalleAnimalBinding;
+import com.example.ganhard.modelo.datos.EventoSanitarioResumen;
 import com.example.ganhard.modelo.entidad.Animal;
 import com.example.ganhard.modelo.entidad.Pesaje;
 import com.example.ganhard.modelo.entidad.Raza;
@@ -35,7 +36,7 @@ public class DetalleAnimalActivity extends BaseActivity {
         vista.filaHistorial.setOnClickListener(v -> abrir(PesajesActivity.class));
         vista.filaEditar.setOnClickListener(v -> abrir(AnimalFormActivity.class));
         vista.filaCambios.setOnClickListener(v -> abrir(HistorialActivity.class));
-        vista.filaSanidad.setHabilitada(false);
+        vista.filaSanidad.setOnClickListener(v -> abrir(SanidadActivity.class));
         vista.filaTareas.setHabilitada(false);
         if (idAnimal == null) noEncontrado();
     }
@@ -118,10 +119,23 @@ public class DetalleAnimalActivity extends BaseActivity {
             vista.filaHistorial.setSubtitulo(getResources().getQuantityString(R.plurals.mediciones_vigentes, pesajes.size(), pesajes.size()));
         }
         vista.toolbar.setTitle(R.string.ficha_animal);
+        cargarSanidad();
     }
 
     private void abrir(Class<?> pantalla) {
         startActivity(new Intent(this, pantalla).putExtra(EXTRA_ID_ANIMAL, idAnimal));
+    }
+
+    /** Cuenta las actividades sanitarias vigentes para el subtítulo de su fila; si falla, la fila sigue sirviendo. */
+    private void cargarSanidad() {
+        app().sanidad().delAnimal(idAnimal, new Callback<List<EventoSanitarioResumen>>() {
+            @Override public void exito(List<EventoSanitarioResumen> actividades) {
+                if (!disponible()) return;
+                vista.filaSanidad.setSubtitulo(actividades.isEmpty() ? getString(R.string.sin_actividades)
+                        : getResources().getQuantityString(R.plurals.actividades_sanitarias, actividades.size(), actividades.size()));
+            }
+            @Override public void error(ErrorModelo error) { /* El subtítulo fijo del diseño ya explica la fila. */ }
+        });
     }
 
     private void mostrarError() {

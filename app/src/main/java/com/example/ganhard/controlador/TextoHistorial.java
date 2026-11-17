@@ -41,18 +41,24 @@ final class TextoHistorial {
     }
 
     private static int hecho(HistorialCambio cambio) {
-        boolean pesaje = HistorialCambio.PESAJE.equals(cambio.entidad), animal = HistorialCambio.ANIMAL.equals(cambio.entidad);
+        boolean pesaje = HistorialCambio.PESAJE.equals(cambio.entidad), animal = HistorialCambio.ANIMAL.equals(cambio.entidad),
+                actividad = HistorialCambio.EVENTO_SANITARIO.equals(cambio.entidad);
         switch (cambio.accion) {
             case HistorialCambio.CREAR:
                 if (pesaje) return R.string.titulo_pesaje_registrado;
                 if (animal) return R.string.titulo_animal_registrado;
+                if (actividad) return R.string.titulo_sanidad_registrada;
                 break;
             case HistorialCambio.EDITAR:
                 if (pesaje) return R.string.titulo_pesaje_corregido;
                 if (animal) return R.string.titulo_animal_editado;
+                if (actividad) return R.string.titulo_sanidad_corregida;
                 break;
             case HistorialCambio.CAMBIAR_ESTADO: return R.string.titulo_estado_cambiado;
-            case HistorialCambio.ANULAR: if (pesaje) return R.string.titulo_pesaje_anulado; break;
+            case HistorialCambio.ANULAR:
+                if (pesaje) return R.string.titulo_pesaje_anulado;
+                if (actividad) return R.string.titulo_sanidad_anulada;
+                break;
             default: break;
         }
         return R.string.titulo_cambio;
@@ -74,6 +80,7 @@ final class TextoHistorial {
         List<String> lineas = new ArrayList<>();
         JSONObject antes = leer(cambio.valoresAnteriores), ahora = leer(cambio.valoresNuevos);
         boolean pesaje = HistorialCambio.PESAJE.equals(cambio.entidad);
+        boolean actividad = HistorialCambio.EVENTO_SANITARIO.equals(cambio.entidad);
         switch (cambio.accion) {
             case HistorialCambio.EDITAR:
                 if (antes != null && ahora != null) {
@@ -94,8 +101,8 @@ final class TextoHistorial {
                 }
                 if (cambio.fechaEfectiva != null) lineas.add(contexto.getString(R.string.historial_desde, FormatoFecha.corta(cambio.fechaEfectiva)));
                 break;
-            case HistorialCambio.ANULAR: if (pesaje) medicion(contexto, antes, lineas); break;
-            case HistorialCambio.CREAR: if (pesaje) medicion(contexto, ahora, lineas); break;
+            case HistorialCambio.ANULAR: if (pesaje) medicion(contexto, antes, lineas); else if (actividad) actividad(contexto, antes, lineas); break;
+            case HistorialCambio.CREAR: if (pesaje) medicion(contexto, ahora, lineas); else if (actividad) actividad(contexto, ahora, lineas); break;
             default: break;
         }
         if (cambio.motivo != null && !cambio.motivo.isEmpty()) lineas.add(contexto.getString(R.string.historial_motivo, cambio.motivo));
@@ -108,6 +115,13 @@ final class TextoHistorial {
         String hora = datos.isNull("hora") ? null : datos.optString("hora");
         lineas.add(contexto.getString(R.string.anulacion_detalle, Presentacion.kilos(datos.optDouble("peso_kg")),
                 FormatoFecha.fechaYHoraConComa(datos.optString("fecha"), hora)));
+    }
+
+    /** "Vacunación · 1 mar 2026": la actividad sanitaria a la que se refiere la entrada. */
+    private static void actividad(Context contexto, JSONObject datos, List<String> lineas) {
+        if (datos == null || datos.isNull("tipo")) return;
+        lineas.add(contexto.getString(R.string.codigo_nombre, Presentacion.tipoSanidad(contexto, datos.optString("tipo")),
+                FormatoFecha.corta(datos.optString("fecha"))));
     }
 
     private static JSONObject leer(String json) {
@@ -131,6 +145,9 @@ final class TextoHistorial {
             case "peso_kg": return contexto.getString(R.string.campo_peso);
             case "estado": return contexto.getString(R.string.campo_estado);
             case "fecha_estado": return contexto.getString(R.string.campo_fecha_estado);
+            case "tipo": return contexto.getString(R.string.campo_tipo);
+            case "descripcion": return contexto.getString(R.string.campo_descripcion);
+            case "producto": return contexto.getString(R.string.campo_producto);
             default: return clave;
         }
     }
@@ -146,6 +163,7 @@ final class TextoHistorial {
             case "hora": return FormatoFecha.hora12(texto);
             case "sexo": return Presentacion.sexo(contexto, texto);
             case "estado": return Presentacion.estado(contexto, texto);
+            case "tipo": return Presentacion.tipoSanidad(contexto, texto);
             case "id_raza": return razas.containsKey(texto) ? razas.get(texto) : texto;
             default: return texto;
         }

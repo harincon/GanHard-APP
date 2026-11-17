@@ -8,6 +8,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import com.example.ganhard.R;
 import com.example.ganhard.databinding.ActivityPesajeCorreccionBinding;
 import com.example.ganhard.modelo.entidad.Animal;
+import com.example.ganhard.modelo.entidad.HistorialCambio;
 import com.example.ganhard.modelo.entidad.Pesaje;
 import com.example.ganhard.modelo.nucleo.Callback;
 import com.example.ganhard.modelo.nucleo.ErrorModelo;
@@ -58,7 +59,8 @@ public class PesajeCorreccionActivity extends FormularioActivity {
         vista.campoFecha.setEndIconOnClickListener(v -> elegirFecha(vista.fecha));
         vista.campoHora.setEndIconOnClickListener(v -> elegirHora());
         vista.filaAnular.setOnClickListener(v -> anulacion.launch(
-                new Intent(this, PesajeAnulacionActivity.class).putExtra(PesajeAnulacionActivity.EXTRA_ID_PESAJE, idPesaje)));
+                new Intent(this, AnulacionActivity.class).putExtra(AnulacionActivity.EXTRA_ENTIDAD, HistorialCambio.PESAJE)
+                        .putExtra(AnulacionActivity.EXTRA_ID, idPesaje)));
         if (idPesaje == null) noEncontrado(); else cargar();
     }
 

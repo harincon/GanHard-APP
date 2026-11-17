@@ -129,7 +129,7 @@
     <string name="modulo_sincronizacion">Sincronización</string>
     <string name="sub_inicio">Resumen del inventario</string>
     <string name="sub_animales">Inventario, fichas y pesajes</string>
-    <string name="sub_sanidad">Actividades realizadas por animal · Próximamente</string>
+    <string name="sub_sanidad">Actividades realizadas por animal</string>
     <string name="sub_tareas">Actividades programadas · Próximamente</string>
     <string name="sub_gastos">Egresos y total del periodo · Próximamente</string>
     <string name="sub_historial">Responsables y correcciones</string>
@@ -164,7 +164,7 @@
     <string name="ultimo_pesaje_ficha">Último pesaje · %1$s</string>
     <string name="sin_mediciones">Sin mediciones</string>
     <string name="historial_pesajes">Historial de pesajes</string>
-    <string name="sanidad_ficha_sub">Consultar actividades realizadas · Próximamente</string>
+    <string name="sanidad_ficha_sub">Consultar actividades realizadas</string>
     <string name="tareas_ficha">Tareas del animal</string>
     <string name="tareas_ficha_sub">Actividades programadas del animal · Próximamente</string>
     <string name="editar_datos">Editar datos y estado</string>
@@ -240,4 +240,48 @@
     <string name="campo_fecha_estado">Fecha del estado</string>
     <string name="historial_cambios_ficha">Historial de cambios</string>
     <string name="historial_cambios_ficha_sub">Responsables y correcciones</string>
+
+    <!-- Etapa 4a: sanidad -->
+    <string name="registrar_sanidad">Registrar sanidad</string>
+    <string name="corregir_actividad">Corregir actividad</string>
+    <string name="anular_actividad">Anular actividad</string>
+    <string name="actividad_guardada">Actividad sanitaria guardada.</string>
+    <string name="actividad_corregida">Actividad corregida.</string>
+    <string name="actividad_anulada">Actividad anulada.</string>
+    <string name="actividad_no_encontrada">No se encontró la actividad.</string>
+    <string name="error_guardado_actividad">No se pudo guardar la actividad. Intenta nuevamente.</string>
+    <string name="sanidad_vacunacion">Vacunación</string>
+    <string name="sanidad_desparasitacion">Desparasitación</string>
+    <string name="sanidad_revision">Revisión</string>
+    <string name="sanidad_tratamiento">Tratamiento</string>
+    <string name="sanidad_otro">Otro</string>
+    <string name="sanidad_todos">Todos los animales</string>
+    <string name="sanidad_sin_animales">Registra primero un animal para anotar su sanidad.</string>
+    <string name="sanidad_vacia">Aún no hay actividades sanitarias registradas.</string>
+    <string name="sin_actividades">Sin actividades registradas</string>
+    <string name="filtro_animal">Animal</string>
+    <string name="animal_hint">Animal *</string>
+    <string name="tipo_actividad">Tipo de actividad *</string>
+    <string name="fecha_realizacion">Fecha de realización *</string>
+    <string name="descripcion_hint">Descripción *</string>
+    <string name="producto_hint">Producto</string>
+    <string name="guardar_actividad">Guardar actividad</string>
+    <string name="actividad_futura_titulo">Actividad futura</string>
+    <string name="actividad_futura_texto">Regístrala como tarea; no aparecerá como realizada hasta completarla.</string>
+    <string name="anular_esta_actividad">Anular esta actividad</string>
+    <string name="anular_esta_actividad_sub">Conservarla sin incluirla en las consultas</string>
+    <string name="actividades_realizadas">Actividades realizadas</string>
+    <string name="registrar_actividad_sanitaria">Registrar actividad sanitaria</string>
+    <string name="programar_actividad">Programar actividad</string>
+    <string name="programar_actividad_sub">Crear una tarea de sanidad · Próximamente</string>
+    <string name="nota_sanidad">Cada actividad conserva el animal, la fecha y la persona que la registró. Toca una para corregirla o anularla.</string>
+    <string name="error_animal_obligatorio">Elige el animal.</string>
+    <string name="error_tipo_obligatorio">Elige el tipo de actividad.</string>
+    <string name="error_descripcion_obligatoria">Describe la actividad.</string>
+    <string name="titulo_sanidad_registrada">Actividad sanitaria registrada</string>
+    <string name="titulo_sanidad_corregida">Actividad sanitaria corregida</string>
+    <string name="titulo_sanidad_anulada">Actividad sanitaria anulada</string>
+    <string name="campo_tipo">Tipo</string>
+    <string name="campo_descripcion">Descripción</string>
+    <string name="campo_producto">Producto</string>
 </resources>

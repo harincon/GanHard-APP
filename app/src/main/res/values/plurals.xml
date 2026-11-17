@@ -16,6 +16,10 @@
         <item quantity="one">%d fallecido en la finca</item>
         <item quantity="other">%d fallecidos en la finca</item>
     </plurals>
+    <plurals name="actividades_sanitarias">
+        <item quantity="one">%d actividad realizada</item>
+        <item quantity="other">%d actividades realizadas</item>
+    </plurals>
     <plurals name="mediciones_vigentes">
         <item quantity="one">%d medición vigente</item>
         <item quantity="other">%d mediciones vigentes</item>
