@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Código automático -->
-    <string name="codigo_automatico_nuevo">El código se asignará automáticamente al guardar (GH-001, GH-002…).</string>
     <string name="codigo_automatico_existente">Código: %1$s</string>
 
     <!-- Identificadores del animal -->

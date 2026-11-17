@@ -13,7 +13,7 @@
             <TextView android:id="@+id/notaObligatorios" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="8dp"
                 android:text="@string/campos_obligatorios" android:textSize="12sp" android:textColor="@color/gh_muted" />
             <TextView android:id="@+id/notaCodigo" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="16dp"
-                android:text="@string/codigo_automatico_nuevo" android:textSize="14sp" android:textColor="@color/gh_muted" />
+                android:textSize="14sp" android:textColor="@color/gh_muted" android:visibility="gone" />
             <com.google.android.material.textfield.TextInputLayout android:id="@+id/campoNombre"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox" android:layout_width="match_parent" android:layout_height="wrap_content"
                 android:hint="@string/nombre_animal" android:layout_marginBottom="12dp">
@@ -39,9 +39,9 @@
             </com.google.android.material.textfield.TextInputLayout>
             <com.google.android.material.textfield.TextInputLayout android:id="@+id/campoRaza"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu" android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:hint="@string/raza" android:layout_marginBottom="12dp">
+                android:hint="@string/raza" app:helperText="@string/raza_ayuda" android:layout_marginBottom="12dp">
                 <com.google.android.material.textfield.MaterialAutoCompleteTextView android:id="@+id/raza" android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:inputType="none" android:importantForAutofill="no" />
+                    android:inputType="textCapWords" android:maxLength="60" android:maxLines="1" android:importantForAutofill="no" />
             </com.google.android.material.textfield.TextInputLayout>
             <com.google.android.material.textfield.TextInputLayout android:id="@+id/campoNacimiento"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox" android:layout_width="match_parent" android:layout_height="wrap_content"

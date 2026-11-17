@@ -26,10 +26,12 @@ import com.example.ganhard.modelo.reglas.EntradaIdentificador;
 import com.example.ganhard.modelo.reglas.ValidadorIdentificadores;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputLayout;
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
@@ -43,7 +45,6 @@ import java.util.UUID;
  */
 public class AnimalFormActivity extends FormularioActivity {
     public static final String EXTRA_ID_ANIMAL = "id_animal";
-    private static final String ESTADO_RAZA = "id_raza";
     private static final String ESTADO_REGISTRO = "id_registro";
     private static final String ESTADO_CARGADO = "formulario_cargado";
     private static final String ESTADO_IDENTIFICADORES_CARGADOS = "identificadores_cargados";
@@ -71,7 +72,11 @@ public class AnimalFormActivity extends FormularioActivity {
     private final List<Hierro> catalogo = new ArrayList<>();
     private final List<Extra> extras = new ArrayList<>();
     private String idAnimal;
-    private String idRaza = "";
+    /**
+     * Raza que trae el animal en edición y que aún no se ha puesto en el campo; nulo después. La raza se lee del
+     * texto del campo, que se puede escribir o elegir de la lista.
+     */
+    private String razaInicial;
     /** Hierro principal elegido (id y nombre); vacío mientras no se elija. */
     private String idHierro = "", nombreHierro = "";
     /** Id del animal nuevo: se genera al abrir y se conserva al rotar para que guardar dos veces no duplique. */
@@ -118,8 +123,7 @@ public class AnimalFormActivity extends FormularioActivity {
             vista.ingreso.setText(FormatoFecha.aPantalla(ingresoInicial));
         }
         if (restaurado) {
-            idRaza = estado.getString(ESTADO_RAZA, "");
-            idHierro = estado.getString(ESTADO_HIERRO, "");
+            idHierro =estado.getString(ESTADO_HIERRO, "");
             nombreHierro = estado.getString(ESTADO_HIERRO_NOMBRE, "");
             exigirHierro = estado.getBoolean(ESTADO_EXIGIR_HIERRO, true);
             List<String> guardados = estado.getStringArrayList(ESTADO_EXTRAS);
@@ -138,9 +142,10 @@ public class AnimalFormActivity extends FormularioActivity {
         vista.campoNacimiento.setEndIconOnClickListener(v -> elegirFecha(vista.nacimiento));
         vista.campoIngreso.setEndIconOnClickListener(v -> elegirFecha(vista.ingreso));
         vista.campoFechaEstado.setEndIconOnClickListener(v -> elegirFecha(vista.fechaEstado));
+        // La raza se escribe o se elige; elegir "Sin raza" deja el campo vacío.
         vista.raza.setOnItemClickListener((adaptador, fila, posicion, id) -> {
-            idRaza = posicion == 0 ? "" : razas.get(posicion - 1).idRaza;
-            if (posicion == 0) vista.raza.setText("", false);
+            Object elegido = adaptador == null ? null : adaptador.getItemAtPosition(posicion);
+            if (getString(R.string.sin_raza).equals(String.valueOf(elegido))) vista.raza.setText("", false);
         });
         vista.hierro.setOnItemClickListener((adaptador, fila, posicion, id) -> elegirHierro(posicion));
         vista.agregarIdentificador.setOnClickListener(v -> agregarIdentificador());
@@ -245,6 +250,7 @@ public class AnimalFormActivity extends FormularioActivity {
                 estadoOriginal = animal.estado;
                 fechaEstadoOriginal = animal.fechaEstado;
                 vista.notaCodigo.setText(getString(R.string.codigo_automatico_existente, animal.codigo));
+                vista.notaCodigo.setVisibility(View.VISIBLE);
                 if (!formularioCargado) {
                     vista.nombre.setText(original.nombre);
                     vista.sexo.setText(Presentacion.sexo(AnimalFormActivity.this, original.sexo), false);
@@ -253,7 +259,7 @@ public class AnimalFormActivity extends FormularioActivity {
                     vista.observaciones.setText(original.observaciones);
                     vista.estado.setText(Presentacion.estado(AnimalFormActivity.this, animal.estado), false);
                     vista.fechaEstado.setText(FormatoFecha.aPantalla(animal.fechaEstado));
-                    idRaza = original.idRaza;
+                    razaInicial = original.idRaza;
                     mostrarRazaElegida();
                 }
                 formularioCargado = true;
@@ -410,10 +416,21 @@ public class AnimalFormActivity extends FormularioActivity {
         });
     }
 
-    /** Muestra el nombre de la raza elegida cuando ya se conocen tanto la lista como la elección. */
+    /** Pone en el campo la raza que trae el animal, cuando ya se conocen tanto la lista como la raza. */
     private void mostrarRazaElegida() {
-        if (!razasCargadas) return;
-        for (Raza raza : razas) if (raza.idRaza.equals(idRaza)) vista.raza.setText(raza.nombre, false);
+        if (!razasCargadas || razaInicial == null) return;
+        vista.raza.setText(nombreDeRaza(razaInicial), false);
+        razaInicial = null;
+    }
+
+    private String nombreDeRaza(String idRaza) {
+        for (Raza raza : razas) if (raza.idRaza.equals(idRaza)) return raza.nombre;
+        return "";
+    }
+
+    /** Minúsculas y sin tildes: "cebu" y "Cebú" son la misma raza. */
+    private static String normalizar(String texto) {
+        return Normalizer.normalize(texto == null ? "" : texto.trim(), Normalizer.Form.NFD).replaceAll("\\p{M}+", "").toLowerCase(Locale.ROOT);
     }
 
     private static EntradaAnimal entradaDe(Animal animal) {
@@ -468,8 +485,11 @@ public class AnimalFormActivity extends FormularioActivity {
         List<EntradaIdentificador> identificadores = new ArrayList<>();
         if (!idHierro.isEmpty()) identificadores.add(new EntradaIdentificador(AnimalIdentificador.HIERRO, idHierro, ""));
         for (Extra extra : extras) identificadores.add(new EntradaIdentificador(extra.tipo, extra.idHierro, extra.valor));
-        return new EntradaAnimal(original == null ? "" : original.codigo, texto(vista.nombre), sexoCodigo(), idRaza,
-                FormatoFecha.aIso(texto(vista.nacimiento)), FormatoFecha.aIso(texto(vista.ingreso)), texto(vista.observaciones), identificadores);
+        // Si la raza del animal aún no llegó al campo, se conserva la que ya tenía en lugar de leer un campo vacío.
+        EntradaAnimal entrada = new EntradaAnimal(original == null ? "" : original.codigo, texto(vista.nombre), sexoCodigo(),
+                razaInicial == null ? "" : razaInicial, FormatoFecha.aIso(texto(vista.nacimiento)), FormatoFecha.aIso(texto(vista.ingreso)),
+                texto(vista.observaciones), identificadores);
+        return razaInicial == null ? entrada.conRazaEscrita(texto(vista.raza)) : entrada;
     }
 
     private String sexoCodigo() {
@@ -505,14 +525,21 @@ public class AnimalFormActivity extends FormularioActivity {
         EntradaAnimal actual = entrada();
         if (esEdicion()) {
             return original != null && !(actual.nombre.equals(original.nombre)
-                    && actual.sexo.equals(original.sexo) && actual.idRaza.equals(original.idRaza)
+                    && actual.sexo.equals(original.sexo) && razaSinCambios(actual, original)
                     && actual.fechaNacimiento.equals(original.fechaNacimiento) && actual.fechaIngreso.equals(original.fechaIngreso)
                     && actual.observaciones.equals(original.observaciones)
                     && estadoCodigo().equals(estadoOriginal) && FormatoFecha.aIso(texto(vista.fechaEstado)).equals(fechaEstadoOriginal)
                     && idHierro.equals(hierroOriginal) && clavesExtras().equals(extrasOriginales));
         }
-        return !actual.nombre.isEmpty() || !actual.sexo.isEmpty() || !actual.idRaza.isEmpty() || !idHierro.isEmpty() || !extras.isEmpty()
+        return !actual.nombre.isEmpty() || !actual.sexo.isEmpty() || !texto(vista.raza).trim().isEmpty() || !idHierro.isEmpty() || !extras.isEmpty()
                 || !actual.fechaNacimiento.isEmpty() || !actual.fechaIngreso.equals(ingresoInicial) || !actual.observaciones.isEmpty();
+    }
+
+    /** La raza es la misma si el texto del campo equivale al nombre de la raza original (o ambos están vacíos). */
+    private boolean razaSinCambios(EntradaAnimal actual, EntradaAnimal original) {
+        if (razaInicial != null) return true; // todavía no se mostró: no hay nada escrito por la persona
+        String antes = original.idRaza.isEmpty() ? "" : nombreDeRaza(original.idRaza);
+        return normalizar(texto(vista.raza)).equals(normalizar(antes));
     }
 
     private List<String> clavesExtras() {
@@ -532,7 +559,6 @@ public class AnimalFormActivity extends FormularioActivity {
     }
 
     @Override protected void onSaveInstanceState(Bundle estado) {
-        estado.putString(ESTADO_RAZA, idRaza);
         estado.putString(ESTADO_REGISTRO, idRegistro);
         estado.putBoolean(ESTADO_CARGADO, formularioCargado);
         estado.putBoolean(ESTADO_IDENTIFICADORES_CARGADOS, identificadoresCargados);

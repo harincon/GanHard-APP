@@ -1,6 +1,7 @@
 package com.example.ganhard.modelo.datos;
 
 import androidx.room.Dao;
+import androidx.room.Insert;
 import androidx.room.Query;
 import com.example.ganhard.modelo.entidad.Raza;
 import java.util.List;
@@ -9,6 +10,9 @@ import java.util.List;
 public interface RazaDao {
     @Query("SELECT * FROM raza ORDER BY nombre")
     List<Raza> todas();
+
+    @Insert
+    void insertar(Raza raza);
 
     @Query("SELECT * FROM raza WHERE id_raza = :idRaza")
     Raza porId(String idRaza);

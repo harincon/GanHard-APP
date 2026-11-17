@@ -7,7 +7,7 @@ import java.util.Map;
 
 /** Reglas del animal (RF03, RN03, RN05, RNF06), en Java puro. Devuelve códigos, no textos. */
 public final class ValidadorAnimal {
-    public static final int CODIGO_MAXIMO = 30, NOMBRE_MAXIMO = 100, OBSERVACIONES_MAXIMO = 500;
+    public static final int CODIGO_MAXIMO = 30, NOMBRE_MAXIMO = 100, OBSERVACIONES_MAXIMO = 500, RAZA_MAXIMO = 60;
 
     private ValidadorAnimal() {}
 
@@ -22,6 +22,7 @@ public final class ValidadorAnimal {
         if (entrada.codigo.isEmpty()) { if (codigoObligatorio) errores.put(Campos.CODIGO, new ErrorCampo(CodigoError.OBLIGATORIO)); }
         else if (entrada.codigo.length() > CODIGO_MAXIMO) errores.put(Campos.CODIGO, new ErrorCampo(CodigoError.LONGITUD_MAXIMA, CODIGO_MAXIMO));
         if (entrada.nombre.length() > NOMBRE_MAXIMO) errores.put(Campos.NOMBRE, new ErrorCampo(CodigoError.LONGITUD_MAXIMA, NOMBRE_MAXIMO));
+        if (entrada.razaEscrita != null && entrada.razaEscrita.length() > RAZA_MAXIMO) errores.put(Campos.ID_RAZA, new ErrorCampo(CodigoError.LONGITUD_MAXIMA, RAZA_MAXIMO));
         if (entrada.sexo.isEmpty()) errores.put(Campos.SEXO, new ErrorCampo(CodigoError.OBLIGATORIO));
         else if (!Animal.HEMBRA.equals(entrada.sexo) && !Animal.MACHO.equals(entrada.sexo)) errores.put(Campos.SEXO, new ErrorCampo(CodigoError.VALOR_INVALIDO));
 

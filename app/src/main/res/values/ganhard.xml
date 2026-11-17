@@ -54,12 +54,13 @@
     <string name="cancelar">Cancelar</string>
     <string name="registrar_animal">Registrar animal</string>
     <string name="editar_animal">Editar animal</string>
-    <string name="nombre_animal">Nombre</string>
+    <string name="nombre_animal">Nombre (opcional)</string>
     <string name="sexo_titulo">Sexo *</string>
     <string name="sexo_hembra">Hembra</string>
     <string name="sexo_macho">Macho</string>
     <string name="raza">Raza</string>
     <string name="sin_raza">Sin raza</string>
+    <string name="raza_ayuda">Elige una de la lista o escribe otra.</string>
     <string name="fecha_nacimiento">Fecha de nacimiento</string>
     <string name="fecha_ingreso">Fecha de ingreso *</string>
     <string name="elegir_fecha">Elegir fecha</string>

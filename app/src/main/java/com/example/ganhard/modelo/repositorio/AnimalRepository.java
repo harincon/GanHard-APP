@@ -70,6 +70,9 @@ public final class AnimalRepository {
             String idFinca = idFincaActiva();
             validar(entrada, true, idFinca, Collections.<String>emptySet(), entrada.identificadores != null);
             Animal animal = nuevo(idAnimal, entrada, idFinca);
+            List<Raza> razasNuevas = new ArrayList<>();
+            String idRazaFinal = idRazaDe(entrada, razasNuevas);
+            animal.idRaza = idRazaFinal.isEmpty() ? null : idRazaFinal;
             // Sin código escrito se asigna el siguiente; se calcula en esta misma tarea, así que no hay carreras.
             if (animal.codigo.isEmpty()) animal.codigo = GeneradorCodigo.siguiente(db.animalDao().codigos(idFinca));
             List<AnimalIdentificador> filas = entrada.identificadores == null
@@ -78,6 +81,7 @@ public final class AnimalRepository {
                     null, ValoresCambio.de(animal, ValoresCambio.identificadores(resumenes(filas))), null, null, animal.creadoEn);
             try {
                 registro.guardar(() -> {
+                    for (Raza raza : razasNuevas) db.razaDao().insertar(raza);
                     db.animalDao().insertar(animal);
                     for (AnimalIdentificador fila : filas) db.identificadorDao().insertar(fila);
                 }, creacion);
@@ -111,6 +115,9 @@ public final class AnimalRepository {
             boolean estadoSinCambio = estado != null && fechaEstado != null
                     && estado.equals(animal.estado) && fechaEstado.trim().equals(animal.fechaEstado);
             aplicarDatos(animal, entrada);
+            List<Raza> razasNuevas = new ArrayList<>();
+            String idRazaFinal = idRazaDe(entrada, razasNuevas);
+            animal.idRaza = idRazaFinal.isEmpty() ? null : idRazaFinal;
             if (!estadoSinCambio) {
                 Map<String, ErrorCampo> errores = new LinkedHashMap<>();
                 if (estado == null || !ESTADOS.contains(estado)) errores.put(Campos.ESTADO, new ErrorCampo(CodigoError.VALOR_INVALIDO));
@@ -152,6 +159,7 @@ public final class AnimalRepository {
             }
             try {
                 registro.guardar(() -> {
+                    for (Raza raza : razasNuevas) db.razaDao().insertar(raza);
                     db.animalDao().actualizar(animal);
                     db.pesajeDao().recalcularAntecedentes(animal.idAnimal, animal.fechaIngreso);
                     for (Tarea tarea : aCancelar) db.tareaDao().actualizar(tarea);
@@ -220,7 +228,7 @@ public final class AnimalRepository {
      */
     private void validar(EntradaAnimal entrada, boolean creacion, String idFinca, Set<String> hierrosDelAnimal, boolean exigirHierro) throws ErrorModelo {
         Map<String, ErrorCampo> errores = ValidadorAnimal.validar(entrada, Tiempo.hoy(), !creacion);
-        if (!entrada.idRaza.isEmpty() && db.razaDao().porId(entrada.idRaza) == null) {
+        if (entrada.razaEscrita == null && !entrada.idRaza.isEmpty() && db.razaDao().porId(entrada.idRaza) == null) {
             errores.put(Campos.ID_RAZA, new ErrorCampo(CodigoError.VALOR_INVALIDO));
         }
         if (entrada.identificadores != null) {
@@ -239,6 +247,22 @@ public final class AnimalRepository {
             }
         }
         if (!errores.isEmpty()) throw ErrorModelo.validacion(errores);
+    }
+
+    /**
+     * El id de la raza de la entrada. Una raza escrita se busca en el catálogo sin distinguir mayúsculas ni tildes;
+     * si no está, se prepara una nueva en {@code nuevas} para guardarla junto con el animal. Vacío es "sin raza".
+     */
+    private String idRazaDe(EntradaAnimal entrada, List<Raza> nuevas) {
+        if (entrada.razaEscrita == null) return entrada.idRaza;
+        if (entrada.razaEscrita.isEmpty()) return "";
+        String buscada = normalizar(entrada.razaEscrita);
+        for (Raza raza : db.razaDao().todas()) if (normalizar(raza.nombre).equals(buscada)) return raza.idRaza;
+        Raza nueva = new Raza();
+        nueva.idRaza = UUID.randomUUID().toString();
+        nueva.nombre = entrada.razaEscrita;
+        nuevas.add(nueva);
+        return nueva.idRaza;
     }
 
     private static boolean tieneHierro(List<IdentificadorResumen> identificadores) {
