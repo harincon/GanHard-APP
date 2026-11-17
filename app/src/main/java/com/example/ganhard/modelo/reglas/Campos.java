@@ -10,6 +10,7 @@ public final class Campos {
     public static final String ESTADO = "estado", FECHA_ESTADO = "fechaEstado", OBSERVACIONES = "observaciones";
     public static final String FECHA = "fecha", HORA = "hora", PESO = "peso", MOTIVO = "motivo";
     public static final String TIPO = "tipo", DESCRIPCION = "descripcion", PRODUCTO = "producto", ID_ANIMAL = "idAnimal";
+    public static final String CATEGORIA = "categoria", CONCEPTO = "concepto", VALOR = "valor";
     public static final String CORREO = "correo", FINCA = "finca", UBICACION = "ubicacion", AREA = "area";
 
     private Campos() {}

@@ -56,7 +56,7 @@ public final class MensajesError {
                 break;
             case Campos.FECHA_NACIMIENTO: if (codigo == CodigoError.FORMATO) return contexto.getString(R.string.error_fecha_formato); break;
             case Campos.FECHA:
-                if (codigo == CodigoError.OBLIGATORIO) return contexto.getString(R.string.error_fecha_pesaje_obligatoria);
+                if (codigo == CodigoError.OBLIGATORIO) return contexto.getString(R.string.error_fecha_obligatoria);
                 if (codigo == CodigoError.FORMATO) return contexto.getString(R.string.error_fecha_formato);
                 if (codigo == CodigoError.FECHA_ANTERIOR) return contexto.getString(R.string.error_fecha_antes_nacimiento);
                 break;
@@ -73,6 +73,13 @@ public final class MensajesError {
             case Campos.ID_ANIMAL: if (codigo == CodigoError.OBLIGATORIO) return contexto.getString(R.string.error_animal_obligatorio); break;
             case Campos.TIPO: if (codigo == CodigoError.OBLIGATORIO) return contexto.getString(R.string.error_tipo_obligatorio); break;
             case Campos.DESCRIPCION: if (codigo == CodigoError.OBLIGATORIO) return contexto.getString(R.string.error_descripcion_obligatoria); break;
+            case Campos.CATEGORIA: if (codigo == CodigoError.OBLIGATORIO) return contexto.getString(R.string.error_categoria_obligatoria); break;
+            case Campos.CONCEPTO: if (codigo == CodigoError.OBLIGATORIO) return contexto.getString(R.string.error_concepto_obligatorio); break;
+            case Campos.VALOR:
+                if (codigo == CodigoError.OBLIGATORIO) return contexto.getString(R.string.error_valor_obligatorio);
+                if (codigo == CodigoError.VALOR_INVALIDO) return contexto.getString(R.string.error_valor_no_valido);
+                if (codigo == CodigoError.FUERA_DE_RANGO) return contexto.getString(R.string.error_valor_fuera_rango);
+                break;
             case Campos.PESO:
                 if (codigo == CodigoError.OBLIGATORIO) return contexto.getString(R.string.error_peso_obligatorio);
                 if (codigo == CodigoError.VALOR_INVALIDO) return contexto.getString(R.string.error_peso_invalido);

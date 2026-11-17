@@ -2,6 +2,7 @@ package com.example.ganhard.modelo.repositorio;
 
 import com.example.ganhard.modelo.entidad.Animal;
 import com.example.ganhard.modelo.entidad.EventoSanitario;
+import com.example.ganhard.modelo.entidad.Gasto;
 import com.example.ganhard.modelo.entidad.Pesaje;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -44,6 +45,15 @@ public final class ValoresCambio {
         poner(datos, "hora", pesaje.hora);
         poner(datos, "peso_kg", pesaje.pesoKg);
         poner(datos, "observaciones", pesaje.observaciones);
+        return datos;
+    }
+
+    public static JSONObject de(Gasto gasto) {
+        JSONObject datos = new JSONObject();
+        poner(datos, "fecha", gasto.fecha);
+        poner(datos, "categoria", gasto.categoria);
+        poner(datos, "concepto", gasto.concepto);
+        poner(datos, "valor_centavos", gasto.valorCentavos);
         return datos;
     }
 

@@ -111,4 +111,16 @@ public final class Migraciones {
             db.execSQL("CREATE INDEX IF NOT EXISTS `index_evento_sanitario_id_animal_fecha` ON `evento_sanitario` (`id_animal`, `fecha`)");
         }
     };
+
+    /** Agrega los gastos; no toca lo existente. */
+    public static final Migration V4_V5 = new Migration(4, 5) {
+        @Override public void migrate(@NonNull SupportSQLiteDatabase db) {
+            db.execSQL("CREATE TABLE IF NOT EXISTS `gasto` (`id_gasto` TEXT NOT NULL, `id_finca` TEXT NOT NULL, `fecha` TEXT NOT NULL, "
+                    + "`categoria` TEXT NOT NULL, `concepto` TEXT NOT NULL, `valor_centavos` INTEGER NOT NULL, `anulado` INTEGER NOT NULL, "
+                    + "`anulado_en` TEXT, `motivo_anulacion` TEXT, `creado_en` TEXT NOT NULL, `actualizado_en` TEXT NOT NULL, "
+                    + "`version` INTEGER NOT NULL, PRIMARY KEY(`id_gasto`), "
+                    + "FOREIGN KEY(`id_finca`) REFERENCES `finca`(`id_finca`) ON UPDATE NO ACTION ON DELETE RESTRICT )");
+            db.execSQL("CREATE INDEX IF NOT EXISTS `index_gasto_id_finca_fecha` ON `gasto` (`id_finca`, `fecha`)");
+        }
+    };
 }

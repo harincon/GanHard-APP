@@ -4,6 +4,7 @@ import android.content.Context;
 import com.example.ganhard.R;
 import com.example.ganhard.modelo.entidad.Animal;
 import com.example.ganhard.modelo.entidad.EventoSanitario;
+import com.example.ganhard.modelo.entidad.Gasto;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
@@ -21,6 +22,22 @@ final class Presentacion {
     static String sexo(Context contexto, String sexo) {
         return contexto.getString(Animal.MACHO.equals(sexo) ? R.string.sexo_macho : R.string.sexo_hembra);
     }
+
+    /** Nombre visible de la categoría de un gasto; una categoría que esta versión no conoce se muestra tal cual. */
+    static String categoriaGasto(Context contexto, String categoria) {
+        if (categoria == null) return "";
+        switch (categoria) {
+            case Gasto.ALIMENTACION: return contexto.getString(R.string.gasto_alimentacion);
+            case Gasto.SANIDAD: return contexto.getString(R.string.gasto_sanidad);
+            case Gasto.MANTENIMIENTO: return contexto.getString(R.string.gasto_mantenimiento);
+            case Gasto.TRANSPORTE: return contexto.getString(R.string.gasto_transporte);
+            case Gasto.OTRO: return contexto.getString(R.string.gasto_otro);
+            default: return categoria;
+        }
+    }
+
+    /** Centavos como pesos enteros con puntos de miles: 32000000 es "$ 320.000". */
+    static String pesos(long centavos) { return "$ " + FormatoMiles.agrupar(String.valueOf(centavos / 100)); }
 
     /** Nombre visible del tipo de actividad sanitaria; un tipo que esta versión no conoce se muestra tal cual. */
     static String tipoSanidad(Context contexto, String tipo) {

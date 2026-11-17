@@ -21,7 +21,7 @@ import androidx.room.PrimaryKey;
                 @Index(value = {"entidad", "id_registro"}),
                 @Index("id_usuario")})
 public class HistorialCambio {
-    public static final String ANIMAL = "animal", PESAJE = "pesaje", EVENTO_SANITARIO = "evento_sanitario";
+    public static final String ANIMAL = "animal", PESAJE = "pesaje", EVENTO_SANITARIO = "evento_sanitario", GASTO = "gasto";
     public static final String CREAR = "CREAR", EDITAR = "EDITAR", ANULAR = "ANULAR", CAMBIAR_ESTADO = "CAMBIAR_ESTADO";
 
     @PrimaryKey @NonNull @ColumnInfo(name = "id_historial_cambio") public String idHistorialCambio = "";

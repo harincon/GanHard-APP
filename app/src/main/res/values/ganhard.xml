@@ -111,7 +111,7 @@
     <string name="error_peso_invalido">Escribe un peso mayor que cero, solo con números.</string>
     <string name="error_peso_decimales">Usa como máximo 2 decimales y no uses separadores de miles.</string>
     <string name="error_peso_fuera_rango">El peso debe ser de %1$d kg o menos.</string>
-    <string name="error_fecha_pesaje_obligatoria">Escribe la fecha del pesaje.</string>
+    <string name="error_fecha_obligatoria">Escribe la fecha.</string>
     <string name="error_fecha_antes_nacimiento">La fecha no puede ser anterior al nacimiento del animal.</string>
     <string name="error_hora_obligatoria">Escribe la hora (HH:MM). Solo un antecedente anterior al ingreso puede omitirla.</string>
     <string name="error_hora_formato">Usa el formato HH:MM, por ejemplo 09:15.</string>
@@ -131,7 +131,7 @@
     <string name="sub_animales">Inventario, fichas y pesajes</string>
     <string name="sub_sanidad">Actividades realizadas por animal</string>
     <string name="sub_tareas">Actividades programadas · Próximamente</string>
-    <string name="sub_gastos">Egresos y total del periodo · Próximamente</string>
+    <string name="sub_gastos">Egresos y total del periodo</string>
     <string name="sub_historial">Responsables y correcciones</string>
     <string name="sub_sincronizacion">Envíos y cambios por revisar · Próximamente</string>
     <string name="sub_configuracion">Perfil, finca y apariencia</string>
@@ -284,4 +284,46 @@
     <string name="campo_tipo">Tipo</string>
     <string name="campo_descripcion">Descripción</string>
     <string name="campo_producto">Producto</string>
+
+    <!-- Etapa 4b: gastos -->
+    <string name="registrar_gasto">Registrar gasto</string>
+    <string name="corregir_gasto">Corregir gasto</string>
+    <string name="anular_gasto">Anular gasto</string>
+    <string name="gasto_guardado">Gasto guardado.</string>
+    <string name="gasto_corregido">Gasto corregido.</string>
+    <string name="gasto_anulado">Gasto anulado.</string>
+    <string name="gasto_no_encontrado">No se encontró el gasto.</string>
+    <string name="error_guardado_gasto">No se pudo guardar el gasto. Intenta nuevamente.</string>
+    <string name="gasto_alimentacion">Alimentación</string>
+    <string name="gasto_sanidad">Sanidad</string>
+    <string name="gasto_mantenimiento">Mantenimiento</string>
+    <string name="gasto_transporte">Transporte</string>
+    <string name="gasto_otro">Otro</string>
+    <string name="gastos_periodo">Periodo</string>
+    <string name="gastos_total_titulo">Total · COP</string>
+    <string name="gastos_total_detalle">Total de gastos vigentes del periodo</string>
+    <string name="gastos_vacio">No hay gastos en este periodo.</string>
+    <string name="nota_gastos">Los registros anulados no se incluyen en el total. Toca un gasto para corregirlo o anularlo.</string>
+    <string name="fecha_gasto">Fecha *</string>
+    <string name="categoria_hint">Categoría *</string>
+    <string name="concepto_hint">Concepto *</string>
+    <string name="valor_cop_hint">Valor (COP) *</string>
+    <string name="ayuda_valor">Ingresa un valor mayor que cero, en pesos enteros.</string>
+    <string name="guardar_gasto">Guardar gasto</string>
+    <string name="registro_egresos_titulo">Registro de egresos</string>
+    <string name="registro_egresos_texto">Cada gasto queda asociado a la finca y a la persona que lo registró.</string>
+    <string name="anular_este_gasto">Anular este gasto</string>
+    <string name="anular_este_gasto_sub">Conservarlo sin incluirlo en el total</string>
+    <string name="gasto_contexto_detalle">%1$s · %2$s</string>
+    <string name="error_categoria_obligatoria">Elige la categoría.</string>
+    <string name="error_concepto_obligatorio">Describe el gasto.</string>
+    <string name="error_valor_obligatorio">Escribe el valor.</string>
+    <string name="error_valor_no_valido">Ingresa un valor mayor que cero.</string>
+    <string name="error_valor_fuera_rango">El valor es demasiado grande.</string>
+    <string name="titulo_gasto_registrado">Gasto registrado</string>
+    <string name="titulo_gasto_corregido">Gasto corregido</string>
+    <string name="titulo_gasto_anulado">Gasto anulado</string>
+    <string name="campo_categoria">Categoría</string>
+    <string name="campo_concepto">Concepto</string>
+    <string name="campo_valor">Valor</string>
 </resources>

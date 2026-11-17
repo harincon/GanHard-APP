@@ -42,6 +42,10 @@
             android:exported="false" />
         <activity android:name=".controlador.SanidadFormActivity"
             android:exported="false" android:windowSoftInputMode="adjustResize" />
+        <activity android:name=".controlador.GastosActivity"
+            android:exported="false" />
+        <activity android:name=".controlador.GastoFormActivity"
+            android:exported="false" android:windowSoftInputMode="adjustResize" />
         <activity android:name=".controlador.AnimalesActivity"
             android:exported="false" android:windowSoftInputMode="adjustResize" />
         <activity android:name=".controlador.AnimalFormActivity"

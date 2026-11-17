@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -42,22 +43,25 @@ final class TextoHistorial {
 
     private static int hecho(HistorialCambio cambio) {
         boolean pesaje = HistorialCambio.PESAJE.equals(cambio.entidad), animal = HistorialCambio.ANIMAL.equals(cambio.entidad),
-                actividad = HistorialCambio.EVENTO_SANITARIO.equals(cambio.entidad);
+                actividad = HistorialCambio.EVENTO_SANITARIO.equals(cambio.entidad), gasto = HistorialCambio.GASTO.equals(cambio.entidad);
         switch (cambio.accion) {
             case HistorialCambio.CREAR:
                 if (pesaje) return R.string.titulo_pesaje_registrado;
                 if (animal) return R.string.titulo_animal_registrado;
                 if (actividad) return R.string.titulo_sanidad_registrada;
+                if (gasto) return R.string.titulo_gasto_registrado;
                 break;
             case HistorialCambio.EDITAR:
                 if (pesaje) return R.string.titulo_pesaje_corregido;
                 if (animal) return R.string.titulo_animal_editado;
                 if (actividad) return R.string.titulo_sanidad_corregida;
+                if (gasto) return R.string.titulo_gasto_corregido;
                 break;
             case HistorialCambio.CAMBIAR_ESTADO: return R.string.titulo_estado_cambiado;
             case HistorialCambio.ANULAR:
                 if (pesaje) return R.string.titulo_pesaje_anulado;
                 if (actividad) return R.string.titulo_sanidad_anulada;
+                if (gasto) return R.string.titulo_gasto_anulado;
                 break;
             default: break;
         }
@@ -81,6 +85,7 @@ final class TextoHistorial {
         JSONObject antes = leer(cambio.valoresAnteriores), ahora = leer(cambio.valoresNuevos);
         boolean pesaje = HistorialCambio.PESAJE.equals(cambio.entidad);
         boolean actividad = HistorialCambio.EVENTO_SANITARIO.equals(cambio.entidad);
+        boolean gasto = HistorialCambio.GASTO.equals(cambio.entidad);
         switch (cambio.accion) {
             case HistorialCambio.EDITAR:
                 if (antes != null && ahora != null) {
@@ -101,8 +106,16 @@ final class TextoHistorial {
                 }
                 if (cambio.fechaEfectiva != null) lineas.add(contexto.getString(R.string.historial_desde, FormatoFecha.corta(cambio.fechaEfectiva)));
                 break;
-            case HistorialCambio.ANULAR: if (pesaje) medicion(contexto, antes, lineas); else if (actividad) actividad(contexto, antes, lineas); break;
-            case HistorialCambio.CREAR: if (pesaje) medicion(contexto, ahora, lineas); else if (actividad) actividad(contexto, ahora, lineas); break;
+            case HistorialCambio.ANULAR:
+                if (pesaje) medicion(contexto, antes, lineas);
+                else if (actividad) actividad(contexto, antes, lineas);
+                else if (gasto) gasto(contexto, antes, lineas);
+                break;
+            case HistorialCambio.CREAR:
+                if (pesaje) medicion(contexto, ahora, lineas);
+                else if (actividad) actividad(contexto, ahora, lineas);
+                else if (gasto) gasto(contexto, ahora, lineas);
+                break;
             default: break;
         }
         if (cambio.motivo != null && !cambio.motivo.isEmpty()) lineas.add(contexto.getString(R.string.historial_motivo, cambio.motivo));
@@ -121,6 +134,15 @@ final class TextoHistorial {
     private static void actividad(Context contexto, JSONObject datos, List<String> lineas) {
         if (datos == null || datos.isNull("tipo")) return;
         lineas.add(contexto.getString(R.string.codigo_nombre, Presentacion.tipoSanidad(contexto, datos.optString("tipo")),
+                FormatoFecha.corta(datos.optString("fecha"))));
+    }
+
+    /** "Compra de concentrado · $ 320.000" y "Alimentación · 10 oct 2026": el gasto al que se refiere la entrada. */
+    private static void gasto(Context contexto, JSONObject datos, List<String> lineas) {
+        if (datos == null || datos.isNull("concepto")) return;
+        lineas.add(contexto.getString(R.string.codigo_nombre, datos.optString("concepto"),
+                valor(contexto, "valor_centavos", datos.opt("valor_centavos"), Collections.<String, String>emptyMap())));
+        lineas.add(contexto.getString(R.string.codigo_nombre, Presentacion.categoriaGasto(contexto, datos.optString("categoria")),
                 FormatoFecha.corta(datos.optString("fecha"))));
     }
 
@@ -148,6 +170,9 @@ final class TextoHistorial {
             case "tipo": return contexto.getString(R.string.campo_tipo);
             case "descripcion": return contexto.getString(R.string.campo_descripcion);
             case "producto": return contexto.getString(R.string.campo_producto);
+            case "categoria": return contexto.getString(R.string.campo_categoria);
+            case "concepto": return contexto.getString(R.string.campo_concepto);
+            case "valor_centavos": return contexto.getString(R.string.campo_valor);
             default: return clave;
         }
     }
@@ -164,6 +189,9 @@ final class TextoHistorial {
             case "sexo": return Presentacion.sexo(contexto, texto);
             case "estado": return Presentacion.estado(contexto, texto);
             case "tipo": return Presentacion.tipoSanidad(contexto, texto);
+            case "categoria": return Presentacion.categoriaGasto(contexto, texto);
+            case "valor_centavos":
+                return valor instanceof Number ? Presentacion.pesos(((Number) valor).longValue()) : texto;
             case "id_raza": return razas.containsKey(texto) ? razas.get(texto) : texto;
             default: return texto;
         }

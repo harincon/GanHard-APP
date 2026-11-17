@@ -18,6 +18,25 @@ final class FormatoFecha {
 
     private FormatoFecha() {}
 
+    private static final String[] MESES_LARGOS = {"Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio",
+            "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"};
+    private static final Pattern PERIODO = Pattern.compile("^(\\d{4})-(0[1-9]|1[0-2])$");
+
+    /** "2026-10" → "Octubre de 2026"; lo que no es un mes AAAA-MM se devuelve tal cual. */
+    static String mesLargo(String periodo) {
+        if (periodo == null) return "";
+        Matcher m = PERIODO.matcher(periodo);
+        if (!m.matches()) return periodo;
+        return MESES_LARGOS[Integer.parseInt(m.group(2)) - 1] + " de " + m.group(1);
+    }
+
+    /** "2026-10-10" → "10 oct": el día y el mes, para listas que ya muestran el año del periodo. */
+    static String diaMes(String iso) {
+        LocalDate fecha = leerIso(iso);
+        if (fecha == null) return iso == null ? "" : iso;
+        return fecha.getDayOfMonth() + " " + MESES[fecha.getMonthValue() - 1];
+    }
+
     /** "2026-01-15" → "15 ene 2026". */
     static String corta(String iso) {
         if (iso == null || iso.isEmpty()) return "";
