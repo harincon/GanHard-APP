@@ -1,6 +1,16 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
 }
+// Los datos del proyecto de Supabase se leen de local.properties (que no se sube al repositorio). Sin ellos la app
+// compila y funciona igual, solo sin cuenta.
+val propiedadesLocales = Properties().apply {
+    val archivo = rootProject.file("local.properties")
+    if (archivo.exists()) archivo.inputStream().use { load(it) }
+}
+fun campoTexto(clave: String): String =
+    "\"" + propiedadesLocales.getProperty(clave, "").trim().replace("\\", "\\\\").replace("\"", "\\\"") + "\""
 
 android {
     namespace = "com.example.ganhard"
@@ -14,6 +24,9 @@ android {
         targetSdk = 37
         versionCode = 1
         versionName = "1.0"
+
+        buildConfigField("String", "SUPABASE_URL", campoTexto("supabase.url"))
+        buildConfigField("String", "SUPABASE_ANON_KEY", campoTexto("supabase.anon.key"))
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         javaCompileOptions {
@@ -35,7 +48,10 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
         isCoreLibraryDesugaringEnabled = true
     }
-    buildFeatures { viewBinding = true }
+    buildFeatures {
+        viewBinding = true
+        buildConfig = true
+    }
     testOptions { unitTests { isIncludeAndroidResources = true } }
     sourceSets {
         // Los esquemas exportados de Room permiten probar las migraciones.

@@ -17,6 +17,8 @@ public class Finca {
     public String ubicacion;
     @ColumnInfo(name = "area_hectareas") public Double areaHectareas;
     public int activa = 1;
+    /** Instante (UTC) en que la finca se vinculó a una cuenta; nulo si solo existe en este teléfono. */
+    @ColumnInfo(name = "vinculada_en") public String vinculadaEn;
     @NonNull @ColumnInfo(name = "creado_en") public String creadoEn = "";
     @NonNull @ColumnInfo(name = "actualizado_en") public String actualizadoEn = "";
     public int version = 0;

@@ -14,6 +14,7 @@ Java y XML (Android Views), arquitectura MVC, base de datos local con Room.
 - Tareas: actividades programadas, generales o de un animal; al realizar un pesaje o una actividad sanitaria programados, la tarea queda completada y enlazada.
 - Historial de cambios de la finca y de cada animal: quién, cuándo, qué cambió y por qué.
 - Inicio con el total de animales activos.
+- Cuenta opcional: vincular la finca, invitar a un encargado por correo y retirar accesos con motivo.
 - Tema claro, oscuro o el del sistema.
 
 Sincronización aparece en el menú como "Próximamente".
@@ -27,6 +28,7 @@ app/src/main/java/com/example/ganhard/
     ├── entidad/      Usuario, Finca, Raza, Animal, Pesaje, EventoSanitario, Gasto, Tarea, HistorialCambio
     ├── datos/        Base Room, DAO y migraciones
     ├── repositorio/  Operaciones de guardado y consulta
+    ├── remoto/       Cliente de Supabase (cuentas, invitaciones)
     └── reglas/       Validaciones
 app/src/main/res/layout/   Una vista XML por pantalla
 ```
@@ -35,3 +37,7 @@ app/src/main/res/layout/   Una vista XML por pantalla
 
 1. Abrir la carpeta en Android Studio y esperar la sincronización de Gradle.
 2. Iniciar un emulador (Android 7.0 / API 24 o superior) y pulsar **Run**.
+
+## Cuenta (opcional)
+
+Sin cuenta la app funciona igual. Para activar las cuentas, crea un proyecto gratuito en Supabase siguiendo [`supabase/LEEME.md`](supabase/LEEME.md) y agrega `supabase.url` y `supabase.anon.key` a `local.properties`.

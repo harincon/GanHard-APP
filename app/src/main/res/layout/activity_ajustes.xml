@@ -17,6 +17,8 @@
                         android:layout_marginTop="2dp" android:text="@string/ajustes_rol" android:textSize="14sp" android:textColor="@color/gh_muted" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
+            <com.example.ganhard.controlador.FilaNavegacion android:id="@+id/filaCuenta" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp" app:titulo="@string/cuenta_fila" />
             <com.example.ganhard.controlador.FilaNavegacion android:id="@+id/filaDatosFinca" android:layout_width="match_parent" android:layout_height="wrap_content"
                 app:titulo="@string/datos_finca_fila" />
             <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="24dp" android:layout_marginBottom="8dp"

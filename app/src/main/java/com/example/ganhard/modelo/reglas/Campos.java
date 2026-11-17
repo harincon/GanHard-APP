@@ -13,6 +13,7 @@ public final class Campos {
     public static final String CATEGORIA = "categoria", CONCEPTO = "concepto", VALOR = "valor";
     public static final String TITULO = "titulo", FECHA_PROGRAMADA = "fechaProgramada";
     public static final String CORREO = "correo", FINCA = "finca", UBICACION = "ubicacion", AREA = "area";
+    public static final String CONTRASENA = "contrasena", CONTRASENA_REPETIDA = "contrasenaRepetida";
 
     private Campos() {}
 }

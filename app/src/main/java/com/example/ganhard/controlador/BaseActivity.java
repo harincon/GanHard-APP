@@ -8,6 +8,7 @@ import com.example.ganhard.GanHardApplication;
 import com.example.ganhard.R;
 import com.example.ganhard.modelo.nucleo.Tiempo;
 import com.example.ganhard.modelo.repositorio.ConfiguracionRepository;
+import com.example.ganhard.modelo.repositorio.CuentaRepository;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.textfield.TextInputEditText;
@@ -18,6 +19,7 @@ import java.time.format.DateTimeParseException;
 public abstract class BaseActivity extends AppCompatActivity {
     protected GanHardApplication app() { return (GanHardApplication) getApplication(); }
     protected ConfiguracionRepository repositorio() { return app().configuracion(); }
+    protected CuentaRepository cuenta() { return app().cuenta(); }
     protected boolean disponible() { return !isFinishing() && !isDestroyed(); }
 
     /** Con flecha de regreso, la barra superior vuelve a la pantalla de origen como el botón Atrás. */

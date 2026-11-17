@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Validación de los formularios de cuenta -->
+    <string name="error_longitud_minima">Usa al menos %1$d caracteres.</string>
+    <string name="error_no_coincide">Los valores no coinciden.</string>
+    <string name="error_contrasena_obligatoria">Escribe la contraseña.</string>
+    <string name="error_contrasenas_distintas">Las contraseñas no coinciden.</string>
+
+    <!-- Errores de la cuenta y del servidor -->
+    <string name="remoto_sin_configurar">Esta versión de la app no tiene configurado el servicio de cuentas.</string>
+    <string name="remoto_sin_sesion">Tu sesión terminó. Inicia sesión de nuevo.</string>
+    <string name="remoto_sin_conexion">No hay conexión con el servidor. Revisa tu internet e inténtalo de nuevo.</string>
+    <string name="remoto_credenciales">Correo o contraseña incorrectos.</string>
+    <string name="remoto_correo_sin_confirmar">Confirma tu correo: te enviamos un mensaje al registrarte.</string>
+    <string name="remoto_no_autorizado">No tienes permiso para esta acción.</string>
+    <string name="remoto_no_encontrado">No se encontró lo que buscabas.</string>
+    <string name="remoto_servidor">El servidor no respondió como se esperaba. Inténtalo más tarde.</string>
+    <string name="remoto_esquema_no_instalado">El servidor aún no tiene instalado el esquema de GanHard (ver supabase/LEEME.md).</string>
+    <string name="remoto_local">No se pudo guardar en el teléfono.</string>
+    <string name="remoto_validacion">Revisa los datos escritos.</string>
+    <string name="regla_demasiados_intentos">Demasiados intentos seguidos. Espera unos minutos e inténtalo de nuevo.</string>
+    <string name="regla_contrasena_debil">La contraseña es demasiado débil. Usa una más larga.</string>
+    <string name="regla_correo_registrado">Ese correo ya tiene una cuenta. Inicia sesión.</string>
+    <string name="regla_finca_de_otra_cuenta">Esta finca ya está vinculada a otra cuenta.</string>
+    <string name="regla_ya_tiene_finca">Tu cuenta ya tiene otra finca vinculada.</string>
+    <string name="regla_no_es_dueno">Solo la cuenta dueña de la finca puede hacer esto.</string>
+    <string name="regla_invitacion_repetida">Ya hay una invitación vigente para ese correo.</string>
+    <string name="regla_es_integrante">Esa persona ya tiene acceso a la finca.</string>
+    <string name="regla_correo_propio">No puedes invitar tu propio correo.</string>
+    <string name="regla_invitacion_no_vigente">La invitación ya no está vigente: venció, se canceló o ya se usó.</string>
+    <string name="regla_correo_no_coincide">Esta invitación es para otro correo.</string>
+    <string name="regla_ya_es_integrante">Ya tienes acceso a esta finca.</string>
+    <string name="regla_es_administrador">El administrador de la finca no puede retirarse.</string>
+    <string name="regla_ya_retirado">Ese acceso ya estaba retirado.</string>
+    <string name="regla_motivo_obligatorio">Escribe el motivo.</string>
+    <string name="regla_correo_invalido">Revisa el formato del correo electrónico.</string>
+    <string name="regla_sin_finca_local">Primero registra los datos de tu finca en este teléfono.</string>
+    <string name="regla_ya_vinculada">Tu finca ya está vinculada a esta cuenta.</string>
+    <string name="regla_otra_cuenta">La finca de este teléfono está vinculada a otra cuenta. Inicia sesión con esa cuenta.</string>
+    <string name="regla_no_vinculada">Primero vincula tu finca a tu cuenta.</string>
+    <string name="regla_desconocida">El servidor rechazó la acción.</string>
+
+    <!-- Pantalla Cuenta -->
+    <string name="cuenta_fila">Cuenta</string>
+    <string name="cuenta_fila_sin_sesion">Sin cuenta · Opcional</string>
+    <string name="cuenta_titulo">Cuenta</string>
+    <string name="cuenta_sin_sesion_titulo">Sin cuenta</string>
+    <string name="cuenta_sin_sesion_texto">GanHard funciona sin cuenta, con los datos de este teléfono. Una cuenta permite invitar a otras personas a tu finca.</string>
+    <string name="cuenta_sin_configurar_titulo">Cuentas no disponibles</string>
+    <string name="cuenta_sin_configurar_texto">Esta versión de la app se instaló sin conexión a un servicio de cuentas. Todo lo demás funciona con normalidad.</string>
+    <string name="cuenta_con_sesion_titulo">Sesión iniciada</string>
+    <string name="cuenta_correo_sin_confirmar">Correo sin confirmar</string>
+    <string name="cuenta_iniciar">Iniciar sesión</string>
+    <string name="cuenta_crear">Crear cuenta</string>
+    <string name="cuenta_cerrar_sesion">Cerrar sesión</string>
+    <string name="cuenta_cerrar_texto">Cerrar sesión no borra los datos de este teléfono.</string>
+    <string name="cuenta_sesion_cerrada">Sesión cerrada.</string>
+    <string name="cuenta_mi_finca">Mi finca</string>
+    <string name="cuenta_sin_finca">Aún no registras los datos de tu finca en este teléfono.</string>
+    <string name="cuenta_finca_sin_vincular">%1$s todavía está solo en este teléfono. Vincúlala a tu cuenta para poder invitar a otras personas.</string>
+    <string name="cuenta_finca_vinculada">%1$s está vinculada a tu cuenta.</string>
+    <string name="cuenta_finca_de_otra">%1$s está vinculada a otra cuenta. Inicia sesión con esa cuenta para administrarla.</string>
+    <string name="cuenta_vincular">Vincular mi finca a mi cuenta</string>
+    <string name="cuenta_finca_vinculada_ok">Finca vinculada a tu cuenta.</string>
+    <string name="cuenta_integrantes_fila">Integrantes e invitaciones</string>
+    <string name="cuenta_integrantes_sub">Quién tiene acceso a tu finca</string>
+    <string name="cuenta_invitaciones_fila">Invitaciones recibidas</string>
+    <string name="cuenta_invitaciones_sub">Invitaciones a otras fincas y tus accesos</string>
+
+    <!-- Iniciar sesión, crear cuenta, recuperar acceso -->
+    <string name="sesion_titulo_inicio">Iniciar sesión</string>
+    <string name="sesion_titulo_registro">Crear cuenta</string>
+    <string name="sesion_titulo_recuperar">Recuperar acceso</string>
+    <string name="sesion_ayuda_registro">Te enviaremos un correo para confirmar tu cuenta. Solo con el correo confirmado podrás aceptar invitaciones.</string>
+    <string name="sesion_ayuda_recuperar">Escribe tu correo y te enviaremos las instrucciones para elegir una contraseña nueva.</string>
+    <string name="sesion_nombre">Nombre completo *</string>
+    <string name="sesion_correo">Correo electrónico *</string>
+    <string name="sesion_contrasena">Contraseña *</string>
+    <string name="sesion_contrasena_repetida">Repite la contraseña *</string>
+    <string name="sesion_ayuda_contrasena">Entre 8 y 72 caracteres.</string>
+    <string name="sesion_accion_inicio">Entrar</string>
+    <string name="sesion_accion_registro">Crear cuenta</string>
+    <string name="sesion_accion_recuperar">Enviar instrucciones</string>
+    <string name="sesion_ya_tengo">Ya tengo cuenta</string>
+    <string name="sesion_no_tengo">No tengo cuenta</string>
+    <string name="sesion_olvide">Olvidé mi contraseña</string>
+    <string name="sesion_registro_listo">Cuenta creada. Revisa tu correo para confirmarla y luego inicia sesión.</string>
+    <string name="sesion_recuperar_listo">Si el correo tiene una cuenta, recibirás las instrucciones en unos minutos.</string>
+    <string name="sesion_iniciada">Sesión iniciada.</string>
+
+    <!-- Integrantes e invitaciones (dueño) -->
+    <string name="integrantes_titulo">Integrantes</string>
+    <string name="integrantes_seccion">Personas con acceso</string>
+    <string name="invitaciones_seccion">Invitaciones enviadas</string>
+    <string name="integrantes_invitar">Invitar a un encargado</string>
+    <string name="integrantes_sin_invitaciones">No has enviado invitaciones.</string>
+    <string name="rol_administrador">Administrador</string>
+    <string name="rol_encargado">Encargado</string>
+    <string name="integrante_con_acceso">Con acceso</string>
+    <string name="estado_revocado">Acceso retirado</string>
+    <string name="invitacion_pendiente">Pendiente</string>
+    <string name="invitacion_aceptada">Aceptada</string>
+    <string name="invitacion_cancelada">Cancelada</string>
+    <string name="invitacion_vencida">Vencida</string>
+    <string name="integrante_ingreso">Ingresó el %1$s</string>
+    <string name="integrante_retiro">Retirado el %1$s · %2$s</string>
+    <string name="invitacion_vence">Vence el %1$s</string>
+    <string name="invitacion_cancelar">Cancelar invitación</string>
+    <string name="invitacion_cancelada_ok">Invitación cancelada.</string>
+    <string name="integrante_retirar">Retirar acceso</string>
+
+    <!-- Invitar -->
+    <string name="invitar_titulo">Invitar a un encargado</string>
+    <string name="invitar_explicacion">La persona debe tener (o crear) una cuenta con este correo y confirmarlo. La invitación vale 7 días.</string>
+    <string name="invitar_correo">Correo de la persona *</string>
+    <string name="invitar_enviar">Invitar</string>
+    <string name="invitar_ok">Invitación enviada a %1$s.</string>
+
+    <!-- Retirar acceso -->
+    <string name="retirar_titulo">Retirar acceso</string>
+    <string name="retirar_aviso_titulo">La persona deja de entrar a la finca</string>
+    <string name="retirar_aviso_texto">Su acceso se conserva en la lista con la fecha y el motivo. Podrás invitarla de nuevo más adelante.</string>
+    <string name="retirar_motivo">Motivo del retiro *</string>
+    <string name="retirar_confirmar">Retirar acceso</string>
+    <string name="retirar_ok">Acceso retirado.</string>
+
+    <!-- Invitaciones recibidas y mis fincas -->
+    <string name="recibidas_titulo">Invitaciones recibidas</string>
+    <string name="recibidas_seccion">Invitaciones para ti</string>
+    <string name="recibidas_vacio">No tienes invitaciones pendientes.</string>
+    <string name="recibidas_de">Invitación de %1$s</string>
+    <string name="recibidas_aceptar">Aceptar</string>
+    <string name="recibidas_aceptada">Ahora tienes acceso a la finca.</string>
+    <string name="mis_fincas_seccion">Mis fincas</string>
+    <string name="mis_fincas_vacio">Todavía no perteneces a ninguna finca con esta cuenta.</string>
+    <string name="mis_fincas_retirado">Tu acceso fue retirado por el administrador.</string>
+</resources>

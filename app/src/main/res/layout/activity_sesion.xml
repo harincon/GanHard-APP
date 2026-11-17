@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/raiz" android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical" android:background="@color/gh_background">
+    <com.google.android.material.appbar.MaterialToolbar android:id="@+id/toolbar" style="@style/Gh.Toolbar"
+        android:layout_width="match_parent" android:layout_height="wrap_content" app:title="@string/sesion_titulo_inicio" />
+    <ProgressBar android:id="@+id/progreso" style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent" android:layout_height="4dp" android:indeterminate="true" android:visibility="invisible" />
+    <ScrollView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"
+        android:fillViewport="true" android:clipToPadding="false">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="@dimen/gh_margen">
+            <TextView android:id="@+id/ayuda" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp" android:textSize="14sp" android:textColor="@color/gh_muted" android:visibility="gone" />
+            <com.google.android.material.textfield.TextInputLayout android:id="@+id/campoNombre"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:hint="@string/sesion_nombre" android:layout_marginBottom="12dp" android:visibility="gone">
+                <com.google.android.material.textfield.TextInputEditText android:id="@+id/nombre" android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:inputType="textPersonName|textCapWords" android:maxLength="100" android:maxLines="1" android:imeOptions="actionNext" android:autofillHints="name" />
+            </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputLayout android:id="@+id/campoCorreo"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:hint="@string/sesion_correo" android:layout_marginBottom="12dp">
+                <com.google.android.material.textfield.TextInputEditText android:id="@+id/correo" android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:inputType="textEmailAddress" android:maxLength="150" android:maxLines="1" android:imeOptions="actionNext" android:autofillHints="emailAddress" />
+            </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputLayout android:id="@+id/campoContrasena"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:hint="@string/sesion_contrasena" app:endIconMode="password_toggle" android:layout_marginBottom="12dp">
+                <com.google.android.material.textfield.TextInputEditText android:id="@+id/contrasena" android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:inputType="textPassword" android:maxLines="1" android:imeOptions="actionNext" android:autofillHints="password" />
+            </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputLayout android:id="@+id/campoContrasenaRepetida"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:hint="@string/sesion_contrasena_repetida" app:endIconMode="password_toggle" android:layout_marginBottom="24dp" android:visibility="gone">
+                <com.google.android.material.textfield.TextInputEditText android:id="@+id/contrasenaRepetida" android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:inputType="textPassword" android:maxLines="1" android:imeOptions="actionDone" android:importantForAutofill="no" />
+            </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.button.MaterialButton android:id="@+id/guardar" style="@style/Gh.Boton" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:text="@string/sesion_accion_inicio" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/enlaceCambiar" style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="@string/sesion_no_tengo" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/enlaceRecuperar" style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/sesion_olvide" />
+            <TextView android:id="@+id/mensaje" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="12dp" android:textColor="@color/gh_muted" android:textSize="14sp" android:accessibilityLiveRegion="polite" android:visibility="gone" />
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

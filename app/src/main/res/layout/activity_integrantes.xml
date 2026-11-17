@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/raiz" android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical" android:background="@color/gh_background">
+    <com.google.android.material.appbar.MaterialToolbar android:id="@+id/toolbar" style="@style/Gh.Toolbar"
+        android:layout_width="match_parent" android:layout_height="wrap_content" app:title="@string/integrantes_titulo" />
+    <ProgressBar android:id="@+id/progreso" style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent" android:layout_height="4dp" android:indeterminate="true" android:visibility="invisible" />
+    <ScrollView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:fillViewport="true">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="@dimen/gh_margen">
+            <com.google.android.material.button.MaterialButton android:id="@+id/botonInvitar" style="@style/Gh.Boton"
+                android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/integrantes_invitar" />
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="24dp" android:layout_marginBottom="8dp"
+                android:text="@string/integrantes_seccion" android:textAppearance="@style/Gh.Titulo" />
+            <LinearLayout android:id="@+id/listaIntegrantes" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" />
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:layout_marginBottom="8dp"
+                android:text="@string/invitaciones_seccion" android:textAppearance="@style/Gh.Titulo" />
+            <TextView android:id="@+id/sinInvitaciones" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:text="@string/integrantes_sin_invitaciones" android:textSize="14sp" android:textColor="@color/gh_muted" android:visibility="gone" />
+            <LinearLayout android:id="@+id/listaInvitaciones" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" />
+            <TextView android:id="@+id/mensaje" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="12dp" android:textColor="@color/gh_muted" android:textSize="14sp" android:accessibilityLiveRegion="polite" android:visibility="gone" />
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

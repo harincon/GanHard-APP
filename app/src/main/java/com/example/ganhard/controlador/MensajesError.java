@@ -26,6 +26,8 @@ public final class MensajesError {
             case SIN_CAMBIOS: return contexto.getString(R.string.error_sin_cambios);
             case NO_PENDIENTE: return contexto.getString(R.string.error_no_pendiente);
             case ANIMAL_INACTIVO: return contexto.getString(R.string.error_animal_inactivo);
+            case LONGITUD_MINIMA: return contexto.getString(R.string.error_longitud_minima, error.limite);
+            case NO_COINCIDE: return contexto.getString(R.string.error_no_coincide);
             default: return contexto.getString(R.string.error_valor_invalido);
         }
     }
@@ -72,6 +74,8 @@ public final class MensajesError {
                 if (codigo == CodigoError.FECHA_ANTERIOR) return contexto.getString(R.string.error_estado_antes_ingreso);
                 break;
             case Campos.MOTIVO: if (codigo == CodigoError.OBLIGATORIO) return contexto.getString(R.string.error_motivo_obligatorio); break;
+            case Campos.CONTRASENA: if (codigo == CodigoError.OBLIGATORIO) return contexto.getString(R.string.error_contrasena_obligatoria); break;
+            case Campos.CONTRASENA_REPETIDA: if (codigo == CodigoError.NO_COINCIDE) return contexto.getString(R.string.error_contrasenas_distintas); break;
             case Campos.ID_ANIMAL: if (codigo == CodigoError.OBLIGATORIO) return contexto.getString(R.string.error_animal_obligatorio); break;
             case Campos.TIPO: if (codigo == CodigoError.OBLIGATORIO) return contexto.getString(R.string.error_tipo_obligatorio); break;
             case Campos.DESCRIPCION: if (codigo == CodigoError.OBLIGATORIO) return contexto.getString(R.string.error_descripcion_obligatoria); break;

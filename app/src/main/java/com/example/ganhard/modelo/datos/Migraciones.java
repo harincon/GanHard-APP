@@ -144,4 +144,11 @@ public final class Migraciones {
             db.execSQL("CREATE INDEX IF NOT EXISTS `index_evento_sanitario_id_tarea` ON `evento_sanitario` (`id_tarea`)");
         }
     };
+
+    /** Agrega a la finca el instante en que se vinculó a una cuenta; las fincas existentes quedan sin vincular. */
+    public static final Migration V6_V7 = new Migration(6, 7) {
+        @Override public void migrate(@NonNull SupportSQLiteDatabase db) {
+            db.execSQL("ALTER TABLE `finca` ADD COLUMN `vinculada_en` TEXT");
+        }
+    };
 }

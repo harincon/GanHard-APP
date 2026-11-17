@@ -9,6 +9,9 @@ import com.example.ganhard.modelo.ConfiguracionLocal;
 import com.example.ganhard.modelo.PreferenciaTema;
 import com.example.ganhard.modelo.nucleo.Callback;
 import com.example.ganhard.modelo.nucleo.ErrorModelo;
+import com.example.ganhard.modelo.remoto.CallbackRemoto;
+import com.example.ganhard.modelo.remoto.ErrorRemoto;
+import com.example.ganhard.modelo.repositorio.EstadoCuenta;
 
 /** Configuración (RF18): perfil, acceso a los datos de la finca y apariencia claro/oscuro/del sistema. */
 public class AjustesActivity extends BaseActivity {
@@ -21,6 +24,7 @@ public class AjustesActivity extends BaseActivity {
         ajustarBarras(vista.getRoot());
         configurarToolbar(vista.toolbar, true);
         vista.filaDatosFinca.setOnClickListener(v -> startActivity(new Intent(this, ConfiguracionActivity.class)));
+        vista.filaCuenta.setOnClickListener(v -> startActivity(new Intent(this, CuentaActivity.class)));
         vista.filaTemaClaro.setOnClickListener(v -> elegirTema(AppCompatDelegate.MODE_NIGHT_NO));
         vista.filaTemaOscuro.setOnClickListener(v -> elegirTema(AppCompatDelegate.MODE_NIGHT_YES));
         vista.filaTemaSistema.setOnClickListener(v -> elegirTema(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM));
@@ -44,6 +48,13 @@ public class AjustesActivity extends BaseActivity {
                 vista.filaDatosFinca.setSubtitulo(ubicacion == null ? datos.finca.nombre : datos.finca.nombre + " · " + ubicacion);
             }
             @Override public void error(ErrorModelo error) { /* La pantalla sigue siendo útil: el tema no depende de la base. */ }
+        });
+        cuenta().estado(new CallbackRemoto<EstadoCuenta>() {
+            @Override public void exito(EstadoCuenta estado) {
+                if (!disponible()) return;
+                vista.filaCuenta.setSubtitulo(estado.configurada && estado.conSesion ? estado.correo : getString(R.string.cuenta_fila_sin_sesion));
+            }
+            @Override public void error(ErrorRemoto error) { /* La fila queda sin subtítulo. */ }
         });
     }
 

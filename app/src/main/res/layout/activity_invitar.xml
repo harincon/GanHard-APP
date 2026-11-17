@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/raiz" android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical" android:background="@color/gh_background">
+    <com.google.android.material.appbar.MaterialToolbar android:id="@+id/toolbar" style="@style/Gh.Toolbar"
+        android:layout_width="match_parent" android:layout_height="wrap_content" app:title="@string/invitar_titulo" />
+    <ProgressBar android:id="@+id/progreso" style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent" android:layout_height="4dp" android:indeterminate="true" android:visibility="invisible" />
+    <ScrollView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"
+        android:fillViewport="true" android:clipToPadding="false">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="@dimen/gh_margen">
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="16dp"
+                android:text="@string/invitar_explicacion" android:textSize="14sp" android:textColor="@color/gh_muted" />
+            <com.google.android.material.textfield.TextInputLayout android:id="@+id/campoCorreo"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:hint="@string/invitar_correo" android:layout_marginBottom="24dp">
+                <com.google.android.material.textfield.TextInputEditText android:id="@+id/correo" android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:inputType="textEmailAddress" android:maxLength="150" android:maxLines="1" android:imeOptions="actionDone" android:importantForAutofill="no" />
+            </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.button.MaterialButton android:id="@+id/guardar" style="@style/Gh.Boton"
+                android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/invitar_enviar" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/cancelar" style="@style/Gh.Boton.Tonal"
+                android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:text="@string/cancelar" />
+            <TextView android:id="@+id/mensaje" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="12dp" android:textColor="@color/gh_muted" android:textSize="14sp" android:accessibilityLiveRegion="polite" android:visibility="gone" />
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

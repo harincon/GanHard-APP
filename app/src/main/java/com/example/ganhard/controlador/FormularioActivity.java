@@ -6,6 +6,7 @@ import androidx.activity.OnBackPressedCallback;
 import com.example.ganhard.R;
 import com.example.ganhard.modelo.nucleo.ErrorModelo;
 import com.example.ganhard.modelo.reglas.ErrorCampo;
+import com.example.ganhard.modelo.remoto.ErrorRemoto;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputLayout;
 import java.util.Map;
@@ -84,6 +85,11 @@ public abstract class FormularioActivity extends BaseActivity {
         if (!mostrarErrores(error.campos)) mensaje(mensajeGeneral);
     }
 
+    /** Igual que {@link #mostrarError(ErrorModelo, int)} para un error de la cuenta o del servidor. */
+    protected void mostrarError(ErrorRemoto error) {
+        if (!mostrarErrores(error.campos)) mensaje(MensajesRemotos.texto(this, error));
+    }
+
     protected void ocupado(boolean ocupado) {
         progreso.setVisibility(ocupado ? View.VISIBLE : progresoOculto);
         guardar.setEnabled(!ocupado);
@@ -92,6 +98,11 @@ public abstract class FormularioActivity extends BaseActivity {
 
     protected void mensaje(int recurso) {
         mensaje.setText(recurso);
+        mensaje.setVisibility(View.VISIBLE);
+    }
+
+    protected void mensaje(CharSequence texto) {
+        mensaje.setText(texto);
         mensaje.setVisibility(View.VISIBLE);
     }
 
