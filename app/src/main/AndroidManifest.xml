@@ -46,6 +46,12 @@
             android:exported="false" />
         <activity android:name=".controlador.GastoFormActivity"
             android:exported="false" android:windowSoftInputMode="adjustResize" />
+        <activity android:name=".controlador.TareasActivity"
+            android:exported="false" />
+        <activity android:name=".controlador.TareaDetalleActivity"
+            android:exported="false" />
+        <activity android:name=".controlador.TareaFormActivity"
+            android:exported="false" android:windowSoftInputMode="adjustResize" />
         <activity android:name=".controlador.AnimalesActivity"
             android:exported="false" android:windowSoftInputMode="adjustResize" />
         <activity android:name=".controlador.AnimalFormActivity"

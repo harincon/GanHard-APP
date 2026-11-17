@@ -4,6 +4,7 @@ import com.example.ganhard.modelo.entidad.Animal;
 import com.example.ganhard.modelo.entidad.EventoSanitario;
 import com.example.ganhard.modelo.entidad.Gasto;
 import com.example.ganhard.modelo.entidad.Pesaje;
+import com.example.ganhard.modelo.entidad.Tarea;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Objects;
@@ -45,6 +46,25 @@ public final class ValoresCambio {
         poner(datos, "hora", pesaje.hora);
         poner(datos, "peso_kg", pesaje.pesoKg);
         poner(datos, "observaciones", pesaje.observaciones);
+        return datos;
+    }
+
+    /** Datos de la tarea; el tipo y el animal van aunque una corrección no los cambie. */
+    public static JSONObject de(Tarea tarea) {
+        JSONObject datos = new JSONObject();
+        poner(datos, "tipo", tarea.tipo);
+        poner(datos, "id_animal", tarea.idAnimal);
+        poner(datos, "titulo", tarea.titulo);
+        poner(datos, "descripcion", tarea.descripcion);
+        poner(datos, "fecha_programada", tarea.fechaProgramada);
+        return datos;
+    }
+
+    /** Estado de la tarea y su fecha de finalización, si la tiene. */
+    public static JSONObject estadoTarea(Tarea tarea) {
+        JSONObject datos = new JSONObject();
+        poner(datos, "estado", tarea.estado);
+        poner(datos, "fecha_completada", tarea.fechaCompletada);
         return datos;
     }
 

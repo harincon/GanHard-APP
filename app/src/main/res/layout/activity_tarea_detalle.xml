@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/raiz" android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical" android:background="@color/gh_background">
+    <com.google.android.material.appbar.MaterialToolbar android:id="@+id/toolbar" style="@style/Gh.Toolbar"
+        android:layout_width="match_parent" android:layout_height="wrap_content" app:title="@string/modulo_tareas" />
+    <ProgressBar android:id="@+id/progreso" style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent" android:layout_height="4dp" android:indeterminate="true" android:visibility="invisible" />
+    <ScrollView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"
+        android:fillViewport="true" android:clipToPadding="false">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="@dimen/gh_margen">
+            <com.google.android.material.card.MaterialCardView android:id="@+id/contenido" style="@style/Gh.Tarjeta"
+                android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="16dp" android:visibility="invisible">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp">
+                    <TextView android:id="@+id/detalleEtiqueta" android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:textAppearance="@style/Gh.Overline" />
+                    <TextView android:id="@+id/detalleTitulo" android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp" android:textAppearance="@style/Gh.Titulo" />
+                    <TextView android:id="@+id/detalleAnimal" android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp" android:textSize="14sp" android:fontFamily="sans-serif-medium" android:textColor="@color/gh_muted" />
+                    <TextView android:id="@+id/detalleProgramada" android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp" android:textSize="14sp" android:fontFamily="sans-serif-medium" android:textColor="@color/gh_muted" />
+                    <TextView android:id="@+id/detalleCompletada" android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp" android:textSize="14sp" android:fontFamily="sans-serif-medium" android:textColor="@color/gh_muted" android:visibility="gone" />
+                    <TextView android:id="@+id/detalleDescripcion" android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp" android:textSize="14sp" android:textColor="@color/gh_text" android:visibility="gone" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+            <LinearLayout android:id="@+id/acciones" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="vertical" android:visibility="gone">
+                <com.google.android.material.button.MaterialButton android:id="@+id/realizar" style="@style/Gh.Boton"
+                    android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/tarea_realizar" />
+                <com.google.android.material.card.MaterialCardView style="@style/Gh.Tarjeta" android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp">
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
+                        <com.example.ganhard.controlador.FilaNavegacion android:id="@+id/filaCorregir" android:layout_width="match_parent" android:layout_height="wrap_content"
+                            app:titulo="@string/tarea_corregir_fila" app:subtitulo="@string/tarea_corregir_fila_sub" />
+                        <com.example.ganhard.controlador.FilaNavegacion android:id="@+id/filaCancelar" android:layout_width="match_parent" android:layout_height="wrap_content"
+                            app:titulo="@string/tarea_cancelar_fila" app:subtitulo="@string/tarea_cancelar_fila_sub" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
+            <TextView android:id="@+id/mensaje" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="12dp" android:textColor="@color/gh_muted" android:textSize="14sp" android:accessibilityLiveRegion="polite" android:visibility="gone" />
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

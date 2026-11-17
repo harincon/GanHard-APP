@@ -16,6 +16,10 @@
         <item quantity="one">%d fallecido en la finca</item>
         <item quantity="other">%d fallecidos en la finca</item>
     </plurals>
+    <plurals name="tareas_pendientes">
+        <item quantity="one">%d tarea pendiente</item>
+        <item quantity="other">%d tareas pendientes</item>
+    </plurals>
     <plurals name="actividades_sanitarias">
         <item quantity="one">%d actividad realizada</item>
         <item quantity="other">%d actividades realizadas</item>

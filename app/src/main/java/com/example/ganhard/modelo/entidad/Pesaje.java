@@ -9,8 +9,10 @@ import androidx.room.PrimaryKey;
 
 /** Medición efectivamente realizada. Una planificación futura es una tarea, no un pesaje. */
 @Entity(tableName = "pesaje",
-        foreignKeys = @ForeignKey(entity = Animal.class, parentColumns = "id_animal", childColumns = "id_animal", onDelete = ForeignKey.RESTRICT),
-        indices = @Index(value = {"id_animal", "fecha", "hora"}))
+        foreignKeys = {
+                @ForeignKey(entity = Animal.class, parentColumns = "id_animal", childColumns = "id_animal", onDelete = ForeignKey.RESTRICT),
+                @ForeignKey(entity = Tarea.class, parentColumns = "id_tarea", childColumns = "id_tarea", onDelete = ForeignKey.RESTRICT)},
+        indices = {@Index(value = {"id_animal", "fecha", "hora"}), @Index("id_tarea")})
 public class Pesaje {
     @PrimaryKey @NonNull @ColumnInfo(name = "id_pesaje") public String idPesaje = "";
     @NonNull @ColumnInfo(name = "id_animal") public String idAnimal = "";
@@ -25,4 +27,6 @@ public class Pesaje {
     @NonNull @ColumnInfo(name = "creado_en") public String creadoEn = "";
     @NonNull @ColumnInfo(name = "actualizado_en") public String actualizadoEn = "";
     public int version = 0;
+    /** Tarea programada que este pesaje cumplió; nulo si se registró sin programar. */
+    @ColumnInfo(name = "id_tarea") public String idTarea;
 }

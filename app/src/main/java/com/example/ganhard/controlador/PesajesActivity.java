@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.example.ganhard.R;
 import com.example.ganhard.databinding.ActivityPesajesBinding;
 import com.example.ganhard.modelo.entidad.Animal;
+import com.example.ganhard.modelo.entidad.Tarea;
 import com.example.ganhard.modelo.entidad.Pesaje;
 import com.example.ganhard.modelo.nucleo.Callback;
 import com.example.ganhard.modelo.nucleo.ErrorModelo;
@@ -34,7 +35,8 @@ public class PesajesActivity extends BaseActivity {
         vista.lista.setAdapter(adaptador);
         vista.registrarPesaje.setOnClickListener(v -> registrar());
         vista.reintentar.setOnClickListener(v -> cargar());
-        vista.filaProgramar.setHabilitada(false);
+        vista.filaProgramar.setOnClickListener(v -> startActivity(new Intent(this, TareaFormActivity.class)
+                .putExtra(TareaFormActivity.EXTRA_TIPO, Tarea.PESAJE).putExtra(TareaFormActivity.EXTRA_ID_ANIMAL, idAnimal)));
         if (idAnimal == null) noEncontrado();
         else cargarAnimal();
     }

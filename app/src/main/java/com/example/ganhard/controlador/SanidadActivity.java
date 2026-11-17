@@ -9,6 +9,7 @@ import com.example.ganhard.R;
 import com.example.ganhard.databinding.ActivitySanidadBinding;
 import com.example.ganhard.modelo.datos.AnimalResumen;
 import com.example.ganhard.modelo.datos.EventoSanitarioResumen;
+import com.example.ganhard.modelo.entidad.Tarea;
 import com.example.ganhard.modelo.nucleo.Callback;
 import com.example.ganhard.modelo.nucleo.ErrorModelo;
 import java.util.ArrayList;
@@ -51,7 +52,11 @@ public class SanidadActivity extends BaseActivity {
             startActivity(registro);
         });
         vista.reintentar.setOnClickListener(v -> cargar());
-        vista.filaProgramar.setHabilitada(false);
+        vista.filaProgramar.setOnClickListener(v -> {
+            Intent programar = new Intent(this, TareaFormActivity.class).putExtra(TareaFormActivity.EXTRA_TIPO, Tarea.SANIDAD);
+            if (idAnimal != null) programar.putExtra(TareaFormActivity.EXTRA_ID_ANIMAL, idAnimal);
+            startActivity(programar);
+        });
     }
 
     /** Se recarga al volver para reflejar lo registrado, corregido o anulado en otras pantallas. */

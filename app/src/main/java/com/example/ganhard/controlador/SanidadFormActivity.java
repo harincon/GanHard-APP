@@ -33,12 +33,15 @@ import java.util.UUID;
 public class SanidadFormActivity extends FormularioActivity {
     public static final String EXTRA_ID_ANIMAL = "id_animal";
     public static final String EXTRA_ID_EVENTO = "id_evento";
+    /** Tarea de sanidad que este registro cumple (RF17); sin ella, la actividad se registra sin programar. */
+    public static final String EXTRA_ID_TAREA = "id_tarea";
     private static final String ESTADO_ANIMAL = "animal_elegido", ESTADO_TIPO = "tipo_elegido";
     private static final String ESTADO_REGISTRO = "id_registro", ESTADO_CARGADO = "formulario_cargado";
 
     private ActivitySanidadFormBinding vista;
     private final List<AnimalResumen> animales = new ArrayList<>();
     private String idEvento;
+    private String idTarea;
     /** Animal y tipo elegidos, como los entiende el Modelo; lo que se ve en pantalla son sus nombres. */
     private String idAnimal = "", tipo = "";
     private boolean animalFijo;
@@ -62,6 +65,7 @@ public class SanidadFormActivity extends FormularioActivity {
         configurarToolbar(vista.toolbar, true);
         prepararFormulario(vista.progreso, vista.guardar, vista.mensaje);
         idEvento = getIntent().getStringExtra(EXTRA_ID_EVENTO);
+        idTarea = getIntent().getStringExtra(EXTRA_ID_TAREA);
         String animalRecibido = getIntent().getStringExtra(EXTRA_ID_ANIMAL);
         animalFijo = !esCorreccion() && animalRecibido != null;
         fechaInicial = FormatoFecha.aPantalla(Tiempo.hoy().toString());
@@ -185,6 +189,12 @@ public class SanidadFormActivity extends FormularioActivity {
             @Override public void error(ErrorModelo error) {
                 if (!disponible()) return;
                 terminarGuardado();
+                if (ErrorModelo.TAREA.equals(error.faltante)) {
+                    Toast.makeText(getApplicationContext(), R.string.tarea_no_encontrada, Toast.LENGTH_SHORT).show();
+                    finish();
+                    return;
+                }
+                if (error.campos.containsKey(Campos.ESTADO)) { mensaje(R.string.tarea_no_pendiente); return; }
                 if (error.tipo == ErrorModelo.Tipo.NO_ENCONTRADO) {
                     if (ErrorModelo.FINCA.equals(error.faltante)) irAConfiguracion(); else noEncontrada();
                     return;
@@ -193,7 +203,7 @@ public class SanidadFormActivity extends FormularioActivity {
             }
         };
         if (esCorreccion()) app().sanidad().corregir(idEvento, entrada, texto(vista.motivo), resultado);
-        else app().sanidad().registrar(idRegistro, idAnimal, entrada, resultado);
+        else app().sanidad().registrar(idRegistro, idAnimal, entrada, idTarea, resultado);
     }
 
     private EntradaSanidad entrada() {

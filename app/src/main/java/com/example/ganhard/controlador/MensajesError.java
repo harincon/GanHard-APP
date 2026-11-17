@@ -24,6 +24,8 @@ public final class MensajesError {
             case FECHA_POSTERIOR: return contexto.getString(R.string.error_fecha_posterior);
             case DUPLICADO: return contexto.getString(R.string.error_duplicado);
             case SIN_CAMBIOS: return contexto.getString(R.string.error_sin_cambios);
+            case NO_PENDIENTE: return contexto.getString(R.string.error_no_pendiente);
+            case ANIMAL_INACTIVO: return contexto.getString(R.string.error_animal_inactivo);
             default: return contexto.getString(R.string.error_valor_invalido);
         }
     }
@@ -73,6 +75,11 @@ public final class MensajesError {
             case Campos.ID_ANIMAL: if (codigo == CodigoError.OBLIGATORIO) return contexto.getString(R.string.error_animal_obligatorio); break;
             case Campos.TIPO: if (codigo == CodigoError.OBLIGATORIO) return contexto.getString(R.string.error_tipo_obligatorio); break;
             case Campos.DESCRIPCION: if (codigo == CodigoError.OBLIGATORIO) return contexto.getString(R.string.error_descripcion_obligatoria); break;
+            case Campos.TITULO: if (codigo == CodigoError.OBLIGATORIO) return contexto.getString(R.string.error_titulo_obligatorio); break;
+            case Campos.FECHA_PROGRAMADA:
+                if (codigo == CodigoError.OBLIGATORIO) return contexto.getString(R.string.error_fecha_obligatoria);
+                if (codigo == CodigoError.FORMATO) return contexto.getString(R.string.error_fecha_formato);
+                break;
             case Campos.CATEGORIA: if (codigo == CodigoError.OBLIGATORIO) return contexto.getString(R.string.error_categoria_obligatoria); break;
             case Campos.CONCEPTO: if (codigo == CodigoError.OBLIGATORIO) return contexto.getString(R.string.error_concepto_obligatorio); break;
             case Campos.VALOR:

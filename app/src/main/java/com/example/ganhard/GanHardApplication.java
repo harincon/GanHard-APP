@@ -11,6 +11,7 @@ import com.example.ganhard.modelo.repositorio.GastoRepository;
 import com.example.ganhard.modelo.repositorio.HistorialRepository;
 import com.example.ganhard.modelo.repositorio.PesajeRepository;
 import com.example.ganhard.modelo.repositorio.SanidadRepository;
+import com.example.ganhard.modelo.repositorio.TareaRepository;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -23,6 +24,7 @@ public class GanHardApplication extends Application {
     private HistorialRepository historial;
     private SanidadRepository sanidad;
     private GastoRepository gastos;
+    private TareaRepository tareas;
     @Override public void onCreate() {
         super.onCreate();
         PreferenciaTema.aplicar(this);
@@ -37,6 +39,7 @@ public class GanHardApplication extends Application {
         historial = new HistorialRepository(database, ejecutor);
         sanidad = new SanidadRepository(database, ejecutor);
         gastos = new GastoRepository(database, ejecutor);
+        tareas = new TareaRepository(database, ejecutor);
     }
     public EjecutorModelo ejecutor() { return ejecutor; }
     public ConfiguracionRepository configuracion() { return configuracion; }
@@ -45,4 +48,5 @@ public class GanHardApplication extends Application {
     public HistorialRepository historial() { return historial; }
     public SanidadRepository sanidad() { return sanidad; }
     public GastoRepository gastos() { return gastos; }
+    public TareaRepository tareas() { return tareas; }
 }

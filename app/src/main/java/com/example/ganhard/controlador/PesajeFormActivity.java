@@ -28,12 +28,15 @@ import java.util.UUID;
  */
 public class PesajeFormActivity extends FormularioActivity {
     public static final String EXTRA_ID_ANIMAL = "id_animal";
+    /** Tarea de pesaje que este registro cumple (RF17); sin ella, el pesaje se registra sin programar. */
+    public static final String EXTRA_ID_TAREA = "id_tarea";
     private static final String ESTADO_FECHA_INICIAL = "fecha_inicial";
     private static final String ESTADO_HORA_INICIAL = "hora_inicial";
     private static final String ESTADO_REGISTRO = "id_registro";
 
     private ActivityPesajeFormBinding vista;
     private String idAnimal;
+    private String idTarea;
     /** Id del pesaje nuevo: se genera al abrir y se conserva al rotar para que guardar dos veces no duplique. */
     private String idRegistro;
     private String fechaInicial, horaInicial;
@@ -46,6 +49,7 @@ public class PesajeFormActivity extends FormularioActivity {
         configurarToolbar(vista.toolbar, true);
         prepararFormulario(vista.progreso, vista.guardar, vista.mensaje);
         idAnimal = getIntent().getStringExtra(EXTRA_ID_ANIMAL);
+        idTarea = getIntent().getStringExtra(EXTRA_ID_TAREA);
         idRegistro = estado == null ? null : estado.getString(ESTADO_REGISTRO);
         if (idRegistro == null) idRegistro = UUID.randomUUID().toString();
         if (estado == null) {
@@ -99,7 +103,7 @@ public class PesajeFormActivity extends FormularioActivity {
         if (guardando) return;
         EntradaPesaje entrada = new EntradaPesaje(FormatoFecha.aIso(texto(vista.fecha)), texto(vista.hora), texto(vista.peso), texto(vista.observaciones));
         empezarGuardado();
-        app().pesajes().registrar(idRegistro, idAnimal, entrada, new Callback<Pesaje>() {
+        app().pesajes().registrar(idRegistro, idAnimal, entrada, idTarea, new Callback<Pesaje>() {
             @Override public void exito(Pesaje pesaje) {
                 if (!disponible()) return;
                 guardando = false;
@@ -110,7 +114,9 @@ public class PesajeFormActivity extends FormularioActivity {
             @Override public void error(ErrorModelo error) {
                 if (!disponible()) return;
                 terminarGuardado();
+                if (ErrorModelo.TAREA.equals(error.faltante)) { tareaNoEncontrada(); return; }
                 if (error.tipo == ErrorModelo.Tipo.NO_ENCONTRADO) { noEncontrado(); return; }
+                if (error.campos.containsKey(Campos.ESTADO)) { mensaje(R.string.tarea_no_pendiente); return; }
                 mostrarError(error, R.string.error_guardado_pesaje);
             }
         });
@@ -138,6 +144,11 @@ public class PesajeFormActivity extends FormularioActivity {
     @Override protected boolean hayCambios() {
         return !texto(vista.peso).trim().isEmpty() || !texto(vista.observaciones).trim().isEmpty()
                 || !texto(vista.fecha).trim().equals(fechaInicial) || !texto(vista.hora).trim().equals(horaInicial);
+    }
+
+    private void tareaNoEncontrada() {
+        Toast.makeText(getApplicationContext(), R.string.tarea_no_encontrada, Toast.LENGTH_SHORT).show();
+        finish();
     }
 
     private void noEncontrado() {

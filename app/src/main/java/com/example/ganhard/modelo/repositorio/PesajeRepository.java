@@ -4,6 +4,7 @@ import com.example.ganhard.modelo.datos.GanHardDatabase;
 import com.example.ganhard.modelo.entidad.Animal;
 import com.example.ganhard.modelo.entidad.HistorialCambio;
 import com.example.ganhard.modelo.entidad.Pesaje;
+import com.example.ganhard.modelo.entidad.Tarea;
 import com.example.ganhard.modelo.nucleo.Callback;
 import com.example.ganhard.modelo.nucleo.EjecutorModelo;
 import com.example.ganhard.modelo.nucleo.ErrorModelo;
@@ -47,6 +48,15 @@ public final class PesajeRepository {
      * si el id ya existe devuelve el pesaje guardado, así repetir la solicitud (por ejemplo tras rotar) no duplica.
      */
     public void registrar(String idPesaje, String idAnimal, EntradaPesaje entrada, Callback<Pesaje> callback) {
+        registrar(idPesaje, idAnimal, entrada, null, callback);
+    }
+
+    /**
+     * Igual que el anterior, pero para cumplir una tarea de pesaje (RF17): en la misma transacción el pesaje se guarda
+     * con su {@code id_tarea} y la tarea queda completada en la fecha del pesaje. Si la tarea no existe, ya no está
+     * pendiente o no es de ese animal y de tipo pesaje, no se guarda nada.
+     */
+    public void registrar(String idPesaje, String idAnimal, EntradaPesaje entrada, String idTarea, Callback<Pesaje> callback) {
         ejecutor.ejecutar(() -> {
             Pesaje existente = db.pesajeDao().porId(idPesaje);
             if (existente != null) return existente;
@@ -62,7 +72,16 @@ public final class PesajeRepository {
             pesaje.actualizadoEn = ahora;
             HistorialCambio creacion = registro.preparar(HistorialCambio.PESAJE, idPesaje, HistorialCambio.CREAR,
                     null, ValoresCambio.de(pesaje), null, null, ahora);
-            registro.guardar(() -> db.pesajeDao().insertar(pesaje), creacion);
+            if (idTarea == null || idTarea.trim().isEmpty()) {
+                registro.guardar(() -> db.pesajeDao().insertar(pesaje), creacion);
+                return pesaje;
+            }
+            pesaje.idTarea = idTarea;
+            CierreTarea cierre = CierreTarea.preparar(db, registro, idTarea, Tarea.PESAJE, idAnimal, pesaje.fecha, ahora);
+            registro.guardar(() -> {
+                db.pesajeDao().insertar(pesaje);
+                db.tareaDao().actualizar(cierre.tarea);
+            }, creacion, cierre.cambio);
             return pesaje;
         }, callback);
     }

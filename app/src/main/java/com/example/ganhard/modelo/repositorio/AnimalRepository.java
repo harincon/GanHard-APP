@@ -6,6 +6,7 @@ import com.example.ganhard.modelo.datos.GanHardDatabase;
 import com.example.ganhard.modelo.entidad.Animal;
 import com.example.ganhard.modelo.entidad.HistorialCambio;
 import com.example.ganhard.modelo.entidad.Raza;
+import com.example.ganhard.modelo.entidad.Tarea;
 import com.example.ganhard.modelo.nucleo.Callback;
 import com.example.ganhard.modelo.nucleo.EjecutorModelo;
 import com.example.ganhard.modelo.nucleo.ErrorModelo;
@@ -109,10 +110,23 @@ public final class AnimalRepository {
                         estadoAntes, ValoresCambio.estado(animal), null, animal.fechaEstado, ahora));
             }
             animal.actualizadoEn = ahora;
+            // RN08: un animal vendido o fallecido deja de tener actividades programadas.
+            List<Tarea> aCancelar = new ArrayList<>();
+            if (!estadoSinCambio && !Animal.ACTIVO.equals(animal.estado)) {
+                for (Tarea tarea : db.tareaDao().pendientesDelAnimal(idAnimal)) {
+                    JSONObject antes = ValoresCambio.estadoTarea(tarea);
+                    tarea.estado = Tarea.CANCELADA;
+                    tarea.actualizadoEn = ahora;
+                    cambios.add(registro.preparar(HistorialCambio.TAREA, tarea.idTarea, HistorialCambio.CAMBIAR_ESTADO,
+                            antes, ValoresCambio.estadoTarea(tarea), null, animal.fechaEstado, ahora));
+                    aCancelar.add(tarea);
+                }
+            }
             try {
                 registro.guardar(() -> {
                     db.animalDao().actualizar(animal);
                     db.pesajeDao().recalcularAntecedentes(animal.idAnimal, animal.fechaIngreso);
+                    for (Tarea tarea : aCancelar) db.tareaDao().actualizar(tarea);
                 }, cambios.toArray(new HistorialCambio[0]));
             } catch (SQLiteConstraintException ex) {
                 throw errorDeRestriccion(ex);

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/raiz" android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical" android:background="@color/gh_background">
+    <com.google.android.material.appbar.MaterialToolbar android:id="@+id/toolbar" style="@style/Gh.Toolbar"
+        android:layout_width="match_parent" android:layout_height="wrap_content" app:title="@string/modulo_tareas" />
+    <ProgressBar android:id="@+id/progreso" style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent" android:layout_height="4dp" android:indeterminate="true" android:visibility="invisible" />
+    <TextView android:id="@+id/tareasCabecera" android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/gh_margen" android:layout_marginEnd="@dimen/gh_margen" android:layout_marginTop="@dimen/gh_margen"
+        android:textAppearance="@style/Gh.Titulo" android:visibility="gone" />
+    <RadioGroup android:id="@+id/filtros" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal"
+        android:paddingStart="@dimen/gh_margen" android:paddingEnd="@dimen/gh_margen" android:paddingTop="8dp" android:paddingBottom="8dp"
+        android:contentDescription="@string/filtro_estado_tarea">
+        <com.google.android.material.radiobutton.MaterialRadioButton android:id="@+id/filtroPendientes" style="@style/Gh.Filtro"
+            android:layout_width="wrap_content" android:layout_height="wrap_content" android:checked="true" android:text="@string/filtro_pendientes" />
+        <com.google.android.material.radiobutton.MaterialRadioButton android:id="@+id/filtroCompletadas" style="@style/Gh.Filtro"
+            android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/filtro_completadas" />
+        <com.google.android.material.radiobutton.MaterialRadioButton android:id="@+id/filtroCanceladas" style="@style/Gh.Filtro"
+            android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/filtro_canceladas" />
+    </RadioGroup>
+    <FrameLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
+        <androidx.recyclerview.widget.RecyclerView android:id="@+id/lista" android:layout_width="match_parent" android:layout_height="match_parent"
+            android:clipToPadding="false" android:paddingBottom="8dp" android:visibility="gone" />
+        <LinearLayout android:id="@+id/estadoVacio" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_gravity="center"
+            android:orientation="vertical" android:padding="24dp" android:gravity="center_horizontal" android:visibility="gone">
+            <TextView android:id="@+id/mensajeVacio" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center"
+                android:textSize="16sp" android:textColor="@color/gh_muted" />
+        </LinearLayout>
+        <LinearLayout android:id="@+id/estadoError" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_gravity="center"
+            android:orientation="vertical" android:padding="24dp" android:gravity="center_horizontal" android:visibility="gone">
+            <TextView android:id="@+id/mensajeError" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center"
+                android:textSize="16sp" android:textColor="@color/gh_muted" android:accessibilityLiveRegion="polite" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/reintentar" style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="wrap_content" android:layout_height="wrap_content" android:minHeight="48dp" android:text="@string/reintentar" />
+        </LinearLayout>
+    </FrameLayout>
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="@dimen/gh_margen">
+        <com.google.android.material.button.MaterialButton android:id="@+id/programarTarea" style="@style/Gh.Boton"
+            android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/programar_tarea" />
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp"
+            android:text="@string/nota_tareas" android:textSize="12sp" android:textColor="@color/gh_muted" />
+    </LinearLayout>
+</LinearLayout>

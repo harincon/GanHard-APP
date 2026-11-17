@@ -123,4 +123,25 @@ public final class Migraciones {
             db.execSQL("CREATE INDEX IF NOT EXISTS `index_gasto_id_finca_fecha` ON `gasto` (`id_finca`, `fecha`)");
         }
     };
+
+    /**
+     * Agrega las tareas y el enlace de un pesaje o una actividad sanitaria con la tarea que cumplieron. Los
+     * registros existentes quedan sin tarea.
+     */
+    public static final Migration V5_V6 = new Migration(5, 6) {
+        @Override public void migrate(@NonNull SupportSQLiteDatabase db) {
+            db.execSQL("CREATE TABLE IF NOT EXISTS `tarea` (`id_tarea` TEXT NOT NULL, `id_finca` TEXT NOT NULL, `id_animal` TEXT, "
+                    + "`tipo` TEXT NOT NULL, `titulo` TEXT NOT NULL, `descripcion` TEXT, `fecha_programada` TEXT NOT NULL, `estado` TEXT NOT NULL, "
+                    + "`fecha_completada` TEXT, `creado_en` TEXT NOT NULL, `actualizado_en` TEXT NOT NULL, `version` INTEGER NOT NULL, "
+                    + "PRIMARY KEY(`id_tarea`), "
+                    + "FOREIGN KEY(`id_finca`) REFERENCES `finca`(`id_finca`) ON UPDATE NO ACTION ON DELETE RESTRICT , "
+                    + "FOREIGN KEY(`id_animal`) REFERENCES `animal`(`id_animal`) ON UPDATE NO ACTION ON DELETE RESTRICT )");
+            db.execSQL("CREATE INDEX IF NOT EXISTS `index_tarea_id_finca_estado_fecha_programada` ON `tarea` (`id_finca`, `estado`, `fecha_programada`)");
+            db.execSQL("CREATE INDEX IF NOT EXISTS `index_tarea_id_animal` ON `tarea` (`id_animal`)");
+            db.execSQL("ALTER TABLE `pesaje` ADD COLUMN `id_tarea` TEXT REFERENCES `tarea`(`id_tarea`) ON UPDATE NO ACTION ON DELETE RESTRICT");
+            db.execSQL("CREATE INDEX IF NOT EXISTS `index_pesaje_id_tarea` ON `pesaje` (`id_tarea`)");
+            db.execSQL("ALTER TABLE `evento_sanitario` ADD COLUMN `id_tarea` TEXT REFERENCES `tarea`(`id_tarea`) ON UPDATE NO ACTION ON DELETE RESTRICT");
+            db.execSQL("CREATE INDEX IF NOT EXISTS `index_evento_sanitario_id_tarea` ON `evento_sanitario` (`id_tarea`)");
+        }
+    };
 }

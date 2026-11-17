@@ -5,6 +5,7 @@ import com.example.ganhard.R;
 import com.example.ganhard.modelo.entidad.Animal;
 import com.example.ganhard.modelo.entidad.EventoSanitario;
 import com.example.ganhard.modelo.entidad.Gasto;
+import com.example.ganhard.modelo.entidad.Tarea;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
@@ -21,6 +22,28 @@ final class Presentacion {
 
     static String sexo(Context contexto, String sexo) {
         return contexto.getString(Animal.MACHO.equals(sexo) ? R.string.sexo_macho : R.string.sexo_hembra);
+    }
+
+    /** Nombre visible del tipo de tarea; uno que esta versión no conoce se muestra tal cual. */
+    static String tipoTarea(Context contexto, String tipo) {
+        if (tipo == null) return "";
+        switch (tipo) {
+            case Tarea.GENERAL: return contexto.getString(R.string.tarea_tipo_general);
+            case Tarea.PESAJE: return contexto.getString(R.string.tarea_tipo_pesaje);
+            case Tarea.SANIDAD: return contexto.getString(R.string.tarea_tipo_sanidad);
+            default: return tipo;
+        }
+    }
+
+    /** Nombre visible del estado de una tarea; uno que esta versión no conoce se muestra tal cual. */
+    static String estadoTarea(Context contexto, String estado) {
+        if (estado == null) return "";
+        switch (estado) {
+            case Tarea.PENDIENTE: return contexto.getString(R.string.tarea_estado_pendiente);
+            case Tarea.COMPLETADA: return contexto.getString(R.string.tarea_estado_completada);
+            case Tarea.CANCELADA: return contexto.getString(R.string.tarea_estado_cancelada);
+            default: return estado;
+        }
     }
 
     /** Nombre visible de la categoría de un gasto; una categoría que esta versión no conoce se muestra tal cual. */

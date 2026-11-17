@@ -7,6 +7,8 @@ import android.widget.Toast;
 import com.example.ganhard.R;
 import com.example.ganhard.databinding.ActivityDetalleAnimalBinding;
 import com.example.ganhard.modelo.datos.EventoSanitarioResumen;
+import com.example.ganhard.modelo.datos.TareaResumen;
+import com.example.ganhard.modelo.entidad.Tarea;
 import com.example.ganhard.modelo.entidad.Animal;
 import com.example.ganhard.modelo.entidad.Pesaje;
 import com.example.ganhard.modelo.entidad.Raza;
@@ -37,7 +39,7 @@ public class DetalleAnimalActivity extends BaseActivity {
         vista.filaEditar.setOnClickListener(v -> abrir(AnimalFormActivity.class));
         vista.filaCambios.setOnClickListener(v -> abrir(HistorialActivity.class));
         vista.filaSanidad.setOnClickListener(v -> abrir(SanidadActivity.class));
-        vista.filaTareas.setHabilitada(false);
+        vista.filaTareas.setOnClickListener(v -> abrir(TareasActivity.class));
         if (idAnimal == null) noEncontrado();
     }
 
@@ -120,6 +122,7 @@ public class DetalleAnimalActivity extends BaseActivity {
         }
         vista.toolbar.setTitle(R.string.ficha_animal);
         cargarSanidad();
+        cargarTareas();
     }
 
     private void abrir(Class<?> pantalla) {
@@ -133,6 +136,18 @@ public class DetalleAnimalActivity extends BaseActivity {
                 if (!disponible()) return;
                 vista.filaSanidad.setSubtitulo(actividades.isEmpty() ? getString(R.string.sin_actividades)
                         : getResources().getQuantityString(R.plurals.actividades_sanitarias, actividades.size(), actividades.size()));
+            }
+            @Override public void error(ErrorModelo error) { /* El subtítulo fijo del diseño ya explica la fila. */ }
+        });
+    }
+
+    /** Cuenta las tareas pendientes del animal para el subtítulo de su fila; si falla, la fila sigue sirviendo. */
+    private void cargarTareas() {
+        app().tareas().listar(Tarea.PENDIENTE, idAnimal, new Callback<List<TareaResumen>>() {
+            @Override public void exito(List<TareaResumen> tareas) {
+                if (!disponible()) return;
+                vista.filaTareas.setSubtitulo(tareas.isEmpty() ? getString(R.string.sin_tareas_pendientes)
+                        : getResources().getQuantityString(R.plurals.tareas_pendientes, tareas.size(), tareas.size()));
             }
             @Override public void error(ErrorModelo error) { /* El subtítulo fijo del diseño ya explica la fila. */ }
         });

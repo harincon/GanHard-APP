@@ -5,6 +5,7 @@ import com.example.ganhard.modelo.datos.GanHardDatabase;
 import com.example.ganhard.modelo.entidad.Animal;
 import com.example.ganhard.modelo.entidad.EventoSanitario;
 import com.example.ganhard.modelo.entidad.HistorialCambio;
+import com.example.ganhard.modelo.entidad.Tarea;
 import com.example.ganhard.modelo.nucleo.Callback;
 import com.example.ganhard.modelo.nucleo.EjecutorModelo;
 import com.example.ganhard.modelo.nucleo.ErrorModelo;
@@ -40,6 +41,15 @@ public final class SanidadRepository {
      * devuelve la guardada, de modo que repetir la solicitud (por ejemplo tras rotar) no duplica.
      */
     public void registrar(String idEvento, String idAnimal, EntradaSanidad entrada, Callback<EventoSanitario> callback) {
+        registrar(idEvento, idAnimal, entrada, null, callback);
+    }
+
+    /**
+     * Igual que el anterior, pero para cumplir una tarea de sanidad (RF17): en la misma transacción la actividad se
+     * guarda con su {@code id_tarea} y la tarea queda completada en la fecha de la actividad. Si la tarea no existe, ya
+     * no está pendiente o no es de ese animal y de tipo sanidad, no se guarda nada.
+     */
+    public void registrar(String idEvento, String idAnimal, EntradaSanidad entrada, String idTarea, Callback<EventoSanitario> callback) {
         ejecutor.ejecutar(() -> {
             EventoSanitario existente = db.eventoSanitarioDao().porId(idEvento);
             if (existente != null) return existente;
@@ -58,7 +68,16 @@ public final class SanidadRepository {
             evento.actualizadoEn = ahora;
             HistorialCambio creacion = registro.preparar(HistorialCambio.EVENTO_SANITARIO, idEvento, HistorialCambio.CREAR,
                     null, ValoresCambio.de(evento), null, null, ahora);
-            registro.guardar(() -> db.eventoSanitarioDao().insertar(evento), creacion);
+            if (idTarea == null || idTarea.trim().isEmpty()) {
+                registro.guardar(() -> db.eventoSanitarioDao().insertar(evento), creacion);
+                return evento;
+            }
+            evento.idTarea = idTarea;
+            CierreTarea cierre = CierreTarea.preparar(db, registro, idTarea, Tarea.SANIDAD, idAnimal, evento.fecha, ahora);
+            registro.guardar(() -> {
+                db.eventoSanitarioDao().insertar(evento);
+                db.tareaDao().actualizar(cierre.tarea);
+            }, creacion, cierre.cambio);
             return evento;
         }, callback);
     }

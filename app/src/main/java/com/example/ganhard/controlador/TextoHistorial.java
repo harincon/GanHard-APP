@@ -4,6 +4,7 @@ import android.content.Context;
 import com.example.ganhard.R;
 import com.example.ganhard.modelo.datos.HistorialResumen;
 import com.example.ganhard.modelo.entidad.HistorialCambio;
+import com.example.ganhard.modelo.entidad.Tarea;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -43,21 +44,31 @@ final class TextoHistorial {
 
     private static int hecho(HistorialCambio cambio) {
         boolean pesaje = HistorialCambio.PESAJE.equals(cambio.entidad), animal = HistorialCambio.ANIMAL.equals(cambio.entidad),
-                actividad = HistorialCambio.EVENTO_SANITARIO.equals(cambio.entidad), gasto = HistorialCambio.GASTO.equals(cambio.entidad);
+                actividad = HistorialCambio.EVENTO_SANITARIO.equals(cambio.entidad), gasto = HistorialCambio.GASTO.equals(cambio.entidad),
+                tarea = HistorialCambio.TAREA.equals(cambio.entidad);
         switch (cambio.accion) {
             case HistorialCambio.CREAR:
                 if (pesaje) return R.string.titulo_pesaje_registrado;
                 if (animal) return R.string.titulo_animal_registrado;
                 if (actividad) return R.string.titulo_sanidad_registrada;
                 if (gasto) return R.string.titulo_gasto_registrado;
+                if (tarea) return R.string.titulo_tarea_programada;
                 break;
             case HistorialCambio.EDITAR:
                 if (pesaje) return R.string.titulo_pesaje_corregido;
                 if (animal) return R.string.titulo_animal_editado;
                 if (actividad) return R.string.titulo_sanidad_corregida;
                 if (gasto) return R.string.titulo_gasto_corregido;
+                if (tarea) return R.string.titulo_tarea_corregida;
                 break;
-            case HistorialCambio.CAMBIAR_ESTADO: return R.string.titulo_estado_cambiado;
+            case HistorialCambio.CAMBIAR_ESTADO:
+                if (tarea) {
+                    JSONObject nuevos = leer(cambio.valoresNuevos);
+                    String estado = nuevos == null ? "" : nuevos.optString("estado");
+                    if (Tarea.COMPLETADA.equals(estado)) return R.string.titulo_tarea_completada;
+                    if (Tarea.CANCELADA.equals(estado)) return R.string.titulo_tarea_cancelada;
+                }
+                return R.string.titulo_estado_cambiado;
             case HistorialCambio.ANULAR:
                 if (pesaje) return R.string.titulo_pesaje_anulado;
                 if (actividad) return R.string.titulo_sanidad_anulada;
@@ -86,6 +97,7 @@ final class TextoHistorial {
         boolean pesaje = HistorialCambio.PESAJE.equals(cambio.entidad);
         boolean actividad = HistorialCambio.EVENTO_SANITARIO.equals(cambio.entidad);
         boolean gasto = HistorialCambio.GASTO.equals(cambio.entidad);
+        boolean tarea = HistorialCambio.TAREA.equals(cambio.entidad);
         switch (cambio.accion) {
             case HistorialCambio.EDITAR:
                 if (antes != null && ahora != null) {
@@ -99,10 +111,10 @@ final class TextoHistorial {
                 break;
             case HistorialCambio.CAMBIAR_ESTADO:
                 if (antes != null && antes.has("estado")) {
-                    lineas.add(contexto.getString(R.string.historial_antes, valor(contexto, "estado", antes.opt("estado"), razas)));
+                    lineas.add(contexto.getString(R.string.historial_antes, valor(contexto, tarea ? "estado_tarea" : "estado", antes.opt("estado"), razas)));
                 }
                 if (ahora != null && ahora.has("estado")) {
-                    lineas.add(contexto.getString(R.string.historial_ahora, valor(contexto, "estado", ahora.opt("estado"), razas)));
+                    lineas.add(contexto.getString(R.string.historial_ahora, valor(contexto, tarea ? "estado_tarea" : "estado", ahora.opt("estado"), razas)));
                 }
                 if (cambio.fechaEfectiva != null) lineas.add(contexto.getString(R.string.historial_desde, FormatoFecha.corta(cambio.fechaEfectiva)));
                 break;
@@ -115,6 +127,7 @@ final class TextoHistorial {
                 if (pesaje) medicion(contexto, ahora, lineas);
                 else if (actividad) actividad(contexto, ahora, lineas);
                 else if (gasto) gasto(contexto, ahora, lineas);
+                else if (tarea) tarea(contexto, ahora, lineas);
                 break;
             default: break;
         }
@@ -146,6 +159,14 @@ final class TextoHistorial {
                 FormatoFecha.corta(datos.optString("fecha"))));
     }
 
+    /** "Pesaje de Luna" y "Pesaje · 13 oct 2026": la tarea a la que se refiere la entrada. */
+    private static void tarea(Context contexto, JSONObject datos, List<String> lineas) {
+        if (datos == null || datos.isNull("titulo")) return;
+        lineas.add(datos.optString("titulo"));
+        lineas.add(contexto.getString(R.string.codigo_nombre, Presentacion.tipoTarea(contexto, datos.optString("tipo")),
+                FormatoFecha.corta(datos.optString("fecha_programada"))));
+    }
+
     private static JSONObject leer(String json) {
         if (json == null || json.isEmpty()) return null;
         try { return new JSONObject(json); }
@@ -173,6 +194,8 @@ final class TextoHistorial {
             case "categoria": return contexto.getString(R.string.campo_categoria);
             case "concepto": return contexto.getString(R.string.campo_concepto);
             case "valor_centavos": return contexto.getString(R.string.campo_valor);
+            case "titulo": return contexto.getString(R.string.campo_titulo);
+            case "fecha_programada": return contexto.getString(R.string.campo_fecha_programada);
             default: return clave;
         }
     }
@@ -184,7 +207,8 @@ final class TextoHistorial {
         switch (clave) {
             case "peso_kg":
                 return valor instanceof Number ? contexto.getString(R.string.peso_formato, Presentacion.kilos(((Number) valor).doubleValue())) : texto;
-            case "fecha": case "fecha_nacimiento": case "fecha_ingreso": case "fecha_estado": return FormatoFecha.corta(texto);
+            case "fecha": case "fecha_nacimiento": case "fecha_ingreso": case "fecha_estado": case "fecha_programada": return FormatoFecha.corta(texto);
+            case "estado_tarea": return Presentacion.estadoTarea(contexto, texto);
             case "hora": return FormatoFecha.hora12(texto);
             case "sexo": return Presentacion.sexo(contexto, texto);
             case "estado": return Presentacion.estado(contexto, texto);

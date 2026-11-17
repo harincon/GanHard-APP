@@ -12,8 +12,10 @@ import java.util.List;
 
 /** Actividad sanitaria efectivamente realizada a un animal. Una actividad futura es una tarea, no un evento. */
 @Entity(tableName = "evento_sanitario",
-        foreignKeys = @ForeignKey(entity = Animal.class, parentColumns = "id_animal", childColumns = "id_animal", onDelete = ForeignKey.RESTRICT),
-        indices = @Index(value = {"id_animal", "fecha"}))
+        foreignKeys = {
+                @ForeignKey(entity = Animal.class, parentColumns = "id_animal", childColumns = "id_animal", onDelete = ForeignKey.RESTRICT),
+                @ForeignKey(entity = Tarea.class, parentColumns = "id_tarea", childColumns = "id_tarea", onDelete = ForeignKey.RESTRICT)},
+        indices = {@Index(value = {"id_animal", "fecha"}), @Index("id_tarea")})
 public class EventoSanitario {
     public static final String VACUNACION = "VACUNACION", DESPARASITACION = "DESPARASITACION", REVISION = "REVISION",
             TRATAMIENTO = "TRATAMIENTO", OTRO = "OTRO";
@@ -34,4 +36,6 @@ public class EventoSanitario {
     @NonNull @ColumnInfo(name = "creado_en") public String creadoEn = "";
     @NonNull @ColumnInfo(name = "actualizado_en") public String actualizadoEn = "";
     public int version = 0;
+    /** Tarea programada que esta actividad cumplió; nulo si se registró sin programar. */
+    @ColumnInfo(name = "id_tarea") public String idTarea;
 }
