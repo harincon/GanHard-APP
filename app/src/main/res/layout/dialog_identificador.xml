@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical"
+    android:paddingStart="24dp" android:paddingEnd="24dp" android:paddingTop="8dp">
+    <com.google.android.material.textfield.TextInputLayout android:id="@+id/campoTipo"
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu" android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:hint="@string/identificador_tipo_hint" android:layout_marginBottom="12dp">
+        <com.google.android.material.textfield.MaterialAutoCompleteTextView android:id="@+id/tipo" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:inputType="none" android:importantForAutofill="no" />
+    </com.google.android.material.textfield.TextInputLayout>
+    <com.google.android.material.textfield.TextInputLayout android:id="@+id/campoHierro"
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu" android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:hint="@string/hierro_hint_obligatorio">
+        <com.google.android.material.textfield.MaterialAutoCompleteTextView android:id="@+id/hierro" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:inputType="none" android:importantForAutofill="no" />
+    </com.google.android.material.textfield.TextInputLayout>
+    <com.google.android.material.textfield.TextInputLayout android:id="@+id/campoValor"
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox" android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:hint="@string/identificador_valor_hint" android:visibility="gone">
+        <com.google.android.material.textfield.TextInputEditText android:id="@+id/valor" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:inputType="textCapCharacters" android:maxLength="50" android:maxLines="1" android:imeOptions="actionDone" android:importantForAutofill="no" />
+    </com.google.android.material.textfield.TextInputLayout>
+</LinearLayout>

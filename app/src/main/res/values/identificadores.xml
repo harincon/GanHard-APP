@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Código automático -->
+    <string name="codigo_automatico_nuevo">El código se asignará automáticamente al guardar (GH-001, GH-002…).</string>
+    <string name="codigo_automatico_existente">Código: %1$s</string>
+
+    <!-- Identificadores del animal -->
+    <string name="identificadores_titulo">Identificadores</string>
+    <string name="hierro_hint_obligatorio">Hierro *</string>
+    <string name="hierro_hint_opcional">Hierro</string>
+    <string name="hierro_nuevo_opcion">+ Nuevo hierro…</string>
+    <string name="identificador_agregar">+ Agregar identificador</string>
+    <string name="identificador_quitar">Quitar</string>
+    <string name="identificador_quitar_descripcion">Quitar el identificador %1$s</string>
+    <string name="identificador_tipo_hint">Tipo</string>
+    <string name="identificador_valor_hint">Número o valor *</string>
+    <string name="identificador_dialogo_titulo">Agregar identificador</string>
+    <string name="identificador_dialogo_agregar">Agregar</string>
+    <string name="identificador_tipo_hierro">Hierro</string>
+    <string name="identificador_tipo_arete">Arete</string>
+    <string name="identificador_tipo_numero">Otro número</string>
+    <string name="identificador_linea">%1$s: %2$s</string>
+    <string name="ficha_sin_hierro">Hierro: sin registrar</string>
+    <string name="sexo_raza_hierro">%1$s · %2$s · %3$s</string>
+    <string name="error_hierro_obligatorio">Elige al menos un hierro. Si todavía no hay ninguno, crea uno nuevo.</string>
+    <string name="error_hierro_invalido">Ese hierro ya no está disponible. Elige otro.</string>
+    <string name="error_hierro_duplicado">Ya existe un hierro con ese nombre.</string>
+    <string name="error_hierro_nombre_obligatorio">Escribe el nombre del hierro.</string>
+    <string name="hierro_error_guardado">No se pudo guardar el hierro. Inténtalo de nuevo.</string>
+    <string name="error_identificadores_maximo">Un animal puede tener hasta %1$d identificadores.</string>
+    <string name="error_identificador_valor">Escribe el valor del identificador.</string>
+    <string name="error_identificador_largo">El valor puede tener hasta %1$d caracteres.</string>
+    <string name="error_identificador_invalido">Revisa los identificadores del animal.</string>
+
+    <!-- Hierros de la finca -->
+    <string name="hierros_fila">Hierros de la finca</string>
+    <string name="hierros_fila_sub">Marcas que se eligen en cada animal</string>
+    <string name="hierros_titulo">Hierros de la finca</string>
+    <string name="hierros_agregar">Agregar hierro</string>
+    <string name="hierros_vacio">Todavía no hay hierros. Agrega el de tu finca para poder registrar animales.</string>
+    <string name="hierros_explicacion">Un hierro se registra una vez y se elige en cada animal. Si ya no se usa, se desactiva: deja de ofrecerse para animales nuevos, pero se sigue viendo en los que ya lo tienen.</string>
+    <string name="hierro_nuevo_titulo">Nuevo hierro</string>
+    <string name="hierro_editar_titulo">Editar hierro</string>
+    <string name="hierro_nombre_hint">Nombre *</string>
+    <string name="hierro_descripcion_hint">Descripción</string>
+    <string name="hierro_descripcion_ayuda">Por ejemplo: hierro propio o finca de procedencia.</string>
+    <string name="hierro_guardar">Guardar</string>
+    <string name="hierro_desactivar">Desactivar</string>
+    <string name="hierro_reactivar">Reactivar</string>
+    <string name="hierro_desactivado_etiqueta">Desactivado</string>
+    <string name="hierro_activo_etiqueta">Activo</string>
+    <string name="hierro_guardado">Hierro guardado.</string>
+    <string name="hierro_desactivado">Hierro desactivado.</string>
+    <string name="hierro_reactivado">Hierro reactivado.</string>
+    <string name="hierro_no_encontrado">No se encontró el hierro.</string>
+
+    <!-- Historial -->
+    <string name="campo_identificadores">Identificadores</string>
+    <string name="titulo_hierro_registrado">Hierro registrado</string>
+    <string name="titulo_hierro_editado">Hierro editado</string>
+    <string name="titulo_hierro_desactivado">Hierro desactivado</string>
+    <string name="titulo_hierro_reactivado">Hierro reactivado</string>
+</resources>

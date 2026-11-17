@@ -151,4 +151,21 @@ public final class Migraciones {
             db.execSQL("ALTER TABLE `finca` ADD COLUMN `vinculada_en` TEXT");
         }
     };
+
+    /** Agrega el catálogo de hierros y los identificadores de los animales; no toca lo existente (los animales quedan sin hierro). */
+    public static final Migration V7_V8 = new Migration(7, 8) {
+        @Override public void migrate(@NonNull SupportSQLiteDatabase db) {
+            db.execSQL("CREATE TABLE IF NOT EXISTS `hierro` (`id_hierro` TEXT NOT NULL, `id_finca` TEXT NOT NULL, `nombre` TEXT NOT NULL COLLATE NOCASE, "
+                    + "`descripcion` TEXT, `activo` INTEGER NOT NULL, `creado_en` TEXT NOT NULL, `actualizado_en` TEXT NOT NULL, `version` INTEGER NOT NULL, "
+                    + "PRIMARY KEY(`id_hierro`), FOREIGN KEY(`id_finca`) REFERENCES `finca`(`id_finca`) ON UPDATE NO ACTION ON DELETE RESTRICT )");
+            db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_hierro_id_finca_nombre` ON `hierro` (`id_finca`, `nombre`)");
+            db.execSQL("CREATE TABLE IF NOT EXISTS `animal_identificador` (`id_animal_identificador` TEXT NOT NULL, `id_animal` TEXT NOT NULL, `tipo` TEXT NOT NULL, "
+                    + "`id_hierro` TEXT, `valor` TEXT, `orden` INTEGER NOT NULL, `creado_en` TEXT NOT NULL, `actualizado_en` TEXT NOT NULL, "
+                    + "PRIMARY KEY(`id_animal_identificador`), "
+                    + "FOREIGN KEY(`id_animal`) REFERENCES `animal`(`id_animal`) ON UPDATE NO ACTION ON DELETE RESTRICT , "
+                    + "FOREIGN KEY(`id_hierro`) REFERENCES `hierro`(`id_hierro`) ON UPDATE NO ACTION ON DELETE RESTRICT )");
+            db.execSQL("CREATE INDEX IF NOT EXISTS `index_animal_identificador_id_animal` ON `animal_identificador` (`id_animal`)");
+            db.execSQL("CREATE INDEX IF NOT EXISTS `index_animal_identificador_id_hierro` ON `animal_identificador` (`id_hierro`)");
+        }
+    };
 }

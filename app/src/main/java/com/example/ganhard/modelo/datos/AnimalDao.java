@@ -21,6 +21,10 @@ public abstract class AnimalDao {
     @Query("SELECT * FROM animal WHERE id_animal = :idAnimal")
     public abstract Animal porId(String idAnimal);
 
+    /** Todos los códigos de la finca, de cualquier estado, para calcular el siguiente. */
+    @Query("SELECT codigo FROM animal WHERE id_finca = :idFinca")
+    public abstract List<String> codigos(String idFinca);
+
     @Query("SELECT COUNT(*) FROM animal WHERE id_finca = :idFinca AND estado = 'ACTIVO'")
     public abstract int contarActivos(String idFinca);
 
@@ -29,6 +33,8 @@ public abstract class AnimalDao {
      * La búsqueda por texto la hace el repositorio, porque SQLite no ignora tildes ni mayúsculas fuera de ASCII.
      */
     @Query("SELECT a.id_animal, a.codigo, a.nombre, a.sexo, a.estado, r.nombre AS raza_nombre, "
+            + "(SELECT h.nombre FROM animal_identificador i JOIN hierro h ON h.id_hierro = i.id_hierro WHERE i.id_animal = a.id_animal "
+            + "AND i.tipo = 'HIERRO' ORDER BY i.orden, i.creado_en LIMIT 1) AS hierro_nombre, "
             + "(SELECT p.peso_kg FROM pesaje p WHERE p.id_animal = a.id_animal AND p.anulado = 0 "
             + "ORDER BY p.fecha DESC, COALESCE(p.hora, '') DESC, p.creado_en DESC LIMIT 1) AS ultimo_peso_kg, "
             + "(SELECT p.fecha FROM pesaje p WHERE p.id_animal = a.id_animal AND p.anulado = 0 "

@@ -7,7 +7,8 @@ Java y XML (Android Views), arquitectura MVC, base de datos local con Room.
 ## Qué hace hoy
 
 - Perfil del administrador y datos de la finca.
-- Registro, búsqueda, ficha y edición de animales, con estado activo, vendido o fallecido.
+- Registro, búsqueda, ficha y edición de animales, con estado activo, vendido o fallecido. El código se asigna solo (GH-001, GH-002…) y cada animal lleva su hierro, y si quieres aretes y otros números.
+- Catálogo de hierros de la finca (crear, editar, desactivar).
 - Registro e historial de pesajes por animal, con corrección y anulación con motivo.
 - Sanidad: actividades realizadas por animal (vacunas, desparasitaciones, revisiones, tratamientos), con corrección y anulación.
 - Gastos: egresos de la finca por mes con su total, con corrección y anulación.

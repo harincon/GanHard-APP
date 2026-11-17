@@ -25,6 +25,7 @@ public class AjustesActivity extends BaseActivity {
         configurarToolbar(vista.toolbar, true);
         vista.filaDatosFinca.setOnClickListener(v -> startActivity(new Intent(this, ConfiguracionActivity.class)));
         vista.filaCuenta.setOnClickListener(v -> startActivity(new Intent(this, CuentaActivity.class)));
+        vista.filaHierros.setOnClickListener(v -> startActivity(new Intent(this, HierrosActivity.class)));
         vista.filaTemaClaro.setOnClickListener(v -> elegirTema(AppCompatDelegate.MODE_NIGHT_NO));
         vista.filaTemaOscuro.setOnClickListener(v -> elegirTema(AppCompatDelegate.MODE_NIGHT_YES));
         vista.filaTemaSistema.setOnClickListener(v -> elegirTema(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM));

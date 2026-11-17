@@ -14,9 +14,12 @@ public final class ValidadorAnimal {
     /** El código se guarda sin espacios en los extremos; la unicidad por finca ignora mayúsculas. */
     public static String normalizarCodigo(String codigo) { return codigo == null ? "" : codigo.trim(); }
 
-    public static Map<String, ErrorCampo> validar(EntradaAnimal entrada, LocalDate hoy) {
+    public static Map<String, ErrorCampo> validar(EntradaAnimal entrada, LocalDate hoy) { return validar(entrada, hoy, true); }
+
+    /** Con {@code codigoObligatorio} falso (al registrar) el código puede ir vacío: el Modelo asigna el siguiente. */
+    public static Map<String, ErrorCampo> validar(EntradaAnimal entrada, LocalDate hoy, boolean codigoObligatorio) {
         Map<String, ErrorCampo> errores = new LinkedHashMap<>();
-        if (entrada.codigo.isEmpty()) errores.put(Campos.CODIGO, new ErrorCampo(CodigoError.OBLIGATORIO));
+        if (entrada.codigo.isEmpty()) { if (codigoObligatorio) errores.put(Campos.CODIGO, new ErrorCampo(CodigoError.OBLIGATORIO)); }
         else if (entrada.codigo.length() > CODIGO_MAXIMO) errores.put(Campos.CODIGO, new ErrorCampo(CodigoError.LONGITUD_MAXIMA, CODIGO_MAXIMO));
         if (entrada.nombre.length() > NOMBRE_MAXIMO) errores.put(Campos.NOMBRE, new ErrorCampo(CodigoError.LONGITUD_MAXIMA, NOMBRE_MAXIMO));
         if (entrada.sexo.isEmpty()) errores.put(Campos.SEXO, new ErrorCampo(CodigoError.OBLIGATORIO));

@@ -10,6 +10,8 @@ public class AnimalResumen {
     public String sexo;
     public String estado;
     @ColumnInfo(name = "raza_nombre") public String razaNombre;
+    /** Nombre del hierro principal (el primero de la lista); nulo si el animal no tiene hierro. */
+    @ColumnInfo(name = "hierro_nombre") public String hierroNombre;
     @ColumnInfo(name = "ultimo_peso_kg") public Double ultimoPesoKg;
     @ColumnInfo(name = "ultimo_peso_fecha") public String ultimoPesoFecha;
 }

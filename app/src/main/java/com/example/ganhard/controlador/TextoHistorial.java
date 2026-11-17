@@ -1,8 +1,10 @@
 package com.example.ganhard.controlador;
 
 import android.content.Context;
+import android.text.TextUtils;
 import com.example.ganhard.R;
 import com.example.ganhard.modelo.datos.HistorialResumen;
+import com.example.ganhard.modelo.entidad.AnimalIdentificador;
 import com.example.ganhard.modelo.entidad.HistorialCambio;
 import com.example.ganhard.modelo.entidad.Tarea;
 import java.time.Instant;
@@ -15,6 +17,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -45,7 +48,7 @@ final class TextoHistorial {
     private static int hecho(HistorialCambio cambio) {
         boolean pesaje = HistorialCambio.PESAJE.equals(cambio.entidad), animal = HistorialCambio.ANIMAL.equals(cambio.entidad),
                 actividad = HistorialCambio.EVENTO_SANITARIO.equals(cambio.entidad), gasto = HistorialCambio.GASTO.equals(cambio.entidad),
-                tarea = HistorialCambio.TAREA.equals(cambio.entidad);
+                tarea = HistorialCambio.TAREA.equals(cambio.entidad), hierro = HistorialCambio.HIERRO.equals(cambio.entidad);
         switch (cambio.accion) {
             case HistorialCambio.CREAR:
                 if (pesaje) return R.string.titulo_pesaje_registrado;
@@ -53,6 +56,7 @@ final class TextoHistorial {
                 if (actividad) return R.string.titulo_sanidad_registrada;
                 if (gasto) return R.string.titulo_gasto_registrado;
                 if (tarea) return R.string.titulo_tarea_programada;
+                if (hierro) return R.string.titulo_hierro_registrado;
                 break;
             case HistorialCambio.EDITAR:
                 if (pesaje) return R.string.titulo_pesaje_corregido;
@@ -60,6 +64,7 @@ final class TextoHistorial {
                 if (actividad) return R.string.titulo_sanidad_corregida;
                 if (gasto) return R.string.titulo_gasto_corregido;
                 if (tarea) return R.string.titulo_tarea_corregida;
+                if (hierro) return R.string.titulo_hierro_editado;
                 break;
             case HistorialCambio.CAMBIAR_ESTADO:
                 if (tarea) {
@@ -67,6 +72,10 @@ final class TextoHistorial {
                     String estado = nuevos == null ? "" : nuevos.optString("estado");
                     if (Tarea.COMPLETADA.equals(estado)) return R.string.titulo_tarea_completada;
                     if (Tarea.CANCELADA.equals(estado)) return R.string.titulo_tarea_cancelada;
+                }
+                if (hierro) {
+                    JSONObject nuevos = leer(cambio.valoresNuevos);
+                    return nuevos != null && nuevos.optBoolean("activo", true) ? R.string.titulo_hierro_reactivado : R.string.titulo_hierro_desactivado;
                 }
                 return R.string.titulo_estado_cambiado;
             case HistorialCambio.ANULAR:
@@ -97,7 +106,7 @@ final class TextoHistorial {
         boolean pesaje = HistorialCambio.PESAJE.equals(cambio.entidad);
         boolean actividad = HistorialCambio.EVENTO_SANITARIO.equals(cambio.entidad);
         boolean gasto = HistorialCambio.GASTO.equals(cambio.entidad);
-        boolean tarea = HistorialCambio.TAREA.equals(cambio.entidad);
+        boolean tarea = HistorialCambio.TAREA.equals(cambio.entidad), hierro = HistorialCambio.HIERRO.equals(cambio.entidad);
         switch (cambio.accion) {
             case HistorialCambio.EDITAR:
                 if (antes != null && ahora != null) {
@@ -128,6 +137,7 @@ final class TextoHistorial {
                 else if (actividad) actividad(contexto, ahora, lineas);
                 else if (gasto) gasto(contexto, ahora, lineas);
                 else if (tarea) tarea(contexto, ahora, lineas);
+                else if (hierro) hierro(ahora, lineas);
                 break;
             default: break;
         }
@@ -167,6 +177,31 @@ final class TextoHistorial {
                 FormatoFecha.corta(datos.optString("fecha_programada"))));
     }
 
+    /** El nombre del hierro y, si tiene, su descripción. */
+    private static void hierro(JSONObject datos, List<String> lineas) {
+        if (datos == null || datos.isNull("nombre")) return;
+        lineas.add(datos.optString("nombre"));
+        if (!datos.isNull("descripcion")) lineas.add(datos.optString("descripcion"));
+    }
+
+    /** Los identificadores guardados como texto JSON ([{"t":"HIERRO","v":"X"}]) en "Hierro: X · Arete: 1234". */
+    private static String identificadores(Context contexto, String json) {
+        try {
+            JSONArray arreglo = new JSONArray(json);
+            List<String> partes = new ArrayList<>();
+            for (int i = 0; i < arreglo.length(); i++) {
+                JSONObject fila = arreglo.getJSONObject(i);
+                String tipo = fila.optString("t");
+                int etiqueta = AnimalIdentificador.HIERRO.equals(tipo) ? R.string.identificador_tipo_hierro
+                        : AnimalIdentificador.ARETE.equals(tipo) ? R.string.identificador_tipo_arete : R.string.identificador_tipo_numero;
+                partes.add(contexto.getString(R.string.identificador_linea, contexto.getString(etiqueta), fila.optString("v")));
+            }
+            return partes.isEmpty() ? contexto.getString(R.string.sin_registrar) : TextUtils.join(" · ", partes);
+        } catch (JSONException ex) {
+            return json;
+        }
+    }
+
     private static JSONObject leer(String json) {
         if (json == null || json.isEmpty()) return null;
         try { return new JSONObject(json); }
@@ -195,6 +230,7 @@ final class TextoHistorial {
             case "concepto": return contexto.getString(R.string.campo_concepto);
             case "valor_centavos": return contexto.getString(R.string.campo_valor);
             case "titulo": return contexto.getString(R.string.campo_titulo);
+            case "identificadores": return contexto.getString(R.string.campo_identificadores);
             case "fecha_programada": return contexto.getString(R.string.campo_fecha_programada);
             default: return clave;
         }
@@ -217,6 +253,7 @@ final class TextoHistorial {
             case "valor_centavos":
                 return valor instanceof Number ? Presentacion.pesos(((Number) valor).longValue()) : texto;
             case "id_raza": return razas.containsKey(texto) ? razas.get(texto) : texto;
+            case "identificadores": return identificadores(contexto, texto);
             default: return texto;
         }
     }

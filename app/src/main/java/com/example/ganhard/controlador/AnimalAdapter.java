@@ -53,7 +53,9 @@ public final class AnimalAdapter extends RecyclerView.Adapter<AnimalAdapter.Fila
         fila.estado.setText(Presentacion.estado(contexto, animal.estado));
         fila.titulo.setText(animal.nombre == null ? animal.codigo : contexto.getString(R.string.codigo_nombre, animal.codigo, animal.nombre));
         String raza = animal.razaNombre == null ? contexto.getString(R.string.raza_sin_registrar) : animal.razaNombre;
-        fila.detalle.setText(contexto.getString(R.string.sexo_y_raza, Presentacion.sexo(contexto, animal.sexo), raza));
+        String sexo = Presentacion.sexo(contexto, animal.sexo);
+        fila.detalle.setText(animal.hierroNombre == null ? contexto.getString(R.string.sexo_y_raza, sexo, raza)
+                : contexto.getString(R.string.sexo_raza_hierro, sexo, raza, animal.hierroNombre));
         fila.peso.setText(Presentacion.ultimoPesaje(contexto, animal.ultimoPesoKg, animal.ultimoPesoFecha));
         fila.itemView.setOnClickListener(v -> escucha.alSeleccionar(animal));
     }

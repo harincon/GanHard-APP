@@ -54,7 +54,6 @@
     <string name="cancelar">Cancelar</string>
     <string name="registrar_animal">Registrar animal</string>
     <string name="editar_animal">Editar animal</string>
-    <string name="codigo_animal">Código del animal *</string>
     <string name="nombre_animal">Nombre</string>
     <string name="sexo_titulo">Sexo *</string>
     <string name="sexo_hembra">Hembra</string>
@@ -154,7 +153,6 @@
     <string name="ultimo_pesaje_lista">Último pesaje: %1$s kg · %2$s</string>
     <string name="formato_fecha">dd/mm/aaaa</string>
     <string name="campos_obligatorios">* Campos obligatorios</string>
-    <string name="ayuda_codigo">Debe ser único en esta finca.</string>
     <string name="estado_hint">Estado *</string>
     <string name="fecha_estado_hint">Fecha del estado *</string>
     <string name="ficha_ingreso">Ingreso: %1$s</string>

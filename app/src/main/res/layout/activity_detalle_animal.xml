@@ -22,6 +22,7 @@
                         <TextView android:id="@+id/fichaIngreso" tools:text="Ingreso: 14 oct 2026" style="@style/Gh.Dato" android:layout_width="match_parent" android:layout_height="wrap_content" />
                         <TextView android:id="@+id/fichaNacimiento" tools:text="Nacimiento: 8 mar 2024" style="@style/Gh.Dato" android:layout_width="match_parent" android:layout_height="wrap_content" />
                         <TextView android:id="@+id/fichaEstadoDesde" style="@style/Gh.Dato" android:layout_width="match_parent" android:layout_height="wrap_content" android:visibility="gone" />
+                        <TextView android:id="@+id/fichaIdentificadores" style="@style/Gh.Dato" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:visibility="gone" />
                         <TextView android:id="@+id/fichaObservaciones" tools:text="Observaciones: Vaca de cria lechera" tools:visibility="visible" style="@style/Gh.Dato" android:layout_width="match_parent" android:layout_height="wrap_content" android:visibility="gone" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>

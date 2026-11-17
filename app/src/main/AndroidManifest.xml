@@ -40,6 +40,8 @@
             android:exported="false" android:windowSoftInputMode="adjustResize" />
         <activity android:name=".controlador.InvitacionesActivity"
             android:exported="false" />
+        <activity android:name=".controlador.HierrosActivity"
+            android:exported="false" />
         <activity android:name=".controlador.MenuActivity"
             android:exported="false" />
         <activity android:name=".controlador.PesajesActivity"

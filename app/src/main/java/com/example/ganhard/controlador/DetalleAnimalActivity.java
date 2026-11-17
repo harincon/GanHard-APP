@@ -7,6 +7,8 @@ import android.widget.Toast;
 import com.example.ganhard.R;
 import com.example.ganhard.databinding.ActivityDetalleAnimalBinding;
 import com.example.ganhard.modelo.datos.EventoSanitarioResumen;
+import com.example.ganhard.modelo.datos.IdentificadorResumen;
+import com.example.ganhard.modelo.entidad.AnimalIdentificador;
 import com.example.ganhard.modelo.datos.TareaResumen;
 import com.example.ganhard.modelo.entidad.Tarea;
 import com.example.ganhard.modelo.entidad.Animal;
@@ -121,12 +123,42 @@ public class DetalleAnimalActivity extends BaseActivity {
             vista.filaHistorial.setSubtitulo(getResources().getQuantityString(R.plurals.mediciones_vigentes, pesajes.size(), pesajes.size()));
         }
         vista.toolbar.setTitle(R.string.ficha_animal);
+        cargarIdentificadores();
         cargarSanidad();
         cargarTareas();
     }
 
     private void abrir(Class<?> pantalla) {
         startActivity(new Intent(this, pantalla).putExtra(EXTRA_ID_ANIMAL, idAnimal));
+    }
+
+    /**
+     * Una línea por identificador ("Hierro: La Esperanza", "Arete: 1234"). Un animal sin hierro lo dice, para que se
+     * note que falta; si la carga falla, la ficha sigue sirviendo sin esta parte.
+     */
+    private void cargarIdentificadores() {
+        app().animales().identificadores(idAnimal, new Callback<List<IdentificadorResumen>>() {
+            @Override public void exito(List<IdentificadorResumen> identificadores) {
+                if (!disponible()) return;
+                StringBuilder texto = new StringBuilder();
+                boolean hierro = false;
+                for (IdentificadorResumen identificador : identificadores) {
+                    boolean esHierro = AnimalIdentificador.HIERRO.equals(identificador.tipo);
+                    hierro |= esHierro;
+                    String etiqueta = getString(esHierro ? R.string.identificador_tipo_hierro
+                            : AnimalIdentificador.ARETE.equals(identificador.tipo) ? R.string.identificador_tipo_arete : R.string.identificador_tipo_numero);
+                    if (texto.length() > 0) texto.append('\n');
+                    texto.append(getString(R.string.identificador_linea, etiqueta, identificador.texto()));
+                }
+                if (!hierro) {
+                    if (texto.length() > 0) texto.insert(0, '\n');
+                    texto.insert(0, getString(R.string.ficha_sin_hierro));
+                }
+                vista.fichaIdentificadores.setText(texto);
+                vista.fichaIdentificadores.setVisibility(View.VISIBLE);
+            }
+            @Override public void error(ErrorModelo error) { /* La ficha sigue sirviendo sin los identificadores. */ }
+        });
     }
 
     /** Cuenta las actividades sanitarias vigentes para el subtítulo de su fila; si falla, la fila sigue sirviendo. */

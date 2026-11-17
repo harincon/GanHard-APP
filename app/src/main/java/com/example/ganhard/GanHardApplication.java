@@ -14,6 +14,7 @@ import com.example.ganhard.modelo.repositorio.AnimalRepository;
 import com.example.ganhard.modelo.repositorio.ConfiguracionRepository;
 import com.example.ganhard.modelo.repositorio.CuentaRepository;
 import com.example.ganhard.modelo.repositorio.GastoRepository;
+import com.example.ganhard.modelo.repositorio.HierroRepository;
 import com.example.ganhard.modelo.repositorio.HistorialRepository;
 import com.example.ganhard.modelo.repositorio.PesajeRepository;
 import com.example.ganhard.modelo.repositorio.SanidadRepository;
@@ -31,6 +32,7 @@ public class GanHardApplication extends Application {
     private SanidadRepository sanidad;
     private GastoRepository gastos;
     private TareaRepository tareas;
+    private HierroRepository hierros;
     private CuentaRepository cuenta;
     @Override public void onCreate() {
         super.onCreate();
@@ -53,6 +55,7 @@ public class GanHardApplication extends Application {
         sanidad = new SanidadRepository(database, ejecutor);
         gastos = new GastoRepository(database, ejecutor);
         tareas = new TareaRepository(database, ejecutor);
+        hierros = new HierroRepository(database, ejecutor);
         cuenta = new CuentaRepository(database, new EjecutorRemoto(trabajoRemoto), servicio, sesiones);
     }
     /** Con los datos de Supabase de local.properties usa el servidor real; sin ellos, la app funciona sin cuenta. */
@@ -68,5 +71,6 @@ public class GanHardApplication extends Application {
     public SanidadRepository sanidad() { return sanidad; }
     public GastoRepository gastos() { return gastos; }
     public TareaRepository tareas() { return tareas; }
+    public HierroRepository hierros() { return hierros; }
     public CuentaRepository cuenta() { return cuenta; }
 }

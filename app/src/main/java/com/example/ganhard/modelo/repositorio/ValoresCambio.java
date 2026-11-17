@@ -1,14 +1,18 @@
 package com.example.ganhard.modelo.repositorio;
 
+import com.example.ganhard.modelo.datos.IdentificadorResumen;
 import com.example.ganhard.modelo.entidad.Animal;
 import com.example.ganhard.modelo.entidad.EventoSanitario;
 import com.example.ganhard.modelo.entidad.Gasto;
+import com.example.ganhard.modelo.entidad.Hierro;
 import com.example.ganhard.modelo.entidad.Pesaje;
 import com.example.ganhard.modelo.entidad.Tarea;
 import java.util.Iterator;
+import java.util.List;
 import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -32,6 +36,44 @@ public final class ValoresCambio {
         return datos;
     }
 
+
+    /** Datos del animal y, si tiene, sus identificadores como un texto comparable (ver {@link #identificadores}). */
+    public static JSONObject de(Animal animal, String identificadores) {
+        JSONObject datos = de(animal);
+        poner(datos, "identificadores", identificadores);
+        return datos;
+    }
+
+    /**
+     * Los identificadores de un animal como un arreglo JSON guardado en un texto, para que dos listas iguales se
+     * comparen como iguales: [{"t":"HIERRO","v":"La Esperanza"},{"t":"ARETE","v":"1234"}]. Nulo si no hay ninguno.
+     */
+    public static String identificadores(List<IdentificadorResumen> lista) {
+        if (lista.isEmpty()) return null;
+        JSONArray arreglo = new JSONArray();
+        for (IdentificadorResumen identificador : lista) {
+            JSONObject fila = new JSONObject();
+            poner(fila, "t", identificador.tipo);
+            poner(fila, "v", identificador.texto());
+            arreglo.put(fila);
+        }
+        return arreglo.toString();
+    }
+
+    /** Datos del hierro del catálogo. */
+    public static JSONObject de(Hierro hierro) {
+        JSONObject datos = new JSONObject();
+        poner(datos, "nombre", hierro.nombre);
+        poner(datos, "descripcion", hierro.descripcion);
+        return datos;
+    }
+
+    /** Si el hierro está activo; lo único que cambia al desactivarlo o reactivarlo. */
+    public static JSONObject estadoHierro(Hierro hierro) {
+        JSONObject datos = new JSONObject();
+        poner(datos, "activo", hierro.activo == 1);
+        return datos;
+    }
     /** Estado del animal y la fecha desde la que rige. */
     public static JSONObject estado(Animal animal) {
         JSONObject datos = new JSONObject();

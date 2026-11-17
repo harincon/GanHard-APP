@@ -5,6 +5,7 @@ import com.example.ganhard.R;
 import com.example.ganhard.modelo.reglas.Campos;
 import com.example.ganhard.modelo.reglas.CodigoError;
 import com.example.ganhard.modelo.reglas.ErrorCampo;
+import com.example.ganhard.modelo.reglas.ValidadorIdentificadores;
 import com.example.ganhard.modelo.reglas.ValidadorPesaje;
 
 /** Traduce los códigos de error del Modelo a los textos de la Vista (recursos, no cadenas escritas en código). */
@@ -30,6 +31,16 @@ public final class MensajesError {
             case NO_COINCIDE: return contexto.getString(R.string.error_no_coincide);
             default: return contexto.getString(R.string.error_valor_invalido);
         }
+    }
+
+    /** Mensaje general de los errores de la lista de identificadores del animal. */
+    public static String identificadores(Context contexto, ErrorCampo error) {
+        if (error.codigo == CodigoError.LONGITUD_MAXIMA && error.limite == ValidadorIdentificadores.MAXIMO) {
+            return contexto.getString(R.string.error_identificadores_maximo, error.limite);
+        }
+        if (error.codigo == CodigoError.LONGITUD_MAXIMA) return contexto.getString(R.string.error_identificador_largo, error.limite);
+        if (error.codigo == CodigoError.OBLIGATORIO) return contexto.getString(R.string.error_identificador_valor);
+        return contexto.getString(R.string.error_identificador_invalido);
     }
 
     /** Texto del campo: usa la indicación específica cuando existe y, si no, la genérica del código. */
@@ -74,6 +85,10 @@ public final class MensajesError {
                 if (codigo == CodigoError.FECHA_ANTERIOR) return contexto.getString(R.string.error_estado_antes_ingreso);
                 break;
             case Campos.MOTIVO: if (codigo == CodigoError.OBLIGATORIO) return contexto.getString(R.string.error_motivo_obligatorio); break;
+            case Campos.HIERRO:
+                if (codigo == CodigoError.OBLIGATORIO) return contexto.getString(R.string.error_hierro_obligatorio);
+                if (codigo == CodigoError.VALOR_INVALIDO) return contexto.getString(R.string.error_hierro_invalido);
+                break;
             case Campos.CONTRASENA: if (codigo == CodigoError.OBLIGATORIO) return contexto.getString(R.string.error_contrasena_obligatoria); break;
             case Campos.CONTRASENA_REPETIDA: if (codigo == CodigoError.NO_COINCIDE) return contexto.getString(R.string.error_contrasenas_distintas); break;
             case Campos.ID_ANIMAL: if (codigo == CodigoError.OBLIGATORIO) return contexto.getString(R.string.error_animal_obligatorio); break;
