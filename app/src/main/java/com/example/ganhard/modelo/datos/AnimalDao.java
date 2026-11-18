@@ -25,6 +25,13 @@ public abstract class AnimalDao {
     @Query("SELECT codigo FROM animal WHERE id_finca = :idFinca")
     public abstract List<String> codigos(String idFinca);
 
+    /** Todos los animales de la finca, de cualquier estado, para las estadísticas del Inicio. */
+    @Query("SELECT * FROM animal WHERE id_finca = :idFinca")
+    public abstract List<Animal> todos(String idFinca);
+
+    @Query("SELECT MIN(fecha_ingreso) FROM animal WHERE id_finca = :idFinca")
+    public abstract String primerIngreso(String idFinca);
+
     @Query("SELECT COUNT(*) FROM animal WHERE id_finca = :idFinca AND estado = 'ACTIVO'")
     public abstract int contarActivos(String idFinca);
 

@@ -27,9 +27,9 @@
             </com.google.android.material.textfield.TextInputLayout>
             <com.google.android.material.textfield.TextInputLayout android:id="@+id/campoTipo"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu" android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:hint="@string/tipo_tarea_hint" android:layout_marginBottom="12dp">
+                android:hint="@string/tipo_tarea_hint" app:helperText="@string/ayuda_tipo_tarea" android:layout_marginBottom="12dp">
                 <com.google.android.material.textfield.MaterialAutoCompleteTextView android:id="@+id/tipo" android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:inputType="none" android:importantForAutofill="no" />
+                    android:inputType="textCapSentences" android:maxLength="40" android:maxLines="1" android:imeOptions="actionNext" android:importantForAutofill="no" />
             </com.google.android.material.textfield.TextInputLayout>
             <com.google.android.material.textfield.TextInputLayout android:id="@+id/campoAnimal"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu" android:layout_width="match_parent" android:layout_height="wrap_content"
@@ -37,6 +37,8 @@
                 <com.google.android.material.textfield.MaterialAutoCompleteTextView android:id="@+id/animal" android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:inputType="none" android:importantForAutofill="no" />
             </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.button.MaterialButton android:id="@+id/filaAnimales" style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="12dp" android:visibility="gone" />
             <com.google.android.material.textfield.TextInputLayout android:id="@+id/campoFecha"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox" android:layout_width="match_parent" android:layout_height="wrap_content"
                 android:hint="@string/fecha_programada_hint" app:placeholderText="@string/formato_fecha" app:endIconMode="custom"

@@ -15,19 +15,74 @@
                     android:textSize="24sp" android:textStyle="bold" android:textColor="@color/gh_text" />
                 <TextView android:id="@+id/administrador" android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:layout_marginTop="8dp" android:layout_marginBottom="16dp" android:textSize="14sp" android:textColor="@color/gh_muted" />
+                <com.google.android.material.button.MaterialButton android:id="@+id/registrarAnimal" style="@style/Gh.Boton"
+                    android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/registrar_animal" />
+
+                <!-- Selector de mes: manda sobre las tres tarjetas -->
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal"
+                    android:gravity="center_vertical" android:layout_marginTop="16dp" android:layout_marginBottom="8dp">
+                    <ImageButton android:id="@+id/mesAnterior" android:layout_width="48dp" android:layout_height="48dp"
+                        android:background="?attr/selectableItemBackgroundBorderless" android:src="@drawable/ic_chevron" android:rotation="180"
+                        android:contentDescription="@string/mes_anterior" />
+                    <TextView android:id="@+id/mesTitulo" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                        android:gravity="center" android:textAppearance="@style/Gh.Titulo" android:accessibilityLiveRegion="polite" />
+                    <ImageButton android:id="@+id/mesSiguiente" android:layout_width="48dp" android:layout_height="48dp"
+                        android:background="?attr/selectableItemBackgroundBorderless" android:src="@drawable/ic_chevron"
+                        android:contentDescription="@string/mes_siguiente" />
+                </LinearLayout>
+
+                <!-- Animales -->
                 <com.google.android.material.card.MaterialCardView style="@style/Gh.Tarjeta" android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp">
                     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp">
-                        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/inventario_titulo"
+                        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/est_animales_titulo"
                             android:textAppearance="@style/Gh.Overline" />
-                        <TextView android:id="@+id/inventarioActivos" android:layout_width="match_parent" android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp" android:textAppearance="@style/Gh.Titulo" android:accessibilityLiveRegion="polite" />
-                        <TextView android:id="@+id/inventarioAyuda" android:layout_width="match_parent" android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp" android:text="@string/inventario_ayuda" android:textSize="14sp" android:textColor="@color/gh_muted" />
+                        <TextView android:id="@+id/animalesActivos" android:layout_width="match_parent" android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp" android:textAppearance="@style/Gh.Titulo" android:textSize="22sp" android:accessibilityLiveRegion="polite" />
+                        <TextView android:id="@+id/animalesVariacion" android:layout_width="match_parent" android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp" android:textSize="14sp" android:textColor="@color/gh_muted" />
+                        <LinearLayout android:id="@+id/animalesDetalle" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
+                            <LinearLayout android:id="@+id/animalesSexo" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" />
+                            <TextView android:id="@+id/animalesRazasTitulo" android:layout_width="match_parent" android:layout_height="wrap_content"
+                                android:layout_marginTop="16dp" android:text="@string/est_razas_titulo" android:textAppearance="@style/Gh.Overline" />
+                            <LinearLayout android:id="@+id/animalesRazas" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" />
+                        </LinearLayout>
+                        <TextView android:id="@+id/animalesMovimientos" android:layout_width="match_parent" android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp" android:textSize="14sp" android:textColor="@color/gh_muted" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
-                <com.google.android.material.button.MaterialButton android:id="@+id/registrarAnimal" style="@style/Gh.Boton"
-                    android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/registrar_animal" />
+
+                <!-- Pesos -->
+                <com.google.android.material.card.MaterialCardView style="@style/Gh.Tarjeta" android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp">
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp">
+                        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/est_pesos_titulo"
+                            android:textAppearance="@style/Gh.Overline" />
+                        <TextView android:id="@+id/pesosVacio" android:layout_width="match_parent" android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp" android:text="@string/est_pesos_vacio" android:textSize="14sp" android:textColor="@color/gh_muted"
+                            android:visibility="gone" />
+                        <TextView android:id="@+id/pesosPromedio" android:layout_width="match_parent" android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp" android:textAppearance="@style/Gh.Titulo" android:textSize="22sp" android:accessibilityLiveRegion="polite" />
+                        <TextView android:id="@+id/pesosVariacion" android:layout_width="match_parent" android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp" android:textSize="14sp" android:textColor="@color/gh_muted" />
+                        <LinearLayout android:id="@+id/pesosBarras" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" />
+                        <TextView android:id="@+id/pesosCalculo" android:layout_width="match_parent" android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp" android:textSize="14sp" android:textColor="@color/gh_muted" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Gastos del mes -->
+                <com.google.android.material.card.MaterialCardView style="@style/Gh.Tarjeta" android:layout_width="match_parent" android:layout_height="wrap_content">
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp">
+                        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/est_gastos_titulo"
+                            android:textAppearance="@style/Gh.Overline" />
+                        <TextView android:id="@+id/gastosTotal" android:layout_width="match_parent" android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp" android:textAppearance="@style/Gh.Titulo" android:textSize="22sp" android:accessibilityLiveRegion="polite" />
+                        <TextView android:id="@+id/gastosVariacion" android:layout_width="match_parent" android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp" android:textSize="14sp" android:textColor="@color/gh_muted" />
+                        <LinearLayout android:id="@+id/gastosCategorias" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
             </LinearLayout>
             <LinearLayout android:id="@+id/estadoError" android:layout_width="match_parent" android:layout_height="wrap_content"
                 android:orientation="vertical" android:padding="24dp" android:gravity="center_horizontal" android:visibility="gone">

@@ -173,8 +173,9 @@ final class TextoHistorial {
     private static void tarea(Context contexto, JSONObject datos, List<String> lineas) {
         if (datos == null || datos.isNull("titulo")) return;
         lineas.add(datos.optString("titulo"));
-        lineas.add(contexto.getString(R.string.codigo_nombre, Presentacion.tipoTarea(contexto, datos.optString("tipo")),
-                FormatoFecha.corta(datos.optString("fecha_programada"))));
+        // Un tipo propio guarda su nombre en "etiqueta"; si no, se muestra el tipo normal.
+        String tipo = datos.isNull("etiqueta") ? Presentacion.tipoTarea(contexto, datos.optString("tipo")) : datos.optString("etiqueta");
+        lineas.add(contexto.getString(R.string.codigo_nombre, tipo, FormatoFecha.corta(datos.optString("fecha_programada"))));
     }
 
     /** El nombre del hierro y, si tiene, su descripción. */

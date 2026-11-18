@@ -31,6 +31,14 @@ public abstract class GastoDao {
     @Query("SELECT COALESCE(SUM(valor_centavos), 0) FROM gasto WHERE id_finca = :idFinca AND anulado = 0 AND fecha >= :desde AND fecha < :hasta")
     public abstract long total(String idFinca, String desde, String hasta);
 
+    /** Lo gastado por categoría en el periodo, de mayor a menor. */
+    @Query("SELECT categoria, SUM(valor_centavos) AS total FROM gasto WHERE id_finca = :idFinca AND anulado = 0 AND fecha >= :desde AND fecha < :hasta "
+            + "GROUP BY categoria ORDER BY total DESC, categoria")
+    public abstract List<CategoriaTotal> porCategoria(String idFinca, String desde, String hasta);
+
+    @Query("SELECT MIN(fecha) FROM gasto WHERE id_finca = :idFinca AND anulado = 0")
+    public abstract String primeraFecha(String idFinca);
+
     /** Meses (AAAA-MM) con al menos un gasto vigente, del más reciente al más antiguo. */
     @Query("SELECT DISTINCT substr(fecha, 1, 7) FROM gasto WHERE id_finca = :idFinca AND anulado = 0 ORDER BY 1 DESC")
     public abstract List<String> meses(String idFinca);

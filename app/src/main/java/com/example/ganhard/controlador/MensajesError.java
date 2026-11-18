@@ -89,6 +89,10 @@ public final class MensajesError {
                 if (codigo == CodigoError.OBLIGATORIO) return contexto.getString(R.string.error_hierro_obligatorio);
                 if (codigo == CodigoError.VALOR_INVALIDO) return contexto.getString(R.string.error_hierro_invalido);
                 break;
+            case Campos.CODIGO_CONFIRMACION:
+                if (codigo == CodigoError.OBLIGATORIO) return contexto.getString(R.string.error_codigo_confirmacion_obligatorio);
+                if (codigo == CodigoError.FORMATO) return contexto.getString(R.string.error_codigo_confirmacion_formato);
+                break;
             case Campos.CONTRASENA: if (codigo == CodigoError.OBLIGATORIO) return contexto.getString(R.string.error_contrasena_obligatoria); break;
             case Campos.CONTRASENA_REPETIDA: if (codigo == CodigoError.NO_COINCIDE) return contexto.getString(R.string.error_contrasenas_distintas); break;
             case Campos.ID_ANIMAL: if (codigo == CodigoError.OBLIGATORIO) return contexto.getString(R.string.error_animal_obligatorio); break;

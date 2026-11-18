@@ -27,6 +27,13 @@ public abstract class PesajeDao {
     @Query("UPDATE pesaje SET es_antecedente = CASE WHEN fecha < :ingreso THEN 1 ELSE 0 END WHERE id_animal = :idAnimal")
     public abstract void recalcularAntecedentes(String idAnimal, String ingreso);
 
+    /** Todos los pesajes vigentes de los animales de la finca. */
+    @Query("SELECT p.* FROM pesaje p JOIN animal a ON a.id_animal = p.id_animal WHERE a.id_finca = :idFinca AND p.anulado = 0")
+    public abstract List<Pesaje> deLaFinca(String idFinca);
+
+    @Query("SELECT MIN(p.fecha) FROM pesaje p JOIN animal a ON a.id_animal = p.id_animal WHERE a.id_finca = :idFinca AND p.anulado = 0")
+    public abstract String primeraFecha(String idFinca);
+
     @Query("SELECT * FROM pesaje WHERE id_pesaje = :idPesaje")
     public abstract Pesaje porId(String idPesaje);
 }

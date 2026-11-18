@@ -176,4 +176,13 @@ public final class Migraciones {
             db.execSQL("CREATE INDEX IF NOT EXISTS `index_evento_sanitario_id_grupo` ON `evento_sanitario` (`id_grupo`)");
         }
     };
+
+    /** Agrega a la tarea su grupo (varios animales a la vez) y la etiqueta del tipo escrito por la persona; las existentes quedan individuales. */
+    public static final Migration V9_V10 = new Migration(9, 10) {
+        @Override public void migrate(@NonNull SupportSQLiteDatabase db) {
+            db.execSQL("ALTER TABLE `tarea` ADD COLUMN `id_grupo` TEXT");
+            db.execSQL("ALTER TABLE `tarea` ADD COLUMN `etiqueta` TEXT");
+            db.execSQL("CREATE INDEX IF NOT EXISTS `index_tarea_id_grupo` ON `tarea` (`id_grupo`)");
+        }
+    };
 }

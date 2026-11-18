@@ -34,6 +34,7 @@ public final class MensajesRemotos {
     private static int regla(String codigo) {
         if (codigo == null) return R.string.regla_desconocida;
         switch (codigo) {
+            case ErrorRemoto.CODIGO_INVALIDO: return R.string.regla_codigo_invalido;
             case ErrorRemoto.DEMASIADOS_INTENTOS: return R.string.regla_demasiados_intentos;
             case ErrorRemoto.CONTRASENA_DEBIL: return R.string.regla_contrasena_debil;
             case ErrorRemoto.CORREO_REGISTRADO: return R.string.regla_correo_registrado;

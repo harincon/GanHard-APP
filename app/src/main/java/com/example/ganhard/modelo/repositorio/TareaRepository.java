@@ -15,9 +15,15 @@ import com.example.ganhard.modelo.reglas.EntradaTarea;
 import com.example.ganhard.modelo.reglas.ErrorCampo;
 import com.example.ganhard.modelo.reglas.ValidadorMotivo;
 import com.example.ganhard.modelo.reglas.ValidadorTarea;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import org.json.JSONObject;
 
 /**
@@ -55,7 +61,7 @@ public final class TareaRepository {
             tarea.idTarea = idTarea;
             tarea.idFinca = idFinca;
             tarea.idAnimal = entrada.idAnimal.isEmpty() ? null : entrada.idAnimal;
-            tarea.tipo = entrada.tipo;
+            aplicarTipo(tarea, entrada.tipo, idFinca);
             aplicar(tarea, entrada);
             tarea.estado = Tarea.PENDIENTE;
             tarea.creadoEn = ahora;
@@ -141,17 +147,157 @@ public final class TareaRepository {
 
     /** Tareas de la finca en un estado; {@code idAnimal} nulo trae las de todos, con uno trae solo las suyas. */
     public void listar(String estado, String idAnimal, Callback<List<TareaResumen>> callback) {
+        ejecutor.ejecutar(() -> consultar(estado, idAnimal), callback);
+    }
+
+    private List<TareaResumen> consultar(String estado, String idAnimal) throws ErrorModelo {
+        if (estado == null || !Tarea.ESTADOS.contains(estado)) {
+            throw ErrorModelo.validacion(Collections.singletonMap(Campos.ESTADO, new ErrorCampo(CodigoError.VALOR_INVALIDO)));
+        }
+        String idFinca = idFincaActiva();
+        String animal = idAnimal == null || idAnimal.trim().isEmpty() ? null : idAnimal.trim();
+        if (animal != null) {
+            Animal existente = db.animalDao().porId(animal);
+            if (existente == null || !idFinca.equals(existente.idFinca)) throw ErrorModelo.noEncontrado(ErrorModelo.ANIMAL);
+        }
+        return Tarea.PENDIENTE.equals(estado) ? db.tareaDao().pendientes(idFinca, animal) : db.tareaDao().cerradas(idFinca, animal, estado);
+    }
+
+    // --- Tipos propios ---
+
+    /** Los tipos propios que la finca ya usó (sin repetir y en orden), para ofrecerlos otra vez al programar. */
+    public void tiposPropios(Callback<List<String>> callback) {
+        ejecutor.ejecutar(() -> db.tareaDao().etiquetas(idFincaActiva()), callback);
+    }
+
+    /**
+     * Deja el tipo de la tarea: uno de los normales si lo escrito coincide con alguno, o general con la etiqueta propia.
+     * Un tipo propio ya usado se escribe igual que la primera vez, aunque se haya tecleado distinto.
+     */
+    private void aplicarTipo(Tarea tarea, String texto, String idFinca) {
+        String normal = ValidadorTarea.tipoNormal(texto);
+        if (normal != null) {
+            tarea.tipo = normal;
+            tarea.etiqueta = null;
+            return;
+        }
+        tarea.tipo = Tarea.GENERAL;
+        tarea.etiqueta = texto;
+        String clave = ValidadorTarea.clave(texto);
+        for (String usada : db.tareaDao().etiquetas(idFinca)) {
+            if (ValidadorTarea.clave(usada).equals(clave)) {
+                tarea.etiqueta = usada;
+                return;
+            }
+        }
+    }
+
+    // --- Tareas para varios animales (grupos) ---
+
+    /**
+     * Programa la misma tarea para varios animales a la vez: una tarea por animal, unidas por {@code idGrupo}. Solo
+     * entran animales activos de la finca; si alguno no existe o no está activo, o la entrada es inválida, no se guarda
+     * nada. Es idempotente por {@code idGrupo}. Cada tarea recibe su propia entrada de historial. El animal de la entrada
+     * se ignora: lo ponen los elegidos.
+     */
+    public void programarGrupo(String idGrupo, List<String> idsAnimales, EntradaTarea entrada, Callback<List<Tarea>> callback) {
         ejecutor.ejecutar(() -> {
-            if (estado == null || !Tarea.ESTADOS.contains(estado)) {
-                throw ErrorModelo.validacion(Collections.singletonMap(Campos.ESTADO, new ErrorCampo(CodigoError.VALOR_INVALIDO)));
+            List<Tarea> existentes = db.tareaDao().todosDelGrupo(idGrupo);
+            if (!existentes.isEmpty()) return existentes;
+            Set<String> ids = new LinkedHashSet<>();
+            if (idsAnimales != null) for (String id : idsAnimales) if (id != null && !id.trim().isEmpty()) ids.add(id.trim());
+            if (ids.isEmpty()) {
+                throw ErrorModelo.validacion(Collections.singletonMap(Campos.ID_ANIMAL, new ErrorCampo(CodigoError.OBLIGATORIO)));
             }
             String idFinca = idFincaActiva();
-            String animal = idAnimal == null || idAnimal.trim().isEmpty() ? null : idAnimal.trim();
-            if (animal != null) {
-                Animal existente = db.animalDao().porId(animal);
-                if (existente == null || !idFinca.equals(existente.idFinca)) throw ErrorModelo.noEncontrado(ErrorModelo.ANIMAL);
+            // Se valida una sola vez, con un animal de los elegidos para que pesaje y sanidad no pidan animal.
+            EntradaTarea conAnimal = new EntradaTarea(entrada.tipo, ids.iterator().next(), entrada.titulo, entrada.descripcion, entrada.fechaProgramada);
+            Map<String, ErrorCampo> errores = ValidadorTarea.validar(conAnimal);
+            if (!errores.isEmpty()) throw ErrorModelo.validacion(errores);
+            for (String idAnimal : ids) animalActivo(idAnimal, idFinca);
+            String ahora = Tiempo.ahoraUtc();
+            List<Tarea> creadas = new ArrayList<>();
+            List<HistorialCambio> cambios = new ArrayList<>();
+            for (String idAnimal : ids) {
+                Tarea tarea = new Tarea();
+                tarea.idTarea = UUID.randomUUID().toString();
+                tarea.idFinca = idFinca;
+                tarea.idAnimal = idAnimal;
+                tarea.idGrupo = idGrupo;
+                aplicarTipo(tarea, entrada.tipo, idFinca);
+                aplicar(tarea, entrada);
+                tarea.estado = Tarea.PENDIENTE;
+                tarea.creadoEn = ahora;
+                tarea.actualizadoEn = ahora;
+                creadas.add(tarea);
+                cambios.add(registro.preparar(HistorialCambio.TAREA, tarea.idTarea, HistorialCambio.CREAR,
+                        null, ValoresCambio.de(tarea), null, null, ahora));
             }
-            return Tarea.PENDIENTE.equals(estado) ? db.tareaDao().pendientes(idFinca, animal) : db.tareaDao().cerradas(idFinca, animal, estado);
+            registro.guardar(() -> {
+                for (Tarea tarea : creadas) db.tareaDao().insertar(tarea);
+            }, cambios.toArray(new HistorialCambio[0]));
+            return creadas;
+        }, callback);
+    }
+
+    /** El grupo con las tareas de cada animal, en cualquier estado; si no existe, no se encuentra. */
+    public void grupo(String idGrupo, Callback<GrupoTarea> callback) {
+        ejecutor.ejecutar(() -> {
+            List<TareaResumen> tareas = db.tareaDao().delGrupo(idGrupo);
+            if (tareas.isEmpty()) throw ErrorModelo.noEncontrado(ErrorModelo.TAREA);
+            Tarea referencia = tareas.get(0).tarea;
+            for (TareaResumen fila : tareas) {
+                if (Tarea.PENDIENTE.equals(fila.tarea.estado)) { referencia = fila.tarea; break; }
+            }
+            return new GrupoTarea(idGrupo, referencia, tareas);
+        }, callback);
+    }
+
+    /**
+     * Cancela las tareas pendientes del grupo (las completadas o ya canceladas no se tocan) y devuelve cuántas canceló.
+     * Cada una deja su entrada de historial. No se puede deshacer.
+     */
+    public void cancelarGrupo(String idGrupo, Callback<Integer> callback) {
+        ejecutor.ejecutar(() -> {
+            if (db.tareaDao().todosDelGrupo(idGrupo).isEmpty()) throw ErrorModelo.noEncontrado(ErrorModelo.TAREA);
+            List<Tarea> pendientes = db.tareaDao().pendientesDelGrupo(idGrupo);
+            if (pendientes.isEmpty()) {
+                throw ErrorModelo.validacion(Collections.singletonMap(Campos.ESTADO, new ErrorCampo(CodigoError.NO_PENDIENTE)));
+            }
+            String ahora = Tiempo.ahoraUtc();
+            List<HistorialCambio> cambios = new ArrayList<>();
+            for (Tarea tarea : pendientes) {
+                JSONObject antes = ValoresCambio.estadoTarea(tarea);
+                tarea.estado = Tarea.CANCELADA;
+                tarea.actualizadoEn = ahora;
+                cambios.add(registro.preparar(HistorialCambio.TAREA, tarea.idTarea, HistorialCambio.CAMBIAR_ESTADO,
+                        antes, ValoresCambio.estadoTarea(tarea), null, null, ahora));
+            }
+            registro.guardar(() -> {
+                for (Tarea tarea : pendientes) db.tareaDao().actualizar(tarea);
+            }, cambios.toArray(new HistorialCambio[0]));
+            return pendientes.size();
+        }, callback);
+    }
+
+    /**
+     * La lista de un estado con las tareas de un mismo grupo juntas en una tarjeta con su total (una por grupo y estado),
+     * en el lugar de la primera del grupo. Con un animal elegido se ven sus tareas una por una.
+     */
+    public void listaAgrupada(String estado, String idAnimal, Callback<List<ElementoTarea>> callback) {
+        ejecutor.ejecutar(() -> {
+            List<TareaResumen> filas = consultar(estado, idAnimal);
+            boolean unAnimal = idAnimal != null && !idAnimal.trim().isEmpty();
+            Map<String, Integer> totales = new HashMap<>();
+            if (!unAnimal) for (TareaResumen fila : filas) if (fila.tarea.idGrupo != null) totales.merge(fila.tarea.idGrupo, 1, Integer::sum);
+            List<ElementoTarea> elementos = new ArrayList<>();
+            Set<String> yaPuestos = new HashSet<>();
+            for (TareaResumen fila : filas) {
+                String grupo = fila.tarea.idGrupo;
+                if (unAnimal || grupo == null) elementos.add(ElementoTarea.individual(fila));
+                else if (yaPuestos.add(grupo)) elementos.add(ElementoTarea.grupo(grupo, fila.tarea, totales.get(grupo)));
+            }
+            return elementos;
         }, callback);
     }
 

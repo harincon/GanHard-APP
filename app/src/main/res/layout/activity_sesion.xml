@@ -36,12 +36,24 @@
                 <com.google.android.material.textfield.TextInputEditText android:id="@+id/contrasenaRepetida" android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:inputType="textPassword" android:maxLines="1" android:imeOptions="actionDone" android:importantForAutofill="no" />
             </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputLayout android:id="@+id/campoCodigo"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:hint="@string/sesion_codigo" android:layout_marginBottom="24dp" android:visibility="gone">
+                <com.google.android.material.textfield.TextInputEditText android:id="@+id/codigo" android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:inputType="number" android:maxLength="10" android:maxLines="1" android:imeOptions="actionDone" android:importantForAutofill="no" />
+            </com.google.android.material.textfield.TextInputLayout>
             <com.google.android.material.button.MaterialButton android:id="@+id/guardar" style="@style/Gh.Boton" android:layout_width="match_parent" android:layout_height="wrap_content"
                 android:text="@string/sesion_accion_inicio" />
             <com.google.android.material.button.MaterialButton android:id="@+id/enlaceCambiar" style="@style/Widget.Material3.Button.TextButton"
                 android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="@string/sesion_no_tengo" />
             <com.google.android.material.button.MaterialButton android:id="@+id/enlaceRecuperar" style="@style/Widget.Material3.Button.TextButton"
                 android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/sesion_olvide" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/enlaceCodigo" style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/sesion_tengo_codigo" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/enlaceReenviar" style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/sesion_reenviar" android:visibility="gone" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/enlaceYaConfirme" style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/sesion_ya_confirme" android:visibility="gone" />
             <TextView android:id="@+id/mensaje" android:layout_width="match_parent" android:layout_height="wrap_content"
                 android:layout_marginTop="12dp" android:textColor="@color/gh_muted" android:textSize="14sp" android:accessibilityLiveRegion="polite" android:visibility="gone" />
         </LinearLayout>

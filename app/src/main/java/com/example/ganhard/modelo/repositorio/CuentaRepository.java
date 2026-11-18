@@ -1,6 +1,8 @@
 package com.example.ganhard.modelo.repositorio;
 
 import com.example.ganhard.modelo.ConfiguracionLocal;
+import androidx.sqlite.db.SupportSQLiteDatabase;
+import com.example.ganhard.modelo.datos.CatalogoRazas;
 import com.example.ganhard.modelo.datos.ConfiguracionDao;
 import com.example.ganhard.modelo.datos.GanHardDatabase;
 import com.example.ganhard.modelo.entidad.Finca;
@@ -35,12 +37,14 @@ public final class CuentaRepository {
         T con(SesionRemota sesion) throws ErrorRemoto;
     }
 
+    private final GanHardDatabase db;
     private final ConfiguracionDao dao;
     private final EjecutorRemoto ejecutor;
     private final ServicioRemoto servicio;
     private final AlmacenSesion almacen;
 
     public CuentaRepository(GanHardDatabase db, EjecutorRemoto ejecutor, ServicioRemoto servicio, AlmacenSesion almacen) {
+        this.db = db;
         this.dao = db.configuracionDao();
         this.ejecutor = ejecutor;
         this.servicio = servicio;
@@ -79,6 +83,25 @@ public final class CuentaRepository {
         }, callback);
     }
 
+    /** Confirma el correo con el código recibido; si es correcto, la sesión queda iniciada. */
+    public void confirmarCorreo(String correo, String codigo, CallbackRemoto<SesionRemota> callback) {
+        ejecutor.ejecutar(() -> {
+            exigirValido(ValidadorCuenta.confirmacion(correo, codigo));
+            SesionRemota sesion = servicio.confirmarCorreo(ValidadorCuenta.normalizarCorreo(correo), ValidadorCuenta.normalizarCodigo(codigo));
+            almacen.guardar(sesion);
+            return sesion;
+        }, callback);
+    }
+
+    /** Pide un código nuevo (el anterior deja de valer). Responde igual exista o no la cuenta. */
+    public void reenviarConfirmacion(String correo, CallbackRemoto<Void> callback) {
+        ejecutor.ejecutar(() -> {
+            exigirCorreo(correo);
+            servicio.reenviarConfirmacion(ValidadorCuenta.normalizarCorreo(correo));
+            return null;
+        }, callback);
+    }
+
     public void recuperarAcceso(String correo, CallbackRemoto<Void> callback) {
         ejecutor.ejecutar(() -> {
             exigirCorreo(correo);
@@ -100,6 +123,41 @@ public final class CuentaRepository {
             }
             return null;
         }, callback);
+    }
+
+    /**
+     * Cierra todo: la sesión de la cuenta (en el servidor, si se puede) y **borra todos los datos de este teléfono**
+     * (perfil, finca, animales, registros e historial), dejando el catálogo de razas inicial, como una instalación
+     * nueva. Funciona sin sesión y sin conexión. No borra nada en el servidor. Los datos se borran en una sola
+     * transacción; solo si eso sale bien se borra la sesión guardada.
+     */
+    public void cerrarTodo(CallbackRemoto<Void> callback) {
+        ejecutor.ejecutar(() -> {
+            SesionRemota sesion = almacen.leer();
+            try {
+                if (sesion != null) servicio.cerrarSesion(sesion.accesoToken);
+            } catch (ErrorRemoto ignorado) {
+                // Sin red o con el token vencido: igual se borra lo de este teléfono.
+            }
+            borrarDatosLocales();
+            almacen.borrar();
+            return null;
+        }, callback);
+    }
+
+    /** Vacía todas las tablas en una transacción (con las claves foráneas diferidas) y vuelve a sembrar las razas. */
+    private void borrarDatosLocales() {
+        db.runInTransaction(() -> {
+            SupportSQLiteDatabase sql = db.getOpenHelper().getWritableDatabase();
+            sql.execSQL("PRAGMA defer_foreign_keys = ON");
+            List<String> tablas = new java.util.ArrayList<>();
+            try (android.database.Cursor c = sql.query("SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%' "
+                    + "AND name NOT LIKE 'android_%' AND name <> 'room_master_table'")) {
+                while (c.moveToNext()) tablas.add(c.getString(0));
+            }
+            for (String tabla : tablas) sql.execSQL("DELETE FROM `" + tabla + "`");
+            CatalogoRazas.insertar(sql);
+        });
     }
 
     // --- Finca ---

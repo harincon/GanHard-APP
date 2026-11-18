@@ -32,6 +32,8 @@ public final class ErrorRemoto extends Exception {
     // Códigos de regla que llegan del servidor (los mismos de supabase/esquema.sql).
     public static final String DEMASIADOS_INTENTOS = "demasiados_intentos", CONTRASENA_DEBIL = "contrasena_debil";
     public static final String CORREO_REGISTRADO = "correo_registrado", ESQUEMA_NO_INSTALADO = "esquema_no_instalado";
+    /** El código de confirmación del correo no es el correcto o ya venció. */
+    public static final String CODIGO_INVALIDO = "codigo_invalido";
     public static final String FINCA_DE_OTRA_CUENTA = "finca_de_otra_cuenta", YA_TIENE_FINCA = "ya_tiene_finca";
     public static final String NO_ES_DUENO = "no_es_dueno", INVITACION_REPETIDA = "invitacion_repetida";
     public static final String ES_INTEGRANTE = "es_integrante", CORREO_PROPIO = "correo_propio";

@@ -4,24 +4,24 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.appcompat.app.AlertDialog;
 import com.example.ganhard.R;
 import com.example.ganhard.databinding.ActivitySanidadFormBinding;
 import com.example.ganhard.modelo.datos.AnimalResumen;
+import com.example.ganhard.modelo.datos.TareaResumen;
 import com.example.ganhard.modelo.entidad.Animal;
 import com.example.ganhard.modelo.entidad.EventoSanitario;
 import com.example.ganhard.modelo.entidad.HistorialCambio;
+import com.example.ganhard.modelo.entidad.Tarea;
 import com.example.ganhard.modelo.nucleo.Callback;
 import com.example.ganhard.modelo.nucleo.ErrorModelo;
 import com.example.ganhard.modelo.nucleo.Tiempo;
 import com.example.ganhard.modelo.reglas.Campos;
 import com.example.ganhard.modelo.reglas.EntradaSanidad;
 import com.example.ganhard.modelo.repositorio.GrupoSanitario;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.example.ganhard.modelo.repositorio.GrupoTarea;
 import com.google.android.material.textfield.TextInputLayout;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -43,6 +43,8 @@ public class SanidadFormActivity extends FormularioActivity {
     public static final String EXTRA_ID_GRUPO = "id_grupo";
     /** Tarea de sanidad que este registro cumple (RF17); sin ella, la actividad se registra sin programar. */
     public static final String EXTRA_ID_TAREA = "id_tarea";
+    /** Con él, la actividad se registra en los animales de ese grupo de tareas y completa la tarea pendiente de cada uno. */
+    public static final String EXTRA_ID_GRUPO_TAREAS = "id_grupo_tareas";
     private static final String ESTADO_ANIMAL = "animal_elegido", ESTADO_TIPO = "tipo_elegido";
     private static final String ESTADO_REGISTRO = "id_registro", ESTADO_CARGADO = "formulario_cargado";
     private static final String ESTADO_TODOS = "aplicar_a_todos", ESTADO_ELEGIDOS = "animales_elegidos", ESTADO_ELEGIDOS_DEFINIDOS = "elegidos_definidos";
@@ -54,6 +56,9 @@ public class SanidadFormActivity extends FormularioActivity {
     private boolean todos, elegidosDefinidos;
     private final Set<String> elegidos = new LinkedHashSet<>();
     private String idTarea;
+    private String idGrupoTareas;
+    /** Al cumplir un grupo de tareas: la tarea pendiente de cada animal. */
+    private final Map<String, String> tareasPorAnimal = new java.util.LinkedHashMap<>();
     /** Animal y tipo elegidos, como los entiende el Modelo; lo que se ve en pantalla son sus nombres. */
     private String idAnimal = "", tipo = "";
     private boolean animalFijo;
@@ -81,6 +86,7 @@ public class SanidadFormActivity extends FormularioActivity {
         idEvento = getIntent().getStringExtra(EXTRA_ID_EVENTO);
         idGrupo = getIntent().getStringExtra(EXTRA_ID_GRUPO);
         idTarea = getIntent().getStringExtra(EXTRA_ID_TAREA);
+        idGrupoTareas = getIntent().getStringExtra(EXTRA_ID_GRUPO_TAREAS);
         String animalRecibido = getIntent().getStringExtra(EXTRA_ID_ANIMAL);
         animalFijo = !esCorreccion() && animalRecibido != null;
         fechaInicial = FormatoFecha.aPantalla(Tiempo.hoy().toString());
@@ -126,12 +132,14 @@ public class SanidadFormActivity extends FormularioActivity {
                     .putExtra(AnulacionActivity.EXTRA_ENTIDAD, HistorialCambio.EVENTO_SANITARIO).putExtra(AnulacionActivity.EXTRA_ID, idEvento)));
             if (idGrupo != null) cargarGrupo(); else cargarActividad();
         } else {
-            // Con un animal fijo (desde su ficha) no se ofrece aplicar a todos.
-            if (!animalFijo) vista.aplicarATodos.setVisibility(View.VISIBLE);
+            // Con un animal fijo (desde su ficha) no se ofrece aplicar a todos. Al cumplir un grupo de tareas siempre es en grupo.
+            boolean cumplirGrupo = idGrupoTareas != null;
+            if (cumplirGrupo) { todos = true; vista.toolbar.setTitle(R.string.grupo_cumplir_toolbar); }
+            else if (!animalFijo) vista.aplicarATodos.setVisibility(View.VISIBLE);
             vista.aplicarATodos.setChecked(todos);
             textoGuardar = vista.guardar.getText();
             mostrarModo();
-            cargarAnimales();
+            if (cumplirGrupo) cargarTareasDelGrupo(); else cargarAnimales();
         }
     }
 
@@ -154,56 +162,54 @@ public class SanidadFormActivity extends FormularioActivity {
         vista.guardar.setText(getResources().getQuantityString(R.plurals.grupo_guardar, elegidos.size(), elegidos.size()));
     }
 
+    /** Los animales activos; al cumplir tareas de un grupo, solo los que aún tienen su tarea pendiente. */
     private List<AnimalResumen> animalesActivos() {
         List<AnimalResumen> activos = new ArrayList<>();
-        for (AnimalResumen animal : animales) if (Animal.ACTIVO.equals(animal.estado)) activos.add(animal);
+        for (AnimalResumen animal : animales) {
+            if (!Animal.ACTIVO.equals(animal.estado)) continue;
+            if (idGrupoTareas != null && !tareasPorAnimal.containsKey(animal.idAnimal)) continue;
+            activos.add(animal);
+        }
         return activos;
+    }
+
+    /** Cumplir para todos: trae las tareas pendientes del grupo (una por animal) antes de ofrecer los animales. */
+    private void cargarTareasDelGrupo() {
+        app().tareas().grupo(idGrupoTareas, new Callback<GrupoTarea>() {
+            @Override public void exito(GrupoTarea grupo) {
+                if (!disponible()) return;
+                tareasPorAnimal.clear();
+                for (TareaResumen fila : grupo.tareas) {
+                    if (Tarea.PENDIENTE.equals(fila.tarea.estado) && Tarea.SANIDAD.equals(fila.tarea.tipo) && fila.tarea.idAnimal != null) {
+                        tareasPorAnimal.put(fila.tarea.idAnimal, fila.tarea.idTarea);
+                    }
+                }
+                if (tareasPorAnimal.isEmpty()) {
+                    Toast.makeText(getApplicationContext(), R.string.tarea_no_pendiente, Toast.LENGTH_SHORT).show();
+                    finish();
+                    return;
+                }
+                if (!formularioCargado && texto(vista.descripcion).isEmpty()) vista.descripcion.setText(grupo.referencia.titulo);
+                formularioCargado = true;
+                cargarAnimales();
+            }
+            @Override public void error(ErrorModelo error) {
+                if (!disponible()) return;
+                if (error.tipo == ErrorModelo.Tipo.NO_ENCONTRADO) {
+                    Toast.makeText(getApplicationContext(), R.string.tarea_grupo_no_encontrada, Toast.LENGTH_SHORT).show();
+                    finish();
+                } else {
+                    mensaje(R.string.error_carga);
+                }
+            }
+        });
     }
 
     /** Lista con casillas de los animales activos; el botón del medio marca o quita a todos de una vez. */
     private void elegirAnimales() {
         if (guardando) return;
-        List<AnimalResumen> activos = animalesActivos();
-        String[] nombres = new String[activos.size()];
-        boolean[] marcados = new boolean[activos.size()];
-        for (int i = 0; i < nombres.length; i++) {
-            nombres[i] = nombreDe(activos.get(i).codigo, activos.get(i).nombre);
-            marcados[i] = elegidos.contains(activos.get(i).idAnimal);
-        }
-        AlertDialog dialogo = new MaterialAlertDialogBuilder(this)
-                .setTitle(R.string.grupo_dialogo_titulo)
-                .setMultiChoiceItems(nombres, marcados, (d, posicion, marcado) -> marcados[posicion] = marcado)
-                .setPositiveButton(R.string.grupo_aceptar, (d, boton) -> {
-                    elegidos.clear();
-                    for (int i = 0; i < marcados.length; i++) if (marcados[i]) elegidos.add(activos.get(i).idAnimal);
-                    elegidosDefinidos = true;
-                    refrescarGrupo();
-                })
-                .setNegativeButton(R.string.cancelar, null)
-                .setNeutralButton(R.string.grupo_quitar_todos, null)
-                .create();
-        dialogo.show();
-        // El botón de en medio se conecta después de mostrar el cuadro; si no, pulsarlo lo cerraría.
-        Button marcarOQuitar = dialogo.getButton(AlertDialog.BUTTON_NEUTRAL);
-        Runnable etiquetar = () -> {
-            boolean todosMarcados = true;
-            for (boolean marcado : marcados) todosMarcados &= marcado;
-            marcarOQuitar.setText(todosMarcados ? R.string.grupo_quitar_todos : R.string.grupo_marcar_todos);
-        };
-        etiquetar.run();
-        dialogo.getListView().setOnItemClickListener((lista, fila, posicion, id) -> {
-            marcados[posicion] = dialogo.getListView().isItemChecked(posicion);
-            etiquetar.run();
-        });
-        marcarOQuitar.setOnClickListener(v -> {
-            boolean todosMarcados = true;
-            for (boolean marcado : marcados) todosMarcados &= marcado;
-            for (int i = 0; i < marcados.length; i++) {
-                marcados[i] = !todosMarcados;
-                dialogo.getListView().setItemChecked(i, !todosMarcados);
-            }
-            etiquetar.run();
-        });
+        SeleccionAnimales.mostrar(this, idGrupoTareas != null ? R.string.grupo_cumplir_dialogo_titulo : R.string.grupo_dialogo_titulo,
+                animalesActivos(), elegidos, () -> { elegidosDefinidos = true; refrescarGrupo(); });
     }
 
     /** Llena el selector con los animales de la finca; sin animales no hay a quién registrarle nada. */
@@ -348,11 +354,13 @@ public class SanidadFormActivity extends FormularioActivity {
     private void registrarEnGrupo(EntradaSanidad entrada) {
         if (elegidos.isEmpty()) { mensaje(R.string.grupo_sin_animales); return; }
         empezarGuardado();
-        app().sanidad().registrarGrupo(idRegistro, new ArrayList<>(elegidos), entrada, new Callback<List<EventoSanitario>>() {
+        boolean cumplirGrupo = idGrupoTareas != null;
+        app().sanidad().registrarGrupo(idRegistro, new ArrayList<>(elegidos), entrada, cumplirGrupo ? tareasPorAnimal : null, new Callback<List<EventoSanitario>>() {
             @Override public void exito(List<EventoSanitario> creadas) {
                 if (!disponible()) return;
                 guardando = false;
-                Toast.makeText(getApplicationContext(), getResources().getQuantityString(R.plurals.grupo_registrada, creadas.size(), creadas.size()),
+                int mensaje = cumplirGrupo ? R.plurals.grupo_cumplida : R.plurals.grupo_registrada;
+                Toast.makeText(getApplicationContext(), getResources().getQuantityString(mensaje, creadas.size(), creadas.size()),
                         Toast.LENGTH_SHORT).show();
                 setResult(RESULT_OK);
                 finish();
@@ -361,6 +369,17 @@ public class SanidadFormActivity extends FormularioActivity {
                 if (!disponible()) return;
                 terminarGuardado();
                 if (error.tipo == ErrorModelo.Tipo.NO_ENCONTRADO && ErrorModelo.FINCA.equals(error.faltante)) { irAConfiguracion(); return; }
+                if (error.tipo == ErrorModelo.Tipo.NO_ENCONTRADO && ErrorModelo.TAREA.equals(error.faltante)) {
+                    Toast.makeText(getApplicationContext(), R.string.tarea_no_encontrada, Toast.LENGTH_SHORT).show();
+                    finish();
+                    return;
+                }
+                if (cumplirGrupo && error.campos.containsKey(Campos.ESTADO)) {
+                    // Otra pantalla ya completó o canceló alguna de las tareas: se vuelven a leer y se reintenta.
+                    mensaje(R.string.tarea_no_pendiente);
+                    cargarTareasDelGrupo();
+                    return;
+                }
                 if (error.tipo == ErrorModelo.Tipo.NO_ENCONTRADO || error.campos.containsKey(Campos.ID_ANIMAL)) {
                     // Un animal se vendió o ya no existe mientras se llenaba el formulario: se actualiza la lista.
                     mensaje(R.string.grupo_animal_inactivo);

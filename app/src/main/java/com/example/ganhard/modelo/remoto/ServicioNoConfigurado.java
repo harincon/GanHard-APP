@@ -10,6 +10,8 @@ public final class ServicioNoConfigurado implements ServicioRemoto {
     @Override public void registrar(String correo, String contrasena, String nombre) throws ErrorRemoto { throw falta(); }
     @Override public SesionRemota iniciarSesion(String correo, String contrasena) throws ErrorRemoto { throw falta(); }
     @Override public SesionRemota renovar(String tokenRenovacion) throws ErrorRemoto { throw falta(); }
+    @Override public SesionRemota confirmarCorreo(String correo, String codigo) throws ErrorRemoto { throw falta(); }
+    @Override public void reenviarConfirmacion(String correo) throws ErrorRemoto { throw falta(); }
     @Override public void recuperarAcceso(String correo) throws ErrorRemoto { throw falta(); }
     @Override public void cerrarSesion(String tokenAcceso) throws ErrorRemoto { throw falta(); }
     @Override public void vincularFinca(String tokenAcceso, FincaRemota finca) throws ErrorRemoto { throw falta(); }

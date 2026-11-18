@@ -7,7 +7,7 @@ import android.widget.Toast;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import com.example.ganhard.R;
 import com.example.ganhard.databinding.ActivityTareasBinding;
-import com.example.ganhard.modelo.datos.TareaResumen;
+import com.example.ganhard.modelo.repositorio.ElementoTarea;
 import com.example.ganhard.modelo.entidad.Animal;
 import com.example.ganhard.modelo.entidad.Tarea;
 import com.example.ganhard.modelo.nucleo.Callback;
@@ -36,6 +36,8 @@ public class TareasActivity extends BaseActivity {
         idAnimal = getIntent().getStringExtra(EXTRA_ID_ANIMAL);
         adaptador = new TareaAdapter(this, tarea -> startActivity(new Intent(this, TareaDetalleActivity.class)
                 .putExtra(TareaDetalleActivity.EXTRA_ID_TAREA, tarea.tarea.idTarea)));
+        adaptador.alSeleccionarGrupo(idGrupo -> startActivity(new Intent(this, TareaGrupoActivity.class)
+                .putExtra(TareaGrupoActivity.EXTRA_ID_GRUPO, idGrupo)));
         vista.lista.setLayoutManager(new LinearLayoutManager(this));
         vista.lista.setAdapter(adaptador);
         vista.filtros.setOnCheckedChangeListener((grupo, id) -> cargar());
@@ -69,11 +71,11 @@ public class TareasActivity extends BaseActivity {
         final int mia = ++peticion;
         final String estado = estadoFiltro();
         vista.progreso.setVisibility(View.VISIBLE);
-        app().tareas().listar(estado, idAnimal, new Callback<List<TareaResumen>>() {
-            @Override public void exito(List<TareaResumen> tareas) {
+        app().tareas().listaAgrupada(estado, idAnimal, new Callback<List<ElementoTarea>>() {
+            @Override public void exito(List<ElementoTarea> tareas) {
                 if (!disponible() || mia != peticion) return;
                 vista.progreso.setVisibility(View.INVISIBLE);
-                adaptador.mostrar(tareas);
+                adaptador.mostrarElementos(tareas);
                 boolean vacia = tareas.isEmpty();
                 vista.estadoError.setVisibility(View.GONE);
                 vista.lista.setVisibility(vacia ? View.GONE : View.VISIBLE);

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Selector de mes del Inicio -->
+    <string name="mes_anterior">Mes anterior</string>
+    <string name="mes_siguiente">Mes siguiente</string>
+
+    <!-- Tarjeta Animales -->
+    <string name="est_animales_titulo">Animales</string>
+    <string name="est_hembras">Hembras</string>
+    <string name="est_machos">Machos</string>
+    <string name="est_razas_titulo">Razas más comunes</string>
+    <string name="est_sin_raza">Sin raza</string>
+    <string name="est_movimientos">En el mes: %1$d ingresos · %2$d ventas · %3$d fallecimientos</string>
+    <string name="est_animales_sin_cambio">Igual que el mes anterior</string>
+    <string name="est_animales_variacion">%1$s frente al mes anterior</string>
+
+    <!-- Tarjeta Pesos -->
+    <string name="est_pesos_titulo">Pesos</string>
+    <string name="est_pesos_promedio">%1$s kg de promedio</string>
+    <string name="est_pesos_vacio">Todavía no hay pesajes de animales activos en este mes.</string>
+    <string name="est_pesos_calculo">Calculado con %1$d de %2$d animales activos</string>
+    <string name="est_pesos_pesados">Pesados en el mes</string>
+    <string name="est_pesos_sin_pesar">Sin pesar hace más de 60 días: %1$d</string>
+    <string name="est_pesos_variacion">%1$s kg frente al mes anterior</string>
+
+    <!-- Cerrar sesión y borrar datos -->
+    <string name="modulo_cerrar_todo">Cerrar sesión y borrar datos</string>
+    <string name="sub_cerrar_todo">Quita la cuenta y todos los datos de este teléfono</string>
+    <string name="borrar_todo_titulo">¿Cerrar sesión y borrar todo?</string>
+    <string name="borrar_todo_aviso">Se borrarán de este teléfono tu perfil, la finca, los animales, los pesajes, la sanidad, los gastos, las tareas y el historial, y se cerrará la sesión de la cuenta.</string>
+    <string name="borrar_todo_sin_sincronizar">Todavía no hay sincronización: lo que no esté guardado en otro lugar se perderá y no se podrá recuperar.</string>
+    <string name="borrar_todo_hint">Escribe BORRAR para confirmar</string>
+    <string name="borrar_todo_palabra">BORRAR</string>
+    <string name="borrar_todo_confirmar">Borrar todo</string>
+    <string name="borrar_todo_error">No se pudieron borrar los datos. No se cambió nada; inténtalo de nuevo.</string>
+
+    <!-- Tarjeta Gastos -->
+    <string name="est_gastos_titulo">Gastos del mes</string>
+    <string name="est_gastos_vacio">No hay gastos registrados en este mes.</string>
+    <string name="est_gastos_variacion">%1$s (%2$s) frente al mes anterior</string>
+    <string name="est_gastos_sin_anterior">Sin gastos el mes anterior</string>
+    <string name="est_gastos_igual">Igual que el mes anterior</string>
+    <string name="est_gasto_categoria_valor">%1$s · %2$d %%</string>
+</resources>

@@ -13,6 +13,10 @@ public interface ServicioRemoto {
     void registrar(String correo, String contrasena, String nombre) throws ErrorRemoto;
     SesionRemota iniciarSesion(String correo, String contrasena) throws ErrorRemoto;
     SesionRemota renovar(String tokenRenovacion) throws ErrorRemoto;
+    /** Confirma el correo con el código que llegó por correo; el servidor entrega la sesión ya iniciada. */
+    SesionRemota confirmarCorreo(String correo, String codigo) throws ErrorRemoto;
+    /** Pide un código de confirmación nuevo; no revela si el correo tiene cuenta. */
+    void reenviarConfirmacion(String correo) throws ErrorRemoto;
     void recuperarAcceso(String correo) throws ErrorRemoto;
     void cerrarSesion(String tokenAcceso) throws ErrorRemoto;
 

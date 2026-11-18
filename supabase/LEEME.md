@@ -27,9 +27,29 @@ En **Authentication → Sign In / Providers → Email**:
   desactivas, cualquiera podría registrarse con el correo de otra persona.
 - **Minimum password length**: pon `8` (es el mínimo que pide la app).
 
-En **Authentication → URL Configuration**, el enlace del correo de confirmación lleva a *Site URL*. La app no tiene
-página web, así que al pulsar el enlace puede verse una página vacía o un error del navegador: **no importa**, la
-cuenta ya queda confirmada y se puede iniciar sesión.
+### El correo de confirmación lleva un código, no un enlace
+
+Los enlaces de confirmación fallan en la práctica: los correos con protección (institucionales, Outlook) abren el
+enlace antes que la persona y lo gastan, y además el enlace termina en `localhost:3000`, que no existe en el teléfono.
+Por eso la app confirma el correo con un **código** que la persona escribe en la pantalla.
+
+En **Authentication → Email Templates → Confirm signup**, reemplaza el contenido por esto (lo importante es
+`{{ .Token }}`; **quita** `{{ .ConfirmationURL }}`):
+
+- **Subject:** `Tu código de GanHard`
+- **Body (HTML):**
+
+  ```html
+  <h2>Confirma tu correo en GanHard</h2>
+  <p>Escribe este código en la app para confirmar tu correo:</p>
+  <p style="font-size:28px;letter-spacing:4px"><strong>{{ .Token }}</strong></p>
+  <p>Si no creaste una cuenta, ignora este mensaje.</p>
+  ```
+
+Guarda con **Save changes**. El código dura una hora (ajustable en **Authentication → Sign In / Providers → Email →
+Email OTP Expiration**) y tiene 6 dígitos por defecto; la app acepta de 6 a 10.
+
+Si alguien no recibe el código, la pantalla de confirmación tiene **Reenviar el código**.
 
 ## 4. Conectar la app
 

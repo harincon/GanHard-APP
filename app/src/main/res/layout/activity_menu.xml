@@ -31,7 +31,9 @@
             <com.example.ganhard.controlador.FilaNavegacion android:id="@+id/filaSincronizacion" android:layout_width="match_parent" android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp" app:titulo="@string/modulo_sincronizacion" app:subtitulo="@string/sub_sincronizacion" />
             <com.example.ganhard.controlador.FilaNavegacion android:id="@+id/filaConfiguracion" android:layout_width="match_parent" android:layout_height="wrap_content"
-                app:titulo="@string/modulo_configuracion" app:subtitulo="@string/sub_configuracion" />
+                android:layout_marginBottom="24dp" app:titulo="@string/modulo_configuracion" app:subtitulo="@string/sub_configuracion" />
+            <com.example.ganhard.controlador.FilaNavegacion android:id="@+id/filaCerrarTodo" android:layout_width="match_parent" android:layout_height="wrap_content"
+                app:titulo="@string/modulo_cerrar_todo" app:subtitulo="@string/sub_cerrar_todo" />
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

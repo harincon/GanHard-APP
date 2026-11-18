@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Programar una tarea para todos los animales -->
+    <string name="tarea_todos_animales">Todos los animales activos</string>
+    <string name="tarea_animales_dialogo_titulo">Animales que tendrán la tarea</string>
+    <string name="ayuda_animal_tarea_grupo">Elige un animal, "Sin animal" o "Todos los animales activos".</string>
+    <string name="ayuda_tipo_tarea">Elige un tipo o escribe el tuyo (por ejemplo: Herrar). Un tipo propio funciona como una tarea general.</string>
+    <plurals name="tarea_guardar_grupo">
+        <item quantity="one">Guardar en %d animal</item>
+        <item quantity="other">Guardar en %d animales</item>
+    </plurals>
+    <plurals name="tarea_grupo_guardada">
+        <item quantity="one">Tarea programada para %d animal.</item>
+        <item quantity="other">Tarea programada para %d animales.</item>
+    </plurals>
+
+    <!-- Tarjeta de un grupo en la lista de tareas -->
+    <plurals name="tarea_grupo_pendientes">
+        <item quantity="one">%d animal pendiente</item>
+        <item quantity="other">%d animales pendientes</item>
+    </plurals>
+    <plurals name="tarea_grupo_completadas">
+        <item quantity="one">%d animal completado</item>
+        <item quantity="other">%d animales completados</item>
+    </plurals>
+    <plurals name="tarea_grupo_canceladas">
+        <item quantity="one">%d animal cancelado</item>
+        <item quantity="other">%d animales cancelados</item>
+    </plurals>
+
+    <!-- Detalle de una tarea de grupo -->
+    <string name="tarea_grupo_titulo">Tarea para varios animales</string>
+    <plurals name="tarea_grupo_para">
+        <item quantity="one">Para %d animal</item>
+        <item quantity="other">Para %d animales</item>
+    </plurals>
+    <string name="tarea_grupo_resumen">%1$d pendientes · %2$d completadas · %3$d canceladas</string>
+    <string name="tarea_grupo_cumplir">Cumplir para todos</string>
+    <string name="tarea_grupo_cancelar">Cancelar las pendientes</string>
+    <string name="tarea_grupo_toque_animal">Toca un animal para ver su tarea, cumplirla o cancelarla solo a él.</string>
+    <string name="tarea_grupo_no_encontrada">Esta tarea ya no existe.</string>
+    <string name="tarea_grupo_cancelar_titulo">¿Cancelar las tareas pendientes?</string>
+    <plurals name="tarea_grupo_cancelar_mensaje">
+        <item quantity="one">Se cancelará la tarea pendiente de %d animal. Las ya completadas no cambian. No se puede reabrir; queda en el Historial de cambios.</item>
+        <item quantity="other">Se cancelarán las tareas pendientes de %d animales. Las ya completadas no cambian. No se pueden reabrir; quedan en el Historial de cambios.</item>
+    </plurals>
+    <string name="tarea_grupo_cancelar_confirmar">Cancelar tareas</string>
+    <plurals name="tarea_grupo_canceladas_ok">
+        <item quantity="one">Se canceló la tarea de %d animal.</item>
+        <item quantity="other">Se cancelaron las tareas de %d animales.</item>
+    </plurals>
+
+    <!-- Cumplir una tarea de sanidad para todos: la actividad que se registra -->
+    <string name="grupo_cumplir_toolbar">Cumplir para todos</string>
+    <string name="grupo_cumplir_dialogo_titulo">Animales que recibieron la actividad</string>
+    <plurals name="grupo_cumplida">
+        <item quantity="one">Actividad registrada y tarea completada en %d animal.</item>
+        <item quantity="other">Actividad registrada y tareas completadas en %d animales.</item>
+    </plurals>
+</resources>

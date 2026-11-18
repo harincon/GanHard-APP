@@ -62,6 +62,14 @@ public final class SupabaseServicio implements ServicioRemoto {
         return leerSesion(exigir(respuesta));
     }
 
+    @Override public SesionRemota confirmarCorreo(String correo, String codigo) throws ErrorRemoto {
+        return leerSesion(exigir(enviar("/auth/v1/verify", null, json("type", "signup", "email", correo, "token", codigo))));
+    }
+
+    @Override public void reenviarConfirmacion(String correo) throws ErrorRemoto {
+        exigir(enviar("/auth/v1/resend", null, json("type", "signup", "email", correo)));
+    }
+
     @Override public void recuperarAcceso(String correo) throws ErrorRemoto {
         exigir(enviar("/auth/v1/recover", null, json("email", correo)));
     }
@@ -226,6 +234,10 @@ public final class SupabaseServicio implements ServicioRemoto {
 
         if (respuesta.estado == 429 || (codigoError != null && codigoError.startsWith("over_") && codigoError.endsWith("_limit"))) {
             return ErrorRemoto.de(ErrorRemoto.Tipo.REGLA, ErrorRemoto.DEMASIADOS_INTENTOS, detalle, null);
+        }
+        // Un código de confirmación equivocado o vencido (Supabase no distingue entre los dos).
+        if ("otp_expired".equals(codigoError) || "invalid_otp".equals(codigoError)) {
+            return ErrorRemoto.de(ErrorRemoto.Tipo.REGLA, ErrorRemoto.CODIGO_INVALIDO, detalle, null);
         }
         if ("weak_password".equals(codigoError)) return ErrorRemoto.de(ErrorRemoto.Tipo.REGLA, ErrorRemoto.CONTRASENA_DEBIL, detalle, null);
         if ("user_already_exists".equals(codigoError) || "email_exists".equals(codigoError)) {

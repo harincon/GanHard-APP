@@ -28,6 +28,7 @@ public class MenuActivity extends BaseActivity {
         vista.filaSanidad.setOnClickListener(v -> startActivity(new Intent(this, SanidadActivity.class)));
         vista.filaGastos.setOnClickListener(v -> startActivity(new Intent(this, GastosActivity.class)));
         vista.filaTareas.setOnClickListener(v -> startActivity(new Intent(this, TareasActivity.class)));
+        vista.filaCerrarTodo.setOnClickListener(v -> DialogoBorrarTodo.mostrar(this));
         for (FilaNavegacion pendiente : new FilaNavegacion[]{vista.filaSincronizacion}) {
             pendiente.setHabilitada(false);
         }

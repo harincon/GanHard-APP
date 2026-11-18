@@ -20,7 +20,8 @@ import java.util.List;
                 @ForeignKey(entity = Animal.class, parentColumns = "id_animal", childColumns = "id_animal", onDelete = ForeignKey.RESTRICT)},
         indices = {
                 @Index(value = {"id_finca", "estado", "fecha_programada"}),
-                @Index("id_animal")})
+                @Index("id_animal"),
+                @Index("id_grupo")})
 public class Tarea {
     public static final String GENERAL = "GENERAL", PESAJE = "PESAJE", SANIDAD = "SANIDAD";
     public static final String PENDIENTE = "PENDIENTE", COMPLETADA = "COMPLETADA", CANCELADA = "CANCELADA";
@@ -31,7 +32,11 @@ public class Tarea {
     @NonNull @ColumnInfo(name = "id_finca") public String idFinca = "";
     /** Obligatorio en las de pesaje y sanidad; opcional en las generales. */
     @ColumnInfo(name = "id_animal") public String idAnimal;
+    /** Identifica las tareas programadas juntas para varios animales; nulo en las individuales. */
+    @ColumnInfo(name = "id_grupo") public String idGrupo;
     @NonNull public String tipo = GENERAL;
+    /** Nombre del tipo cuando la persona escribió uno propio (el tipo queda en GENERAL); nulo en los tipos normales. */
+    public String etiqueta;
     @NonNull public String titulo = "";
     public String descripcion;
     @NonNull @ColumnInfo(name = "fecha_programada") public String fechaProgramada = "";

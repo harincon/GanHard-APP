@@ -25,6 +25,11 @@ final class Presentacion {
     }
 
     /** Nombre visible del tipo de tarea; uno que esta versión no conoce se muestra tal cual. */
+    /** Nombre del tipo de una tarea: el que escribió la persona si es un tipo propio; si no, el normal. */
+    static String tipoTarea(Context contexto, Tarea tarea) {
+        return tarea.etiqueta != null ? tarea.etiqueta : tipoTarea(contexto, tarea.tipo);
+    }
+
     static String tipoTarea(Context contexto, String tipo) {
         if (tipo == null) return "";
         switch (tipo) {

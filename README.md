@@ -12,10 +12,11 @@ Java y XML (Android Views), arquitectura MVC, base de datos local con Room.
 - Registro e historial de pesajes por animal, con corrección y anulación con motivo.
 - Sanidad: actividades realizadas por animal (vacunas, desparasitaciones, revisiones, tratamientos), con corrección y anulación. Se pueden aplicar a todos los animales activos de una vez, y corregir o anular todo el grupo.
 - Gastos: egresos de la finca por mes con su total, con corrección y anulación.
-- Tareas: actividades programadas, generales o de un animal; al realizar un pesaje o una actividad sanitaria programados, la tarea queda completada y enlazada.
+- Tareas: actividades programadas, generales o de un animal; al realizar un pesaje o una actividad sanitaria programados, la tarea queda completada y enlazada. El tipo se elige o se escribe (un tipo propio, como «Herrar», funciona como una tarea general), y se pueden programar para todos los animales activos de una vez: la lista las junta en una tarjeta, se cancelan juntas y una de sanidad se cumple para todos con una sola actividad.
 - Historial de cambios de la finca y de cada animal: quién, cuándo, qué cambió y por qué.
-- Inicio con el total de animales activos.
-- Cuenta opcional: vincular la finca, invitar a un encargado por correo y retirar accesos con motivo.
+- Inicio con estadísticas mes por mes: animales (activos, hembras y machos, razas, ingresos, ventas y fallecimientos), pesos (promedio y animales sin pesar) y gastos (total y categorías), con barras simples.
+- Cuenta opcional: crear la cuenta o iniciar sesión (el correo se confirma con un código), vincular la finca, invitar a un encargado por correo y retirar accesos con motivo.
+- «Cerrar sesión y borrar datos» en el menú: cierra la sesión y deja el teléfono como recién instalado, previa advertencia.
 - Tema claro, oscuro o el del sistema.
 
 Sincronización aparece en el menú como "Próximamente".

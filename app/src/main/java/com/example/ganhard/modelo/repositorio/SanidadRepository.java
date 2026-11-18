@@ -157,6 +157,17 @@ public final class SanidadRepository {
      * entrada de historial.
      */
     public void registrarGrupo(String idGrupo, List<String> idsAnimales, EntradaSanidad entrada, Callback<List<EventoSanitario>> callback) {
+        registrarGrupo(idGrupo, idsAnimales, entrada, null, callback);
+    }
+
+    /**
+     * Igual que el anterior, pero para cumplir tareas de sanidad (RF17) de varios animales a la vez: {@code tareasPorAnimal}
+     * dice qué tarea pendiente completa la actividad de cada animal (los que no estén en el mapa no cierran ninguna). En
+     * la misma transacción cada actividad se guarda con su {@code id_tarea} y su tarea queda completada en la fecha de la
+     * actividad. Si alguna tarea ya no está pendiente, no es de sanidad o no es de ese animal, no se guarda nada.
+     */
+    public void registrarGrupo(String idGrupo, List<String> idsAnimales, EntradaSanidad entrada,
+                               Map<String, String> tareasPorAnimal, Callback<List<EventoSanitario>> callback) {
         ejecutor.ejecutar(() -> {
             List<EventoSanitario> existentes = db.eventoSanitarioDao().todosDelGrupo(idGrupo);
             if (!existentes.isEmpty()) return existentes;
@@ -170,6 +181,7 @@ public final class SanidadRepository {
             String ahora = Tiempo.ahoraUtc();
             List<EventoSanitario> eventos = new ArrayList<>();
             List<HistorialCambio> cambios = new ArrayList<>();
+            List<Tarea> tareasCerradas = new ArrayList<>();
             for (String idAnimal : ids) {
                 Animal animal = animalExistente(idAnimal);
                 if (!animal.idFinca.equals(idFinca)) throw ErrorModelo.noEncontrado(ErrorModelo.ANIMAL);
@@ -185,12 +197,20 @@ public final class SanidadRepository {
                 aplicar(evento, entrada, animal);
                 evento.creadoEn = ahora;
                 evento.actualizadoEn = ahora;
+                String idTarea = tareasPorAnimal == null ? null : tareasPorAnimal.get(idAnimal);
+                if (idTarea != null && !idTarea.trim().isEmpty()) evento.idTarea = idTarea;
                 eventos.add(evento);
                 cambios.add(registro.preparar(HistorialCambio.EVENTO_SANITARIO, evento.idEventoSanitario, HistorialCambio.CREAR,
                         null, ValoresCambio.de(evento), null, null, ahora));
+                if (evento.idTarea != null) {
+                    CierreTarea cierre = CierreTarea.preparar(db, registro, idTarea, Tarea.SANIDAD, idAnimal, evento.fecha, ahora);
+                    tareasCerradas.add(cierre.tarea);
+                    cambios.add(cierre.cambio);
+                }
             }
             registro.guardar(() -> {
                 for (EventoSanitario evento : eventos) db.eventoSanitarioDao().insertar(evento);
+                for (Tarea tarea : tareasCerradas) db.tareaDao().actualizar(tarea);
             }, cambios.toArray(new HistorialCambio[0]));
             return eventos;
         }, callback);

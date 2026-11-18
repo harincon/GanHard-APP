@@ -11,7 +11,7 @@
     <string name="remoto_sin_sesion">Tu sesión terminó. Inicia sesión de nuevo.</string>
     <string name="remoto_sin_conexion">No hay conexión con el servidor. Revisa tu internet e inténtalo de nuevo.</string>
     <string name="remoto_credenciales">Correo o contraseña incorrectos.</string>
-    <string name="remoto_correo_sin_confirmar">Confirma tu correo: te enviamos un mensaje al registrarte.</string>
+    <string name="remoto_correo_sin_confirmar">Confirma tu correo con el enlace que te enviamos o con su código. Si ya lo confirmaste, vuelve a intentarlo; si tienes el código, pulsa «Confirmar mi correo con un código».</string>
     <string name="remoto_no_autorizado">No tienes permiso para esta acción.</string>
     <string name="remoto_no_encontrado">No se encontró lo que buscabas.</string>
     <string name="remoto_servidor">El servidor no respondió como se esperaba. Inténtalo más tarde.</string>
@@ -52,8 +52,8 @@
     <string name="cuenta_correo_sin_confirmar">Correo sin confirmar</string>
     <string name="cuenta_iniciar">Iniciar sesión</string>
     <string name="cuenta_crear">Crear cuenta</string>
-    <string name="cuenta_cerrar_sesion">Cerrar sesión</string>
-    <string name="cuenta_cerrar_texto">Cerrar sesión no borra los datos de este teléfono.</string>
+    <string name="cuenta_cerrar_sesion">Cerrar sesión de la cuenta</string>
+    <string name="cuenta_cerrar_texto">Cerrar la sesión de la cuenta no borra los datos de este teléfono. Para borrarlos, usa «Cerrar sesión y borrar datos» del menú.</string>
     <string name="cuenta_sesion_cerrada">Sesión cerrada.</string>
     <string name="cuenta_mi_finca">Mi finca</string>
     <string name="cuenta_sin_finca">Aún no registras los datos de tu finca en este teléfono.</string>
@@ -71,7 +71,7 @@
     <string name="sesion_titulo_inicio">Iniciar sesión</string>
     <string name="sesion_titulo_registro">Crear cuenta</string>
     <string name="sesion_titulo_recuperar">Recuperar acceso</string>
-    <string name="sesion_ayuda_registro">Te enviaremos un correo para confirmar tu cuenta. Solo con el correo confirmado podrás aceptar invitaciones.</string>
+    <string name="sesion_ayuda_registro">Te enviaremos un correo para confirmar la cuenta: puedes tocar el enlace o escribir el código que traiga. Solo con el correo confirmado podrás aceptar invitaciones.</string>
     <string name="sesion_ayuda_recuperar">Escribe tu correo y te enviaremos las instrucciones para elegir una contraseña nueva.</string>
     <string name="sesion_nombre">Nombre completo *</string>
     <string name="sesion_correo">Correo electrónico *</string>
@@ -84,9 +84,22 @@
     <string name="sesion_ya_tengo">Ya tengo cuenta</string>
     <string name="sesion_no_tengo">No tengo cuenta</string>
     <string name="sesion_olvide">Olvidé mi contraseña</string>
-    <string name="sesion_registro_listo">Cuenta creada. Revisa tu correo para confirmarla y luego inicia sesión.</string>
+    <string name="sesion_registro_listo">Cuenta creada. Te enviamos un correo: toca el enlace que trae o escribe aquí su código. Si no llega, revisa el correo no deseado.</string>
     <string name="sesion_recuperar_listo">Si el correo tiene una cuenta, recibirás las instrucciones en unos minutos.</string>
     <string name="sesion_iniciada">Sesión iniciada.</string>
+    <string name="sesion_titulo_confirmar">Confirmar correo</string>
+    <string name="sesion_ayuda_confirmar">Confirma con una de las dos: escribe aquí el código del correo, o toca el enlace del correo y después pulsa «Ya confirmé con el enlace». Si no llega o ya venció, pide uno nuevo.</string>
+    <string name="sesion_ya_confirme">Ya confirmé con el enlace</string>
+    <string name="sesion_ya_confirme_ayuda">Si ya tocaste el enlace del correo, escribe tu contraseña e inicia sesión.</string>
+    <string name="sesion_accion_confirmar">Confirmar</string>
+    <string name="sesion_codigo">Código de confirmación *</string>
+    <string name="sesion_tengo_codigo">Confirmar mi correo con un código</string>
+    <string name="sesion_reenviar">Reenviar el código</string>
+    <string name="sesion_reenviado">Te enviamos un código nuevo. Puede tardar unos minutos; revisa también el correo no deseado.</string>
+    <string name="sesion_confirmada">Correo confirmado. Sesión iniciada.</string>
+    <string name="regla_codigo_invalido">El código no es correcto o ya venció. Pide uno nuevo con «Reenviar el código».</string>
+    <string name="error_codigo_confirmacion_obligatorio">Escribe el código que te enviamos.</string>
+    <string name="error_codigo_confirmacion_formato">El código solo tiene números (entre 6 y 10).</string>
 
     <!-- Integrantes e invitaciones (dueño) -->
     <string name="integrantes_titulo">Integrantes</string>

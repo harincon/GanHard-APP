@@ -74,7 +74,7 @@ public class TareaDetalleActivity extends BaseActivity {
         vista.progreso.setVisibility(View.INVISIBLE);
         vista.contenido.setVisibility(View.VISIBLE);
         boolean pendiente = Tarea.PENDIENTE.equals(tarea.estado);
-        vista.detalleEtiqueta.setText(getString(R.string.codigo_nombre, Presentacion.tipoTarea(this, tarea.tipo), Presentacion.estadoTarea(this, tarea.estado)));
+        vista.detalleEtiqueta.setText(getString(R.string.codigo_nombre, Presentacion.tipoTarea(this, tarea), Presentacion.estadoTarea(this, tarea.estado)));
         vista.detalleTitulo.setText(tarea.titulo);
         vista.detalleAnimal.setText(animal == null ? getString(R.string.tarea_general_finca)
                 : animal.nombre == null ? animal.codigo : getString(R.string.codigo_nombre, animal.codigo, animal.nombre));

@@ -15,12 +15,12 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * Iniciar sesión, crear una cuenta o recuperar el acceso: una sola pantalla con tres modos. Crear la cuenta no abre
+ * Iniciar sesión, crear una cuenta, confirmar el correo con un código o recuperar el acceso: una sola pantalla con cuatro modos. Crear la cuenta no abre
  * sesión; hay que confirmar el correo y entrar. Devuelve RESULT_OK cuando se inició sesión.
  */
 public class SesionActivity extends FormularioActivity {
     public static final String EXTRA_MODO = "modo";
-    public static final int INICIO = 0, REGISTRO = 1, RECUPERAR = 2;
+    public static final int INICIO = 0, REGISTRO = 1, RECUPERAR = 2, CONFIRMAR = 3;
 
     private ActivitySesionBinding vista;
     private int modo;
@@ -36,6 +36,10 @@ public class SesionActivity extends FormularioActivity {
         vista.guardar.setOnClickListener(v -> enviar());
         vista.enlaceCambiar.setOnClickListener(v -> cambiarModo(modo == INICIO ? REGISTRO : INICIO));
         vista.enlaceRecuperar.setOnClickListener(v -> cambiarModo(RECUPERAR));
+        vista.enlaceCodigo.setOnClickListener(v -> cambiarModo(CONFIRMAR));
+        vista.enlaceReenviar.setOnClickListener(v -> reenviarCodigo());
+        // Quien confirmó con el enlace del correo no necesita el código: solo entra con su contraseña.
+        vista.enlaceYaConfirme.setOnClickListener(v -> { cambiarModo(INICIO); mensaje(R.string.sesion_ya_confirme_ayuda); });
         aplicarModo();
     }
 
@@ -53,17 +57,38 @@ public class SesionActivity extends FormularioActivity {
     }
 
     private void aplicarModo() {
-        boolean registro = modo == REGISTRO, recuperar = modo == RECUPERAR;
-        vista.toolbar.setTitle(registro ? R.string.sesion_titulo_registro : recuperar ? R.string.sesion_titulo_recuperar : R.string.sesion_titulo_inicio);
-        vista.ayuda.setVisibility(registro || recuperar ? View.VISIBLE : View.GONE);
-        vista.ayuda.setText(registro ? R.string.sesion_ayuda_registro : R.string.sesion_ayuda_recuperar);
+        boolean registro = modo == REGISTRO, recuperar = modo == RECUPERAR, confirmar = modo == CONFIRMAR;
+        vista.toolbar.setTitle(registro ? R.string.sesion_titulo_registro : recuperar ? R.string.sesion_titulo_recuperar
+                : confirmar ? R.string.sesion_titulo_confirmar : R.string.sesion_titulo_inicio);
+        vista.ayuda.setVisibility(modo == INICIO ? View.GONE : View.VISIBLE);
+        vista.ayuda.setText(registro ? R.string.sesion_ayuda_registro : recuperar ? R.string.sesion_ayuda_recuperar : R.string.sesion_ayuda_confirmar);
         vista.campoNombre.setVisibility(registro ? View.VISIBLE : View.GONE);
-        vista.campoContrasena.setVisibility(recuperar ? View.GONE : View.VISIBLE);
+        vista.campoContrasena.setVisibility(recuperar || confirmar ? View.GONE : View.VISIBLE);
         vista.campoContrasena.setHelperText(registro ? getString(R.string.sesion_ayuda_contrasena) : null);
         vista.campoContrasenaRepetida.setVisibility(registro ? View.VISIBLE : View.GONE);
-        vista.guardar.setText(registro ? R.string.sesion_accion_registro : recuperar ? R.string.sesion_accion_recuperar : R.string.sesion_accion_inicio);
+        vista.campoCodigo.setVisibility(confirmar ? View.VISIBLE : View.GONE);
+        vista.guardar.setText(registro ? R.string.sesion_accion_registro : recuperar ? R.string.sesion_accion_recuperar
+                : confirmar ? R.string.sesion_accion_confirmar : R.string.sesion_accion_inicio);
         vista.enlaceCambiar.setText(modo == INICIO ? R.string.sesion_no_tengo : R.string.sesion_ya_tengo);
         vista.enlaceRecuperar.setVisibility(modo == INICIO ? View.VISIBLE : View.GONE);
+        vista.enlaceCodigo.setVisibility(modo == INICIO ? View.VISIBLE : View.GONE);
+        vista.enlaceReenviar.setVisibility(confirmar ? View.VISIBLE : View.GONE);
+        vista.enlaceYaConfirme.setVisibility(confirmar ? View.VISIBLE : View.GONE);
+    }
+
+    /** Pide un código nuevo para el correo escrito; el anterior deja de valer. */
+    private void reenviarCodigo() {
+        if (guardando) return;
+        empezarGuardado();
+        cuenta().reenviarConfirmacion(texto(vista.correo), new CallbackRemoto<Void>() {
+            @Override public void exito(Void valor) {
+                if (!disponible()) return;
+                terminarGuardado();
+                mostrarErrores(Collections.emptyMap());
+                mensaje(R.string.sesion_reenviado);
+            }
+            @Override public void error(ErrorRemoto error) { fallo(error); }
+        });
     }
 
     private void enviar() {
@@ -77,8 +102,20 @@ public class SesionActivity extends FormularioActivity {
                     terminarGuardado();
                     vista.contrasena.setText("");
                     vista.contrasenaRepetida.setText("");
-                    cambiarModo(INICIO);
+                    // Crear la cuenta no abre sesión: se pide el código que llegó al correo para confirmarla.
+                    cambiarModo(CONFIRMAR);
                     mensaje(R.string.sesion_registro_listo);
+                }
+                @Override public void error(ErrorRemoto error) { fallo(error); }
+            });
+        } else if (modo == CONFIRMAR) {
+            cuenta().confirmarCorreo(correo, texto(vista.codigo), new CallbackRemoto<SesionRemota>() {
+                @Override public void exito(SesionRemota sesion) {
+                    if (!disponible()) return;
+                    guardando = false;
+                    Toast.makeText(getApplicationContext(), R.string.sesion_confirmada, Toast.LENGTH_SHORT).show();
+                    setResult(RESULT_OK);
+                    finish();
                 }
                 @Override public void error(ErrorRemoto error) { fallo(error); }
             });
@@ -118,6 +155,7 @@ public class SesionActivity extends FormularioActivity {
         campos.put(Campos.CORREO, vista.campoCorreo);
         campos.put(Campos.CONTRASENA, vista.campoContrasena);
         campos.put(Campos.CONTRASENA_REPETIDA, vista.campoContrasenaRepetida);
+        campos.put(Campos.CODIGO_CONFIRMACION, vista.campoCodigo);
         return campos;
     }
 

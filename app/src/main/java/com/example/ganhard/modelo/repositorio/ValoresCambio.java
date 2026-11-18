@@ -95,6 +95,7 @@ public final class ValoresCambio {
     public static JSONObject de(Tarea tarea) {
         JSONObject datos = new JSONObject();
         poner(datos, "tipo", tarea.tipo);
+        poner(datos, "etiqueta", tarea.etiqueta);
         poner(datos, "id_animal", tarea.idAnimal);
         poner(datos, "titulo", tarea.titulo);
         poner(datos, "descripcion", tarea.descripcion);

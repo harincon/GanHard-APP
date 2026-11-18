@@ -36,6 +36,18 @@ public final class ValidadorCuenta {
         return errores;
     }
 
+    /** Confirmar el correo: correo válido y el código que llegó, solo dígitos (el servicio de cuentas lo envía de 6 a 10). */
+    public static Map<String, ErrorCampo> confirmacion(String correo, String codigo) {
+        Map<String, ErrorCampo> errores = new LinkedHashMap<>();
+        ponerCorreo(errores, correo);
+        String limpio = normalizarCodigo(codigo);
+        if (limpio.isEmpty()) errores.put(Campos.CODIGO_CONFIRMACION, new ErrorCampo(CodigoError.OBLIGATORIO));
+        else if (!limpio.matches("\\d{6,10}")) errores.put(Campos.CODIGO_CONFIRMACION, new ErrorCampo(CodigoError.FORMATO));
+        return errores;
+    }
+
+    public static String normalizarCodigo(String codigo) { return codigo == null ? "" : codigo.trim(); }
+
     /** Nulo si el correo es válido. Sirve para recuperar el acceso y para invitar. */
     public static ErrorCampo correo(String correo) {
         String limpio = normalizarCorreo(correo);
