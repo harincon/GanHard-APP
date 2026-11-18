@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="ayuda_tipo_sanidad">Elige un tipo o escribe el tuyo (por ejemplo: Cirugía). Los que uses se vuelven a ofrecer.</string>
+
     <!-- Programar una tarea para todos los animales -->
     <string name="tarea_todos_animales">Todos los animales activos</string>
     <string name="tarea_animales_dialogo_titulo">Animales que tendrán la tarea</string>

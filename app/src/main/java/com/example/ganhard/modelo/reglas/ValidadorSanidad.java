@@ -8,14 +8,27 @@ import java.util.Map;
 
 /** Reglas de la actividad sanitaria (RF11, RN05), en Java puro. Devuelve códigos, no textos. */
 public final class ValidadorSanidad {
-    public static final int DESCRIPCION_MAXIMO = 500, PRODUCTO_MAXIMO = 100, OBSERVACIONES_MAXIMO = 500;
+    public static final int DESCRIPCION_MAXIMO = 500, PRODUCTO_MAXIMO = 100, OBSERVACIONES_MAXIMO = 500, TIPO_PROPIO_MAXIMO = 40;
 
     private ValidadorSanidad() {}
 
+    /**
+     * El tipo normal (vacunación, desparasitación, revisión, tratamiento u otro) al que equivale lo escrito o elegido,
+     * sin importar mayúsculas ni tildes; nulo si es otro nombre, es decir, un tipo propio.
+     */
+    public static String tipoNormal(String texto) {
+        String clave = Claves.de(texto);
+        for (String tipo : EventoSanitario.TIPOS) if (clave.equals(Claves.de(tipo))) return tipo;
+        return null;
+    }
+
+    /** El tipo puede ser uno normal o uno propio escrito por la persona (hasta 40 caracteres). */
     public static Map<String, ErrorCampo> validar(EntradaSanidad entrada, Animal animal, LocalDate hoy) {
         Map<String, ErrorCampo> errores = new LinkedHashMap<>();
         if (entrada.tipo.isEmpty()) errores.put(Campos.TIPO, new ErrorCampo(CodigoError.OBLIGATORIO));
-        else if (!EventoSanitario.TIPOS.contains(entrada.tipo)) errores.put(Campos.TIPO, new ErrorCampo(CodigoError.VALOR_INVALIDO));
+        else if (tipoNormal(entrada.tipo) == null && entrada.tipo.length() > TIPO_PROPIO_MAXIMO) {
+            errores.put(Campos.TIPO, new ErrorCampo(CodigoError.LONGITUD_MAXIMA, TIPO_PROPIO_MAXIMO));
+        }
         if (entrada.fecha.isEmpty()) {
             errores.put(Campos.FECHA, new ErrorCampo(CodigoError.OBLIGATORIO));
         } else {

@@ -27,22 +27,28 @@ En **Authentication → Sign In / Providers → Email**:
   desactivas, cualquiera podría registrarse con el correo de otra persona.
 - **Minimum password length**: pon `8` (es el mínimo que pide la app).
 
-### El correo de confirmación lleva un código, no un enlace
+### El correo de confirmación: enlace o código, a elección de la persona
 
-Los enlaces de confirmación fallan en la práctica: los correos con protección (institucionales, Outlook) abren el
-enlace antes que la persona y lo gastan, y además el enlace termina en `localhost:3000`, que no existe en el teléfono.
-Por eso la app confirma el correo con un **código** que la persona escribe en la pantalla.
+La app acepta las dos formas de confirmar el correo:
 
-En **Authentication → Email Templates → Confirm signup**, reemplaza el contenido por esto (lo importante es
-`{{ .Token }}`; **quita** `{{ .ConfirmationURL }}`):
+- **Con el enlace** del correo: se toca y después, en la app, se pulsa «Ya confirmé con el enlace» e inicia sesión.
+- **Con un código**: se escribe en la pantalla «Confirmar correo».
 
-- **Subject:** `Tu código de GanHard`
+El enlace puede fallar en algunos correos con protección (institucionales, Outlook), que lo abren antes que la persona
+y lo gastan, y termina en `localhost:3000`, que no existe en el teléfono. Por eso conviene que el correo traiga **también
+el código**, que no tiene ese problema. El código solo llega si la plantilla incluye `{{ .Token }}`.
+
+En **Authentication → Email Templates → Confirm signup**, deja el contenido así (el enlace se conserva, y se agrega el código):
+
+- **Subject:** `Confirma tu cuenta de GanHard`
 - **Body (HTML):**
 
   ```html
   <h2>Confirma tu correo en GanHard</h2>
-  <p>Escribe este código en la app para confirmar tu correo:</p>
+  <p>Puedes confirmarlo de dos maneras:</p>
+  <p>1. Escribe este código en la app:</p>
   <p style="font-size:28px;letter-spacing:4px"><strong>{{ .Token }}</strong></p>
+  <p>2. O toca este enlace: <a href="{{ .ConfirmationURL }}">Confirmar mi correo</a></p>
   <p>Si no creaste una cuenta, ignora este mensaje.</p>
   ```
 

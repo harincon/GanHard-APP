@@ -1,10 +1,8 @@
 package com.example.ganhard.modelo.reglas;
 
 import com.example.ganhard.modelo.entidad.Tarea;
-import java.text.Normalizer;
 import java.time.LocalDate;
 import java.util.LinkedHashMap;
-import java.util.Locale;
 import java.util.Map;
 
 /** Reglas de la tarea (RF12, RF17), en Java puro. Devuelve códigos, no textos. */
@@ -14,11 +12,7 @@ public final class ValidadorTarea {
     private ValidadorTarea() {}
 
     /** Clave para comparar lo escrito: sin espacios sobrantes, sin tildes y sin distinguir mayúsculas. */
-    public static String clave(String texto) {
-        if (texto == null) return "";
-        String sinTildes = Normalizer.normalize(texto.trim(), Normalizer.Form.NFD).replaceAll("\\p{M}+", "");
-        return sinTildes.toLowerCase(Locale.ROOT);
-    }
+    public static String clave(String texto) { return Claves.de(texto); }
 
     /**
      * El tipo normal (GENERAL, PESAJE o SANIDAD) al que equivale lo escrito o elegido, sin importar mayúsculas ni

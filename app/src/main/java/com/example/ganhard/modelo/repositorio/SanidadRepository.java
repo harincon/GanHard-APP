@@ -11,6 +11,7 @@ import com.example.ganhard.modelo.nucleo.EjecutorModelo;
 import com.example.ganhard.modelo.nucleo.ErrorModelo;
 import com.example.ganhard.modelo.nucleo.Tiempo;
 import com.example.ganhard.modelo.reglas.Campos;
+import com.example.ganhard.modelo.reglas.Claves;
 import com.example.ganhard.modelo.reglas.CodigoError;
 import com.example.ganhard.modelo.reglas.EntradaSanidad;
 import com.example.ganhard.modelo.reglas.ErrorCampo;
@@ -330,8 +331,31 @@ public final class SanidadRepository {
         }, callback);
     }
 
-    private static void aplicar(EventoSanitario evento, EntradaSanidad entrada, Animal animal) {
-        evento.tipo = entrada.tipo;
+    /** Los tipos propios que la finca ya usó (sin repetir y en orden), para ofrecerlos otra vez al registrar. */
+    public void tiposPropios(Callback<List<String>> callback) {
+        ejecutor.ejecutar(() -> {
+            String idFinca = db.configuracionDao().idFincaActiva();
+            if (idFinca == null) throw ErrorModelo.noEncontrado(ErrorModelo.FINCA);
+            return db.eventoSanitarioDao().tiposPropios(idFinca);
+        }, callback);
+    }
+
+    /**
+     * El tipo que se guarda: el normal si lo escrito coincide con alguno (sin importar mayúsculas ni tildes) o el texto
+     * propio. Un tipo propio ya usado se guarda igual que la primera vez, aunque se haya tecleado distinto.
+     */
+    private String tipoAGuardar(String texto, Animal animal) {
+        String normal = ValidadorSanidad.tipoNormal(texto);
+        if (normal != null) return normal;
+        String clave = Claves.de(texto);
+        for (String usado : db.eventoSanitarioDao().tiposPropios(animal.idFinca)) {
+            if (Claves.de(usado).equals(clave)) return usado;
+        }
+        return texto;
+    }
+
+    private void aplicar(EventoSanitario evento, EntradaSanidad entrada, Animal animal) {
+        evento.tipo = tipoAGuardar(entrada.tipo, animal);
         evento.fecha = entrada.fecha;
         evento.descripcion = entrada.descripcion;
         evento.producto = entrada.producto.isEmpty() ? null : entrada.producto;

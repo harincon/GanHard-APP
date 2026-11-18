@@ -20,6 +20,7 @@ import com.example.ganhard.modelo.nucleo.ErrorModelo;
 import com.example.ganhard.modelo.nucleo.Tiempo;
 import com.example.ganhard.modelo.reglas.Campos;
 import com.example.ganhard.modelo.reglas.EntradaSanidad;
+import com.example.ganhard.modelo.reglas.ValidadorSanidad;
 import com.example.ganhard.modelo.repositorio.GrupoSanitario;
 import com.example.ganhard.modelo.repositorio.GrupoTarea;
 import com.google.android.material.textfield.TextInputLayout;
@@ -45,7 +46,7 @@ public class SanidadFormActivity extends FormularioActivity {
     public static final String EXTRA_ID_TAREA = "id_tarea";
     /** Con él, la actividad se registra en los animales de ese grupo de tareas y completa la tarea pendiente de cada uno. */
     public static final String EXTRA_ID_GRUPO_TAREAS = "id_grupo_tareas";
-    private static final String ESTADO_ANIMAL = "animal_elegido", ESTADO_TIPO = "tipo_elegido";
+    private static final String ESTADO_ANIMAL = "animal_elegido";
     private static final String ESTADO_REGISTRO = "id_registro", ESTADO_CARGADO = "formulario_cargado";
     private static final String ESTADO_TODOS = "aplicar_a_todos", ESTADO_ELEGIDOS = "animales_elegidos", ESTADO_ELEGIDOS_DEFINIDOS = "elegidos_definidos";
 
@@ -59,8 +60,8 @@ public class SanidadFormActivity extends FormularioActivity {
     private String idGrupoTareas;
     /** Al cumplir un grupo de tareas: la tarea pendiente de cada animal. */
     private final Map<String, String> tareasPorAnimal = new java.util.LinkedHashMap<>();
-    /** Animal y tipo elegidos, como los entiende el Modelo; lo que se ve en pantalla son sus nombres. */
-    private String idAnimal = "", tipo = "";
+    /** Animal elegido, como lo entiende el Modelo; lo que se ve en pantalla es su nombre. */
+    private String idAnimal = "";
     private boolean animalFijo;
     /** Id de la actividad nueva: se genera al abrir y se conserva al rotar para que guardar dos veces no duplique. */
     private String idRegistro;
@@ -92,7 +93,6 @@ public class SanidadFormActivity extends FormularioActivity {
         fechaInicial = FormatoFecha.aPantalla(Tiempo.hoy().toString());
         if (estado != null) {
             idAnimal = estado.getString(ESTADO_ANIMAL, "");
-            tipo = estado.getString(ESTADO_TIPO, "");
             idRegistro = estado.getString(ESTADO_REGISTRO);
             formularioCargado = estado.getBoolean(ESTADO_CARGADO, false);
             todos = estado.getBoolean(ESTADO_TODOS, false);
@@ -105,10 +105,9 @@ public class SanidadFormActivity extends FormularioActivity {
         }
         if (idRegistro == null) idRegistro = UUID.randomUUID().toString();
 
-        List<String> tipos = new ArrayList<>();
-        for (String codigo : EventoSanitario.TIPOS) tipos.add(Presentacion.tipoSanidad(this, codigo));
-        vista.tipo.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, tipos));
-        vista.tipo.setOnItemClickListener((adaptador, fila, posicion, id) -> tipo = EventoSanitario.TIPOS.get(posicion));
+        mostrarTipos(new ArrayList<>());
+        // Lo que se elige de la lista queda escrito en el campo; el Modelo entiende el texto, sea de la lista o propio.
+        vista.tipo.setOnItemClickListener((adaptador, fila, posicion, id) -> { });
         vista.animal.setOnItemClickListener((adaptador, fila, posicion, id) -> idAnimal = animales.get(posicion).idAnimal);
         vista.fecha.addTextChangedListener(new MascaraFecha());
         vista.campoFecha.setEndIconOnClickListener(v -> elegirFecha(vista.fecha));
@@ -139,11 +138,35 @@ public class SanidadFormActivity extends FormularioActivity {
             vista.aplicarATodos.setChecked(todos);
             textoGuardar = vista.guardar.getText();
             mostrarModo();
+            cargarTiposPropios();
             if (cumplirGrupo) cargarTareasDelGrupo(); else cargarAnimales();
         }
     }
 
     private boolean esCorreccion() { return idEvento != null || idGrupo != null; }
+
+    // --- Tipo: se elige de la lista o se escribe ---
+
+    /** El menú del tipo: los cinco normales y, después, los tipos propios que la finca ya usó. */
+    private void mostrarTipos(List<String> propios) {
+        List<String> opciones = new ArrayList<>();
+        for (String codigo : EventoSanitario.TIPOS) opciones.add(Presentacion.tipoSanidad(this, codigo));
+        opciones.addAll(propios);
+        vista.tipo.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, opciones));
+    }
+
+    private void cargarTiposPropios() {
+        app().sanidad().tiposPropios(new Callback<List<String>>() {
+            @Override public void exito(List<String> propios) { if (disponible()) mostrarTipos(propios); }
+            @Override public void error(ErrorModelo error) { /* Sin los tipos propios el menú sigue sirviendo con los normales. */ }
+        });
+    }
+
+    /** El código del tipo normal si lo escrito coincide con uno; si no, el texto propio tal cual. */
+    private static String codigoDe(String texto) {
+        String normal = ValidadorSanidad.tipoNormal(texto);
+        return normal != null ? normal : texto.trim();
+    }
 
     /** Con el interruptor activo se oculta el selector de un animal y aparece la lista de los que reciben la actividad. */
     private void mostrarModo() {
@@ -226,7 +249,6 @@ public class SanidadFormActivity extends FormularioActivity {
                 for (AnimalResumen animal : animales) {
                     if (animal.idAnimal.equals(idAnimal)) vista.animal.setText(nombreDe(animal.codigo, animal.nombre), false);
                 }
-                if (!tipo.isEmpty()) vista.tipo.setText(Presentacion.tipoSanidad(SanidadFormActivity.this, tipo), false);
                 // Por defecto reciben la actividad todos los animales activos; después solo quedan los que sigan siéndolo.
                 Set<String> activos = new LinkedHashSet<>();
                 for (AnimalResumen animal : animalesActivos()) activos.add(animal.idAnimal);
@@ -249,13 +271,12 @@ public class SanidadFormActivity extends FormularioActivity {
                 if (!disponible()) return;
                 original = new EntradaSanidad(evento.tipo, evento.fecha, evento.descripcion, evento.producto, evento.observaciones);
                 if (!formularioCargado) {
-                    tipo = evento.tipo;
+                    vista.tipo.setText(Presentacion.tipoSanidad(SanidadFormActivity.this, evento.tipo), false);
                     vista.fecha.setText(FormatoFecha.aPantalla(evento.fecha));
                     vista.descripcion.setText(evento.descripcion);
                     vista.producto.setText(evento.producto);
                     vista.observaciones.setText(evento.observaciones);
                 }
-                vista.tipo.setText(Presentacion.tipoSanidad(SanidadFormActivity.this, tipo), false);
                 formularioCargado = true;
                 vista.guardar.setEnabled(true);
                 vista.contextoDetalle.setText(getString(R.string.codigo_nombre,
@@ -277,13 +298,12 @@ public class SanidadFormActivity extends FormularioActivity {
                 EventoSanitario evento = grupo.referencia;
                 original = new EntradaSanidad(evento.tipo, evento.fecha, evento.descripcion, evento.producto, evento.observaciones);
                 if (!formularioCargado) {
-                    tipo = evento.tipo;
+                    vista.tipo.setText(Presentacion.tipoSanidad(SanidadFormActivity.this, evento.tipo), false);
                     vista.fecha.setText(FormatoFecha.aPantalla(evento.fecha));
                     vista.descripcion.setText(evento.descripcion);
                     vista.producto.setText(evento.producto);
                     vista.observaciones.setText(evento.observaciones);
                 }
-                vista.tipo.setText(Presentacion.tipoSanidad(SanidadFormActivity.this, tipo), false);
                 formularioCargado = true;
                 vista.guardar.setEnabled(true);
                 int total = grupo.actividades.size();
@@ -417,7 +437,7 @@ public class SanidadFormActivity extends FormularioActivity {
     }
 
     private EntradaSanidad entrada() {
-        return new EntradaSanidad(tipo, FormatoFecha.aIso(texto(vista.fecha)), texto(vista.descripcion), texto(vista.producto), texto(vista.observaciones));
+        return new EntradaSanidad(codigoDe(texto(vista.tipo)), FormatoFecha.aIso(texto(vista.fecha)), texto(vista.descripcion), texto(vista.producto), texto(vista.observaciones));
     }
 
     @Override protected Map<String, TextInputLayout> campos() {
@@ -463,7 +483,6 @@ public class SanidadFormActivity extends FormularioActivity {
 
     @Override protected void onSaveInstanceState(Bundle estado) {
         estado.putString(ESTADO_ANIMAL, idAnimal);
-        estado.putString(ESTADO_TIPO, tipo);
         estado.putString(ESTADO_REGISTRO, idRegistro);
         estado.putBoolean(ESTADO_CARGADO, formularioCargado);
         estado.putBoolean(ESTADO_TODOS, todos);

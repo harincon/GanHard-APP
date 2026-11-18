@@ -41,6 +41,12 @@ public abstract class EventoSanitarioDao {
     @Query(RESUMEN + "AND e.id_grupo = :idGrupo ORDER BY a.codigo")
     public abstract List<EventoSanitarioResumen> delGrupo(String idGrupo);
 
+    /** Los tipos propios que la finca ya usó en actividades vigentes (los que no son uno de los cinco normales). */
+    @Query("SELECT DISTINCT e.tipo FROM evento_sanitario e JOIN animal a ON a.id_animal = e.id_animal "
+            + "WHERE a.id_finca = :idFinca AND e.anulado = 0 "
+            + "AND e.tipo NOT IN ('VACUNACION', 'DESPARASITACION', 'REVISION', 'TRATAMIENTO', 'OTRO') ORDER BY e.tipo COLLATE NOCASE")
+    public abstract List<String> tiposPropios(String idFinca);
+
     @Query(RESUMEN + "AND e.id_animal = :idAnimal " + ORDEN)
     public abstract List<EventoSanitarioResumen> delAnimal(String idAnimal);
 }
