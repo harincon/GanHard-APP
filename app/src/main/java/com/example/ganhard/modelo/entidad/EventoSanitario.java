@@ -15,7 +15,7 @@ import java.util.List;
         foreignKeys = {
                 @ForeignKey(entity = Animal.class, parentColumns = "id_animal", childColumns = "id_animal", onDelete = ForeignKey.RESTRICT),
                 @ForeignKey(entity = Tarea.class, parentColumns = "id_tarea", childColumns = "id_tarea", onDelete = ForeignKey.RESTRICT)},
-        indices = {@Index(value = {"id_animal", "fecha"}), @Index("id_tarea")})
+        indices = {@Index(value = {"id_animal", "fecha"}), @Index("id_tarea"), @Index("id_grupo")})
 public class EventoSanitario {
     public static final String VACUNACION = "VACUNACION", DESPARASITACION = "DESPARASITACION", REVISION = "REVISION",
             TRATAMIENTO = "TRATAMIENTO", OTRO = "OTRO";
@@ -38,4 +38,6 @@ public class EventoSanitario {
     public int version = 0;
     /** Tarea programada que esta actividad cumplió; nulo si se registró sin programar. */
     @ColumnInfo(name = "id_tarea") public String idTarea;
+    /** Identificador de la aplicación a varios animales a la vez; nulo en una actividad individual. */
+    @ColumnInfo(name = "id_grupo") public String idGrupo;
 }

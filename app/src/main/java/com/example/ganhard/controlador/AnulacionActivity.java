@@ -12,6 +12,7 @@ import com.example.ganhard.modelo.entidad.Pesaje;
 import com.example.ganhard.modelo.nucleo.Callback;
 import com.example.ganhard.modelo.nucleo.ErrorModelo;
 import com.example.ganhard.modelo.reglas.Campos;
+import com.example.ganhard.modelo.repositorio.GrupoSanitario;
 import com.google.android.material.textfield.TextInputLayout;
 import java.util.Collections;
 import java.util.Map;
@@ -25,9 +26,11 @@ public class AnulacionActivity extends FormularioActivity {
     /** Qué se anula: {@link HistorialCambio#PESAJE}, {@link HistorialCambio#EVENTO_SANITARIO} o {@link HistorialCambio#GASTO}. */
     public static final String EXTRA_ENTIDAD = "entidad";
     public static final String EXTRA_ID = "id_registro";
+    /** Con él (y la entidad de sanidad) se anulan a la vez todas las actividades de ese grupo de animales. */
+    public static final String EXTRA_ID_GRUPO = "id_grupo";
 
     private ActivityAnulacionBinding vista;
-    private String id, entidad = "";
+    private String id, idGrupo, entidad = "";
 
     @Override protected void onCreate(Bundle estado) {
         super.onCreate(estado);
@@ -43,7 +46,11 @@ public class AnulacionActivity extends FormularioActivity {
         vista.guardar.setEnabled(false); // Se habilita al cargar el registro.
         vista.guardar.setOnClickListener(v -> anular());
         vista.cancelar.setOnClickListener(v -> getOnBackPressedDispatcher().onBackPressed());
-        if (id == null) noEncontrado();
+        idGrupo = getIntent().getStringExtra(EXTRA_ID_GRUPO);
+        if (idGrupo != null) {
+            vista.toolbar.setTitle(R.string.grupo_anular_toolbar);
+            cargarGrupo();
+        } else if (id == null) noEncontrado();
         else switch (entidad) {
             case HistorialCambio.PESAJE: cargarPesaje(); break;
             case HistorialCambio.EVENTO_SANITARIO: cargarActividad(); break;
@@ -111,9 +118,51 @@ public class AnulacionActivity extends FormularioActivity {
         if (error.tipo == ErrorModelo.Tipo.NO_ENCONTRADO) noEncontrado(); else mensaje(R.string.error_carga);
     }
 
+    /** Una aplicación a varios animales: el título dice qué actividad es y el detalle, a cuántos animales alcanza. */
+    private void cargarGrupo() {
+        app().sanidad().grupo(idGrupo, new Callback<GrupoSanitario>() {
+            @Override public void exito(GrupoSanitario grupo) {
+                if (!disponible()) return;
+                int total = grupo.actividades.size();
+                vista.anulacionTitulo.setText(Presentacion.tipoSanidad(AnulacionActivity.this, grupo.referencia.tipo));
+                vista.anulacionDetalle.setText(getString(R.string.codigo_nombre,
+                        getResources().getQuantityString(R.plurals.grupo_aplicada_a, total, total), FormatoFecha.corta(grupo.referencia.fecha)));
+                vista.guardar.setEnabled(true);
+            }
+            @Override public void error(ErrorModelo error) {
+                if (!disponible()) return;
+                if (error.tipo == ErrorModelo.Tipo.NO_ENCONTRADO) grupoNoEncontrado(); else mensaje(R.string.error_carga);
+            }
+        });
+    }
+
+    private void anularGrupo() {
+        app().sanidad().anularGrupo(idGrupo, texto(vista.motivo), new Callback<Integer>() {
+            @Override public void exito(Integer total) {
+                if (!disponible()) return;
+                guardando = false;
+                Toast.makeText(getApplicationContext(), getResources().getQuantityString(R.plurals.grupo_anulada, total, total), Toast.LENGTH_SHORT).show();
+                setResult(RESULT_OK);
+                finish();
+            }
+            @Override public void error(ErrorModelo error) {
+                if (!disponible()) return;
+                terminarGuardado();
+                if (error.tipo == ErrorModelo.Tipo.NO_ENCONTRADO) { grupoNoEncontrado(); return; }
+                mostrarError(error, R.string.error_anulacion);
+            }
+        });
+    }
+
+    private void grupoNoEncontrado() {
+        Toast.makeText(getApplicationContext(), R.string.grupo_no_encontrado, Toast.LENGTH_SHORT).show();
+        finish();
+    }
+
     private void anular() {
         if (guardando) return;
         empezarGuardado();
+        if (idGrupo != null) { anularGrupo(); return; }
         switch (entidad) {
             case HistorialCambio.EVENTO_SANITARIO: app().sanidad().anular(id, texto(vista.motivo), new Resultado<EventoSanitario>()); break;
             case HistorialCambio.GASTO: app().gastos().anular(id, texto(vista.motivo), new Resultado<Gasto>()); break;

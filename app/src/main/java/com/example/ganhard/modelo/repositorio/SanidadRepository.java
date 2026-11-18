@@ -16,9 +16,16 @@ import com.example.ganhard.modelo.reglas.EntradaSanidad;
 import com.example.ganhard.modelo.reglas.ErrorCampo;
 import com.example.ganhard.modelo.reglas.ValidadorMotivo;
 import com.example.ganhard.modelo.reglas.ValidadorSanidad;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import org.json.JSONObject;
 
 /**
@@ -119,22 +126,172 @@ public final class SanidadRepository {
             if (evento.anulado == 1) return evento;
             ErrorCampo errorMotivo = ValidadorMotivo.validar(motivo);
             if (errorMotivo != null) throw ErrorModelo.validacion(Collections.singletonMap(Campos.MOTIVO, errorMotivo));
-            // La entrada guarda qué actividad se anuló, para mostrarla cuando ya no esté en la lista.
-            JSONObject actividad = new JSONObject();
-            ValoresCambio.poner(actividad, "tipo", evento.tipo);
-            ValoresCambio.poner(actividad, "fecha", evento.fecha);
-            JSONObject anulado = new JSONObject();
-            ValoresCambio.poner(anulado, "anulado", 1);
-            String ahora = Tiempo.ahoraUtc();
-            evento.anulado = 1;
-            evento.anuladoEn = ahora;
-            evento.motivoAnulacion = motivo.trim();
-            evento.actualizadoEn = ahora;
-            HistorialCambio anulacion = registro.preparar(HistorialCambio.EVENTO_SANITARIO, idEvento, HistorialCambio.ANULAR,
-                    actividad, anulado, evento.motivoAnulacion, null, ahora);
+            HistorialCambio anulacion = marcarAnulada(evento, motivo, Tiempo.ahoraUtc());
             registro.guardar(() -> db.eventoSanitarioDao().actualizar(evento), anulacion);
             return evento;
         }, callback);
+    }
+
+    /** Deja la actividad anulada en memoria y devuelve su entrada de historial; quien llama la guarda. */
+    private HistorialCambio marcarAnulada(EventoSanitario evento, String motivo, String ahora) throws ErrorModelo {
+        // La entrada guarda qué actividad se anuló, para mostrarla cuando ya no esté en la lista.
+        JSONObject actividad = new JSONObject();
+        ValoresCambio.poner(actividad, "tipo", evento.tipo);
+        ValoresCambio.poner(actividad, "fecha", evento.fecha);
+        JSONObject anulado = new JSONObject();
+        ValoresCambio.poner(anulado, "anulado", 1);
+        evento.anulado = 1;
+        evento.anuladoEn = ahora;
+        evento.motivoAnulacion = motivo.trim();
+        evento.actualizadoEn = ahora;
+        return registro.preparar(HistorialCambio.EVENTO_SANITARIO, evento.idEventoSanitario, HistorialCambio.ANULAR,
+                actividad, anulado, evento.motivoAnulacion, null, ahora);
+    }
+
+    // --- Aplicación a varios animales (grupos) ---
+
+    /**
+     * Registra la misma actividad en varios animales a la vez: una actividad por animal, unidas por {@code idGrupo}.
+     * Solo entran animales activos; si alguno no existe, no está activo o la entrada es inválida, no se guarda nada.
+     * Es idempotente por {@code idGrupo}: repetir la solicitud devuelve lo ya guardado. Cada animal recibe su propia
+     * entrada de historial.
+     */
+    public void registrarGrupo(String idGrupo, List<String> idsAnimales, EntradaSanidad entrada, Callback<List<EventoSanitario>> callback) {
+        ejecutor.ejecutar(() -> {
+            List<EventoSanitario> existentes = db.eventoSanitarioDao().todosDelGrupo(idGrupo);
+            if (!existentes.isEmpty()) return existentes;
+            Set<String> ids = new LinkedHashSet<>();
+            if (idsAnimales != null) for (String id : idsAnimales) if (id != null && !id.trim().isEmpty()) ids.add(id.trim());
+            if (ids.isEmpty()) {
+                throw ErrorModelo.validacion(Collections.singletonMap(Campos.ID_ANIMAL, new ErrorCampo(CodigoError.OBLIGATORIO)));
+            }
+            String idFinca = db.configuracionDao().idFincaActiva();
+            if (idFinca == null) throw ErrorModelo.noEncontrado(ErrorModelo.FINCA);
+            String ahora = Tiempo.ahoraUtc();
+            List<EventoSanitario> eventos = new ArrayList<>();
+            List<HistorialCambio> cambios = new ArrayList<>();
+            for (String idAnimal : ids) {
+                Animal animal = animalExistente(idAnimal);
+                if (!animal.idFinca.equals(idFinca)) throw ErrorModelo.noEncontrado(ErrorModelo.ANIMAL);
+                if (!Animal.ACTIVO.equals(animal.estado)) {
+                    throw ErrorModelo.validacion(Collections.singletonMap(Campos.ID_ANIMAL, new ErrorCampo(CodigoError.ANIMAL_INACTIVO)));
+                }
+                Map<String, ErrorCampo> errores = ValidadorSanidad.validar(entrada, animal, Tiempo.hoy());
+                if (!errores.isEmpty()) throw ErrorModelo.validacion(errores);
+                EventoSanitario evento = new EventoSanitario();
+                evento.idEventoSanitario = UUID.randomUUID().toString();
+                evento.idAnimal = idAnimal;
+                evento.idGrupo = idGrupo;
+                aplicar(evento, entrada, animal);
+                evento.creadoEn = ahora;
+                evento.actualizadoEn = ahora;
+                eventos.add(evento);
+                cambios.add(registro.preparar(HistorialCambio.EVENTO_SANITARIO, evento.idEventoSanitario, HistorialCambio.CREAR,
+                        null, ValoresCambio.de(evento), null, null, ahora));
+            }
+            registro.guardar(() -> {
+                for (EventoSanitario evento : eventos) db.eventoSanitarioDao().insertar(evento);
+            }, cambios.toArray(new HistorialCambio[0]));
+            return eventos;
+        }, callback);
+    }
+
+    /** El grupo con sus actividades vigentes; si ya no queda ninguna (todas anuladas), no existe. */
+    public void grupo(String idGrupo, Callback<GrupoSanitario> callback) {
+        ejecutor.ejecutar(() -> cargarGrupo(idGrupo), callback);
+    }
+
+    /**
+     * Corrige todo el grupo con las reglas del registro y un motivo obligatorio: cambia las actividades vigentes del
+     * grupo (también las que ya se habían corregido aparte) y deja una entrada de historial por animal. Si en ninguna
+     * cambia nada, se rechaza como una corrección individual sin cambios.
+     */
+    public void corregirGrupo(String idGrupo, EntradaSanidad entrada, String motivo, Callback<GrupoSanitario> callback) {
+        ejecutor.ejecutar(() -> {
+            List<EventoSanitario> vigentes = vigentesDelGrupo(idGrupo);
+            Map<String, ErrorCampo> errores = new LinkedHashMap<>();
+            Map<String, Animal> animalesDe = new HashMap<>();
+            for (EventoSanitario evento : vigentes) {
+                Animal animal = animalExistente(evento.idAnimal);
+                animalesDe.put(evento.idAnimal, animal);
+                if (errores.isEmpty()) errores.putAll(ValidadorSanidad.validar(entrada, animal, Tiempo.hoy()));
+            }
+            ErrorCampo errorMotivo = ValidadorMotivo.validar(motivo);
+            if (errorMotivo != null) errores.put(Campos.MOTIVO, errorMotivo);
+            if (!errores.isEmpty()) throw ErrorModelo.validacion(errores);
+            String ahora = Tiempo.ahoraUtc();
+            List<EventoSanitario> cambiados = new ArrayList<>();
+            List<HistorialCambio> cambios = new ArrayList<>();
+            for (EventoSanitario evento : vigentes) {
+                JSONObject antes = ValoresCambio.de(evento);
+                aplicar(evento, entrada, animalesDe.get(evento.idAnimal));
+                JSONObject[] diferencia = ValoresCambio.diferencia(antes, ValoresCambio.de(evento));
+                if (diferencia == null) continue;
+                evento.actualizadoEn = ahora;
+                cambiados.add(evento);
+                cambios.add(registro.preparar(HistorialCambio.EVENTO_SANITARIO, evento.idEventoSanitario, HistorialCambio.EDITAR,
+                        diferencia[0], diferencia[1], motivo.trim(), null, ahora));
+            }
+            if (cambiados.isEmpty()) {
+                throw ErrorModelo.validacion(Collections.singletonMap(Campos.DESCRIPCION, new ErrorCampo(CodigoError.SIN_CAMBIOS)));
+            }
+            registro.guardar(() -> {
+                for (EventoSanitario evento : cambiados) db.eventoSanitarioDao().actualizar(evento);
+            }, cambios.toArray(new HistorialCambio[0]));
+            return cargarGrupo(idGrupo);
+        }, callback);
+    }
+
+    /** Anula las actividades vigentes del grupo con un motivo obligatorio; devuelve cuántas anuló. No se puede deshacer. */
+    public void anularGrupo(String idGrupo, String motivo, Callback<Integer> callback) {
+        ejecutor.ejecutar(() -> {
+            List<EventoSanitario> vigentes = vigentesDelGrupo(idGrupo);
+            ErrorCampo errorMotivo = ValidadorMotivo.validar(motivo);
+            if (errorMotivo != null) throw ErrorModelo.validacion(Collections.singletonMap(Campos.MOTIVO, errorMotivo));
+            String ahora = Tiempo.ahoraUtc();
+            List<HistorialCambio> cambios = new ArrayList<>();
+            for (EventoSanitario evento : vigentes) cambios.add(marcarAnulada(evento, motivo, ahora));
+            registro.guardar(() -> {
+                for (EventoSanitario evento : vigentes) db.eventoSanitarioDao().actualizar(evento);
+            }, cambios.toArray(new HistorialCambio[0]));
+            return vigentes.size();
+        }, callback);
+    }
+
+    /**
+     * La lista general: cada actividad individual como una tarjeta y las de un mismo grupo juntas en una sola, con su
+     * total, en el lugar de la más reciente del grupo.
+     */
+    public void listaAgrupada(Callback<List<ElementoSanidad>> callback) {
+        ejecutor.ejecutar(() -> {
+            String idFinca = db.configuracionDao().idFincaActiva();
+            if (idFinca == null) throw ErrorModelo.noEncontrado(ErrorModelo.FINCA);
+            List<EventoSanitarioResumen> filas = db.eventoSanitarioDao().deLaFinca(idFinca);
+            Map<String, Integer> totales = new HashMap<>();
+            for (EventoSanitarioResumen fila : filas) {
+                if (fila.evento.idGrupo != null) totales.merge(fila.evento.idGrupo, 1, Integer::sum);
+            }
+            List<ElementoSanidad> elementos = new ArrayList<>();
+            Set<String> yaPuestos = new HashSet<>();
+            for (EventoSanitarioResumen fila : filas) {
+                String grupo = fila.evento.idGrupo;
+                if (grupo == null) elementos.add(ElementoSanidad.individual(fila));
+                else if (yaPuestos.add(grupo)) elementos.add(ElementoSanidad.grupo(grupo, fila.evento, totales.get(grupo)));
+            }
+            return elementos;
+        }, callback);
+    }
+
+    private GrupoSanitario cargarGrupo(String idGrupo) throws ErrorModelo {
+        List<EventoSanitarioResumen> actividades = db.eventoSanitarioDao().delGrupo(idGrupo);
+        if (actividades.isEmpty()) throw ErrorModelo.noEncontrado(ErrorModelo.EVENTO);
+        return new GrupoSanitario(idGrupo, actividades.get(0).evento, actividades);
+    }
+
+    private List<EventoSanitario> vigentesDelGrupo(String idGrupo) throws ErrorModelo {
+        List<EventoSanitario> vigentes = db.eventoSanitarioDao().vigentesDelGrupo(idGrupo);
+        if (vigentes.isEmpty()) throw ErrorModelo.noEncontrado(ErrorModelo.EVENTO);
+        return vigentes;
     }
 
     /** Actividades vigentes de toda la finca, de la más reciente a la más antigua. */

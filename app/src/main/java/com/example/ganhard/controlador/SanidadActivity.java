@@ -12,6 +12,7 @@ import com.example.ganhard.modelo.datos.EventoSanitarioResumen;
 import com.example.ganhard.modelo.entidad.Tarea;
 import com.example.ganhard.modelo.nucleo.Callback;
 import com.example.ganhard.modelo.nucleo.ErrorModelo;
+import com.example.ganhard.modelo.repositorio.ElementoSanidad;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,6 +41,8 @@ public class SanidadActivity extends BaseActivity {
         idAnimal = estado != null ? estado.getString(ESTADO_ANIMAL) : getIntent().getStringExtra(EXTRA_ID_ANIMAL);
         adaptador = new SanidadAdapter(this, actividad -> startActivity(new Intent(this, SanidadFormActivity.class)
                 .putExtra(SanidadFormActivity.EXTRA_ID_EVENTO, actividad.evento.idEventoSanitario)));
+        adaptador.alSeleccionarGrupo(idGrupo -> startActivity(new Intent(this, SanidadGrupoActivity.class)
+                .putExtra(SanidadGrupoActivity.EXTRA_ID_GRUPO, idGrupo)));
         vista.lista.setLayoutManager(new LinearLayoutManager(this));
         vista.lista.setAdapter(adaptador);
         vista.filtroAnimal.setOnItemClickListener((lista, fila, posicion, id) -> {
@@ -95,20 +98,33 @@ public class SanidadActivity extends BaseActivity {
         final int mia = ++peticion;
         final boolean todos = idAnimal == null;
         vista.progreso.setVisibility(View.VISIBLE);
-        Callback<List<EventoSanitarioResumen>> resultado = new Callback<List<EventoSanitarioResumen>>() {
+        if (todos) {
+            // La lista general junta en una sola tarjeta lo aplicado a varios animales.
+            app().sanidad().listaAgrupada(new Callback<List<ElementoSanidad>>() {
+                @Override public void exito(List<ElementoSanidad> elementos) {
+                    if (!disponible() || mia != peticion) return;
+                    adaptador.mostrarElementos(elementos, true);
+                    mostrarLista(elementos.isEmpty());
+                }
+                @Override public void error(ErrorModelo error) { if (disponible() && mia == peticion) mostrarError(error); }
+            });
+            return;
+        }
+        app().sanidad().delAnimal(idAnimal, new Callback<List<EventoSanitarioResumen>>() {
             @Override public void exito(List<EventoSanitarioResumen> actividades) {
                 if (!disponible() || mia != peticion) return;
-                vista.progreso.setVisibility(View.INVISIBLE);
-                adaptador.mostrar(actividades, todos);
-                boolean vacia = actividades.isEmpty();
-                vista.estadoError.setVisibility(View.GONE);
-                vista.lista.setVisibility(vacia ? View.GONE : View.VISIBLE);
-                vista.estadoVacio.setVisibility(vacia ? View.VISIBLE : View.GONE);
+                adaptador.mostrar(actividades, false);
+                mostrarLista(actividades.isEmpty());
             }
             @Override public void error(ErrorModelo error) { if (disponible() && mia == peticion) mostrarError(error); }
-        };
-        if (todos) app().sanidad().deLaFinca(resultado);
-        else app().sanidad().delAnimal(idAnimal, resultado);
+        });
+    }
+
+    private void mostrarLista(boolean vacia) {
+        vista.progreso.setVisibility(View.INVISIBLE);
+        vista.estadoError.setVisibility(View.GONE);
+        vista.lista.setVisibility(vacia ? View.GONE : View.VISIBLE);
+        vista.estadoVacio.setVisibility(vacia ? View.VISIBLE : View.GONE);
     }
 
     private void mostrarError(ErrorModelo error) {

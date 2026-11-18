@@ -30,6 +30,17 @@ public abstract class EventoSanitarioDao {
     @Query(RESUMEN + "AND a.id_finca = :idFinca " + ORDEN)
     public abstract List<EventoSanitarioResumen> deLaFinca(String idFinca);
 
+    /** Todas las filas del grupo, también las anuladas: sirve para no repetir un registro ya hecho. */
+    @Query("SELECT * FROM evento_sanitario WHERE id_grupo = :idGrupo ORDER BY creado_en, id_evento_sanitario")
+    public abstract List<EventoSanitario> todosDelGrupo(String idGrupo);
+
+    @Query("SELECT * FROM evento_sanitario WHERE id_grupo = :idGrupo AND anulado = 0 ORDER BY creado_en, id_evento_sanitario")
+    public abstract List<EventoSanitario> vigentesDelGrupo(String idGrupo);
+
+    /** Las actividades vigentes del grupo con su animal, por código. */
+    @Query(RESUMEN + "AND e.id_grupo = :idGrupo ORDER BY a.codigo")
+    public abstract List<EventoSanitarioResumen> delGrupo(String idGrupo);
+
     @Query(RESUMEN + "AND e.id_animal = :idAnimal " + ORDEN)
     public abstract List<EventoSanitarioResumen> delAnimal(String idAnimal);
 }

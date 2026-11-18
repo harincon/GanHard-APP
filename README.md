@@ -10,7 +10,7 @@ Java y XML (Android Views), arquitectura MVC, base de datos local con Room.
 - Registro, búsqueda, ficha y edición de animales, con estado activo, vendido o fallecido. El código se asigna solo (GH-001, GH-002…) y cada animal lleva su hierro, y si quieres aretes y otros números.
 - Catálogo de hierros de la finca (crear, editar, desactivar).
 - Registro e historial de pesajes por animal, con corrección y anulación con motivo.
-- Sanidad: actividades realizadas por animal (vacunas, desparasitaciones, revisiones, tratamientos), con corrección y anulación.
+- Sanidad: actividades realizadas por animal (vacunas, desparasitaciones, revisiones, tratamientos), con corrección y anulación. Se pueden aplicar a todos los animales activos de una vez, y corregir o anular todo el grupo.
 - Gastos: egresos de la finca por mes con su total, con corrección y anulación.
 - Tareas: actividades programadas, generales o de un animal; al realizar un pesaje o una actividad sanitaria programados, la tarea queda completada y enlazada.
 - Historial de cambios de la finca y de cada animal: quién, cuándo, qué cambió y por qué.

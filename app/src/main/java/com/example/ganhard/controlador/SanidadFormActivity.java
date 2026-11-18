@@ -4,9 +4,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AlertDialog;
 import com.example.ganhard.R;
 import com.example.ganhard.databinding.ActivitySanidadFormBinding;
 import com.example.ganhard.modelo.datos.AnimalResumen;
@@ -18,11 +20,15 @@ import com.example.ganhard.modelo.nucleo.ErrorModelo;
 import com.example.ganhard.modelo.nucleo.Tiempo;
 import com.example.ganhard.modelo.reglas.Campos;
 import com.example.ganhard.modelo.reglas.EntradaSanidad;
+import com.example.ganhard.modelo.repositorio.GrupoSanitario;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputLayout;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -33,14 +39,20 @@ import java.util.UUID;
 public class SanidadFormActivity extends FormularioActivity {
     public static final String EXTRA_ID_ANIMAL = "id_animal";
     public static final String EXTRA_ID_EVENTO = "id_evento";
+    /** Con él, el formulario corrige a la vez todas las actividades de ese grupo (aplicación a varios animales). */
+    public static final String EXTRA_ID_GRUPO = "id_grupo";
     /** Tarea de sanidad que este registro cumple (RF17); sin ella, la actividad se registra sin programar. */
     public static final String EXTRA_ID_TAREA = "id_tarea";
     private static final String ESTADO_ANIMAL = "animal_elegido", ESTADO_TIPO = "tipo_elegido";
     private static final String ESTADO_REGISTRO = "id_registro", ESTADO_CARGADO = "formulario_cargado";
+    private static final String ESTADO_TODOS = "aplicar_a_todos", ESTADO_ELEGIDOS = "animales_elegidos", ESTADO_ELEGIDOS_DEFINIDOS = "elegidos_definidos";
 
     private ActivitySanidadFormBinding vista;
     private final List<AnimalResumen> animales = new ArrayList<>();
-    private String idEvento;
+    private String idEvento, idGrupo;
+    /** Con el interruptor activo la actividad se registra en todos los animales activos elegidos, no en uno. */
+    private boolean todos, elegidosDefinidos;
+    private final Set<String> elegidos = new LinkedHashSet<>();
     private String idTarea;
     /** Animal y tipo elegidos, como los entiende el Modelo; lo que se ve en pantalla son sus nombres. */
     private String idAnimal = "", tipo = "";
@@ -48,6 +60,8 @@ public class SanidadFormActivity extends FormularioActivity {
     /** Id de la actividad nueva: se genera al abrir y se conserva al rotar para que guardar dos veces no duplique. */
     private String idRegistro;
     private String fechaInicial = "";
+    /** El texto del botón de guardar de un registro individual, para devolverlo al apagar el interruptor. */
+    private CharSequence textoGuardar;
     /** Lo que tenía la actividad al abrir la corrección; permite saber si hay cambios sin guardar. */
     private EntradaSanidad original;
     private boolean formularioCargado;
@@ -65,6 +79,7 @@ public class SanidadFormActivity extends FormularioActivity {
         configurarToolbar(vista.toolbar, true);
         prepararFormulario(vista.progreso, vista.guardar, vista.mensaje);
         idEvento = getIntent().getStringExtra(EXTRA_ID_EVENTO);
+        idGrupo = getIntent().getStringExtra(EXTRA_ID_GRUPO);
         idTarea = getIntent().getStringExtra(EXTRA_ID_TAREA);
         String animalRecibido = getIntent().getStringExtra(EXTRA_ID_ANIMAL);
         animalFijo = !esCorreccion() && animalRecibido != null;
@@ -74,6 +89,10 @@ public class SanidadFormActivity extends FormularioActivity {
             tipo = estado.getString(ESTADO_TIPO, "");
             idRegistro = estado.getString(ESTADO_REGISTRO);
             formularioCargado = estado.getBoolean(ESTADO_CARGADO, false);
+            todos = estado.getBoolean(ESTADO_TODOS, false);
+            elegidosDefinidos = estado.getBoolean(ESTADO_ELEGIDOS_DEFINIDOS, false);
+            List<String> guardados = estado.getStringArrayList(ESTADO_ELEGIDOS);
+            if (guardados != null) elegidos.addAll(guardados);
         } else {
             if (animalFijo) idAnimal = animalRecibido;
             if (!esCorreccion()) vista.fecha.setText(fechaInicial);
@@ -91,24 +110,101 @@ public class SanidadFormActivity extends FormularioActivity {
         vista.cancelar.setOnClickListener(v -> getOnBackPressedDispatcher().onBackPressed());
         vista.guardar.setEnabled(false); // Se habilita cuando están los datos necesarios.
 
+        vista.aplicarATodos.setOnCheckedChangeListener((boton, marcado) -> { todos = marcado; mostrarModo(); });
+        vista.filaAnimales.setOnClickListener(v -> elegirAnimales());
         if (esCorreccion()) {
-            vista.toolbar.setTitle(R.string.corregir_actividad);
+            vista.toolbar.setTitle(idGrupo != null ? R.string.grupo_corregir_toolbar : R.string.corregir_actividad);
             vista.guardar.setText(R.string.guardar_correccion);
             vista.campoAnimal.setVisibility(View.GONE);
             vista.tarjetaFutura.setVisibility(View.GONE);
             vista.tarjetaContexto.setVisibility(View.VISIBLE);
             vista.campoMotivo.setVisibility(View.VISIBLE);
             vista.notaCorreccion.setVisibility(View.VISIBLE);
-            vista.tarjetaAnular.setVisibility(View.VISIBLE);
+            // Anular un grupo entero se hace desde su detalle; aquí solo se corrige.
+            vista.tarjetaAnular.setVisibility(idGrupo != null ? View.GONE : View.VISIBLE);
             vista.filaAnular.setOnClickListener(v -> anulacion.launch(new Intent(this, AnulacionActivity.class)
                     .putExtra(AnulacionActivity.EXTRA_ENTIDAD, HistorialCambio.EVENTO_SANITARIO).putExtra(AnulacionActivity.EXTRA_ID, idEvento)));
-            cargarActividad();
+            if (idGrupo != null) cargarGrupo(); else cargarActividad();
         } else {
+            // Con un animal fijo (desde su ficha) no se ofrece aplicar a todos.
+            if (!animalFijo) vista.aplicarATodos.setVisibility(View.VISIBLE);
+            vista.aplicarATodos.setChecked(todos);
+            textoGuardar = vista.guardar.getText();
+            mostrarModo();
             cargarAnimales();
         }
     }
 
-    private boolean esCorreccion() { return idEvento != null; }
+    private boolean esCorreccion() { return idEvento != null || idGrupo != null; }
+
+    /** Con el interruptor activo se oculta el selector de un animal y aparece la lista de los que reciben la actividad. */
+    private void mostrarModo() {
+        if (esCorreccion()) return;
+        vista.campoAnimal.setVisibility(todos ? View.GONE : View.VISIBLE);
+        vista.filaAnimales.setVisibility(todos ? View.VISIBLE : View.GONE);
+        refrescarGrupo();
+    }
+
+    /** Pone el total elegido en la fila de animales y en el botón de guardar. */
+    private void refrescarGrupo() {
+        if (esCorreccion()) return;
+        if (!todos) { vista.guardar.setText(textoGuardar); return; }
+        int total = animalesActivos().size();
+        vista.filaAnimales.setText(getString(R.string.sanidad_animales_elegidos, elegidos.size(), total));
+        vista.guardar.setText(getResources().getQuantityString(R.plurals.grupo_guardar, elegidos.size(), elegidos.size()));
+    }
+
+    private List<AnimalResumen> animalesActivos() {
+        List<AnimalResumen> activos = new ArrayList<>();
+        for (AnimalResumen animal : animales) if (Animal.ACTIVO.equals(animal.estado)) activos.add(animal);
+        return activos;
+    }
+
+    /** Lista con casillas de los animales activos; el botón del medio marca o quita a todos de una vez. */
+    private void elegirAnimales() {
+        if (guardando) return;
+        List<AnimalResumen> activos = animalesActivos();
+        String[] nombres = new String[activos.size()];
+        boolean[] marcados = new boolean[activos.size()];
+        for (int i = 0; i < nombres.length; i++) {
+            nombres[i] = nombreDe(activos.get(i).codigo, activos.get(i).nombre);
+            marcados[i] = elegidos.contains(activos.get(i).idAnimal);
+        }
+        AlertDialog dialogo = new MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.grupo_dialogo_titulo)
+                .setMultiChoiceItems(nombres, marcados, (d, posicion, marcado) -> marcados[posicion] = marcado)
+                .setPositiveButton(R.string.grupo_aceptar, (d, boton) -> {
+                    elegidos.clear();
+                    for (int i = 0; i < marcados.length; i++) if (marcados[i]) elegidos.add(activos.get(i).idAnimal);
+                    elegidosDefinidos = true;
+                    refrescarGrupo();
+                })
+                .setNegativeButton(R.string.cancelar, null)
+                .setNeutralButton(R.string.grupo_quitar_todos, null)
+                .create();
+        dialogo.show();
+        // El botón de en medio se conecta después de mostrar el cuadro; si no, pulsarlo lo cerraría.
+        Button marcarOQuitar = dialogo.getButton(AlertDialog.BUTTON_NEUTRAL);
+        Runnable etiquetar = () -> {
+            boolean todosMarcados = true;
+            for (boolean marcado : marcados) todosMarcados &= marcado;
+            marcarOQuitar.setText(todosMarcados ? R.string.grupo_quitar_todos : R.string.grupo_marcar_todos);
+        };
+        etiquetar.run();
+        dialogo.getListView().setOnItemClickListener((lista, fila, posicion, id) -> {
+            marcados[posicion] = dialogo.getListView().isItemChecked(posicion);
+            etiquetar.run();
+        });
+        marcarOQuitar.setOnClickListener(v -> {
+            boolean todosMarcados = true;
+            for (boolean marcado : marcados) todosMarcados &= marcado;
+            for (int i = 0; i < marcados.length; i++) {
+                marcados[i] = !todosMarcados;
+                dialogo.getListView().setItemChecked(i, !todosMarcados);
+            }
+            etiquetar.run();
+        });
+    }
 
     /** Llena el selector con los animales de la finca; sin animales no hay a quién registrarle nada. */
     private void cargarAnimales() {
@@ -125,6 +221,12 @@ public class SanidadFormActivity extends FormularioActivity {
                     if (animal.idAnimal.equals(idAnimal)) vista.animal.setText(nombreDe(animal.codigo, animal.nombre), false);
                 }
                 if (!tipo.isEmpty()) vista.tipo.setText(Presentacion.tipoSanidad(SanidadFormActivity.this, tipo), false);
+                // Por defecto reciben la actividad todos los animales activos; después solo quedan los que sigan siéndolo.
+                Set<String> activos = new LinkedHashSet<>();
+                for (AnimalResumen animal : animalesActivos()) activos.add(animal.idAnimal);
+                if (!elegidosDefinidos) { elegidos.clear(); elegidos.addAll(activos); elegidosDefinidos = true; }
+                else elegidos.retainAll(activos);
+                refrescarGrupo();
                 vista.guardar.setEnabled(true);
                 if (animalFijo) vista.campoAnimal.setEnabled(false);
             }
@@ -161,6 +263,40 @@ public class SanidadFormActivity extends FormularioActivity {
         });
     }
 
+    /** Corrección de un grupo: trae sus datos comunes y dice a cuántos animales se aplicará. */
+    private void cargarGrupo() {
+        app().sanidad().grupo(idGrupo, new Callback<GrupoSanitario>() {
+            @Override public void exito(GrupoSanitario grupo) {
+                if (!disponible()) return;
+                EventoSanitario evento = grupo.referencia;
+                original = new EntradaSanidad(evento.tipo, evento.fecha, evento.descripcion, evento.producto, evento.observaciones);
+                if (!formularioCargado) {
+                    tipo = evento.tipo;
+                    vista.fecha.setText(FormatoFecha.aPantalla(evento.fecha));
+                    vista.descripcion.setText(evento.descripcion);
+                    vista.producto.setText(evento.producto);
+                    vista.observaciones.setText(evento.observaciones);
+                }
+                vista.tipo.setText(Presentacion.tipoSanidad(SanidadFormActivity.this, tipo), false);
+                formularioCargado = true;
+                vista.guardar.setEnabled(true);
+                int total = grupo.actividades.size();
+                vista.contextoAnimal.setText(getResources().getQuantityString(R.plurals.grupo_contexto_correccion, total, total));
+                vista.contextoDetalle.setText(getString(R.string.codigo_nombre,
+                        Presentacion.tipoSanidad(SanidadFormActivity.this, evento.tipo), FormatoFecha.corta(evento.fecha)));
+            }
+            @Override public void error(ErrorModelo error) {
+                if (!disponible()) return;
+                if (error.tipo == ErrorModelo.Tipo.NO_ENCONTRADO) {
+                    Toast.makeText(getApplicationContext(), R.string.grupo_no_encontrado, Toast.LENGTH_SHORT).show();
+                    finish();
+                } else {
+                    mensaje(R.string.error_carga);
+                }
+            }
+        });
+    }
+
     private void cargarContexto(String idDelAnimal) {
         app().animales().obtener(idDelAnimal, new Callback<Animal>() {
             @Override public void exito(Animal animal) {
@@ -177,6 +313,8 @@ public class SanidadFormActivity extends FormularioActivity {
     private void guardar() {
         if (guardando) return;
         EntradaSanidad entrada = entrada();
+        if (idGrupo != null) { corregirGrupo(entrada); return; }
+        if (!esCorreccion() && todos) { registrarEnGrupo(entrada); return; }
         empezarGuardado();
         Callback<EventoSanitario> resultado = new Callback<EventoSanitario>() {
             @Override public void exito(EventoSanitario evento) {
@@ -206,6 +344,59 @@ public class SanidadFormActivity extends FormularioActivity {
         else app().sanidad().registrar(idRegistro, idAnimal, entrada, idTarea, resultado);
     }
 
+    /** Registra la actividad en todos los animales elegidos; si alguno ya no es válido, no se guarda nada. */
+    private void registrarEnGrupo(EntradaSanidad entrada) {
+        if (elegidos.isEmpty()) { mensaje(R.string.grupo_sin_animales); return; }
+        empezarGuardado();
+        app().sanidad().registrarGrupo(idRegistro, new ArrayList<>(elegidos), entrada, new Callback<List<EventoSanitario>>() {
+            @Override public void exito(List<EventoSanitario> creadas) {
+                if (!disponible()) return;
+                guardando = false;
+                Toast.makeText(getApplicationContext(), getResources().getQuantityString(R.plurals.grupo_registrada, creadas.size(), creadas.size()),
+                        Toast.LENGTH_SHORT).show();
+                setResult(RESULT_OK);
+                finish();
+            }
+            @Override public void error(ErrorModelo error) {
+                if (!disponible()) return;
+                terminarGuardado();
+                if (error.tipo == ErrorModelo.Tipo.NO_ENCONTRADO && ErrorModelo.FINCA.equals(error.faltante)) { irAConfiguracion(); return; }
+                if (error.tipo == ErrorModelo.Tipo.NO_ENCONTRADO || error.campos.containsKey(Campos.ID_ANIMAL)) {
+                    // Un animal se vendió o ya no existe mientras se llenaba el formulario: se actualiza la lista.
+                    mensaje(R.string.grupo_animal_inactivo);
+                    cargarAnimales();
+                    return;
+                }
+                mostrarError(error, R.string.error_guardado_actividad);
+            }
+        });
+    }
+
+    /** Corrige a la vez todas las actividades del grupo, con un motivo. */
+    private void corregirGrupo(EntradaSanidad entrada) {
+        empezarGuardado();
+        app().sanidad().corregirGrupo(idGrupo, entrada, texto(vista.motivo), new Callback<GrupoSanitario>() {
+            @Override public void exito(GrupoSanitario grupo) {
+                if (!disponible()) return;
+                guardando = false;
+                int total = grupo.actividades.size();
+                Toast.makeText(getApplicationContext(), getResources().getQuantityString(R.plurals.grupo_corregida, total, total), Toast.LENGTH_SHORT).show();
+                setResult(RESULT_OK);
+                finish();
+            }
+            @Override public void error(ErrorModelo error) {
+                if (!disponible()) return;
+                terminarGuardado();
+                if (error.tipo == ErrorModelo.Tipo.NO_ENCONTRADO) {
+                    Toast.makeText(getApplicationContext(), R.string.grupo_no_encontrado, Toast.LENGTH_SHORT).show();
+                    finish();
+                    return;
+                }
+                mostrarError(error, R.string.error_guardado_actividad);
+            }
+        });
+    }
+
     private EntradaSanidad entrada() {
         return new EntradaSanidad(tipo, FormatoFecha.aIso(texto(vista.fecha)), texto(vista.descripcion), texto(vista.producto), texto(vista.observaciones));
     }
@@ -226,6 +417,8 @@ public class SanidadFormActivity extends FormularioActivity {
     @Override protected void ocupado(boolean ocupado) {
         super.ocupado(ocupado);
         if (animalFijo) vista.campoAnimal.setEnabled(false);
+        vista.aplicarATodos.setEnabled(!ocupado);
+        vista.filaAnimales.setEnabled(!ocupado);
     }
 
     @Override protected boolean hayCambios() {
@@ -254,6 +447,9 @@ public class SanidadFormActivity extends FormularioActivity {
         estado.putString(ESTADO_TIPO, tipo);
         estado.putString(ESTADO_REGISTRO, idRegistro);
         estado.putBoolean(ESTADO_CARGADO, formularioCargado);
+        estado.putBoolean(ESTADO_TODOS, todos);
+        estado.putBoolean(ESTADO_ELEGIDOS_DEFINIDOS, elegidosDefinidos);
+        estado.putStringArrayList(ESTADO_ELEGIDOS, new ArrayList<>(elegidos));
         super.onSaveInstanceState(estado);
     }
 }

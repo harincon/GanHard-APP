@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Registrar una actividad en varios animales -->
+    <string name="sanidad_aplicar_todos">Aplicar a todos los animales activos</string>
+    <string name="sanidad_animales_elegidos">%1$d de %2$d animales</string>
+    <string name="grupo_dialogo_titulo">Animales que recibieron la actividad</string>
+    <string name="grupo_aceptar">Aceptar</string>
+    <string name="grupo_marcar_todos">Marcar todos</string>
+    <string name="grupo_quitar_todos">Quitar todos</string>
+    <string name="grupo_sin_animales">Elige al menos un animal.</string>
+    <string name="grupo_animal_inactivo">Algún animal ya no está activo o ya no existe. Revisa la lista e inténtalo de nuevo.</string>
+    <plurals name="grupo_guardar">
+        <item quantity="one">Registrar en %d animal</item>
+        <item quantity="other">Registrar en %d animales</item>
+    </plurals>
+    <plurals name="grupo_registrada">
+        <item quantity="one">Actividad registrada en %d animal.</item>
+        <item quantity="other">Actividad registrada en %d animales.</item>
+    </plurals>
+
+    <!-- Lista y detalle de una aplicación en grupo -->
+    <plurals name="grupo_aplicada_a">
+        <item quantity="one">Aplicada a %d animal</item>
+        <item quantity="other">Aplicada a %d animales</item>
+    </plurals>
+    <string name="grupo_titulo">Actividad en varios animales</string>
+    <string name="grupo_animales_titulo">Animales</string>
+    <string name="grupo_corregir">Corregir para todos</string>
+    <string name="grupo_anular">Anular para todos</string>
+    <string name="grupo_no_encontrado">Esta aplicación ya no existe.</string>
+    <string name="grupo_toque_animal">Toca un animal para corregir o anular solo su actividad.</string>
+
+    <!-- Corregir y anular el grupo -->
+    <string name="grupo_corregir_toolbar">Corregir para todos</string>
+    <plurals name="grupo_contexto_correccion">
+        <item quantity="one">Se corregirá la actividad de %d animal.</item>
+        <item quantity="other">Se corregirá la actividad de %d animales.</item>
+    </plurals>
+    <plurals name="grupo_corregida">
+        <item quantity="one">Actividad corregida en %d animal.</item>
+        <item quantity="other">Actividad corregida en %d animales.</item>
+    </plurals>
+    <string name="grupo_anular_toolbar">Anular para todos</string>
+    <plurals name="grupo_anulada">
+        <item quantity="one">Actividad anulada en %d animal.</item>
+        <item quantity="other">Actividad anulada en %d animales.</item>
+    </plurals>
+</resources>

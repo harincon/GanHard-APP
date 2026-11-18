@@ -9,13 +9,22 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.ganhard.R;
 import com.example.ganhard.modelo.datos.EventoSanitarioResumen;
+import com.example.ganhard.modelo.entidad.EventoSanitario;
+import com.example.ganhard.modelo.repositorio.ElementoSanidad;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Presenta las actividades sanitarias; al tocar una se abre su corrección. */
+/**
+ * Presenta las actividades sanitarias. Al tocar una individual se abre su corrección; una aplicación a varios
+ * animales es una sola tarjeta con su total, y al tocarla se abre el detalle del grupo.
+ */
 public final class SanidadAdapter extends RecyclerView.Adapter<SanidadAdapter.Fila> {
     public interface Escucha {
         void alSeleccionar(EventoSanitarioResumen actividad);
+    }
+
+    public interface EscuchaGrupo {
+        void alSeleccionarGrupo(String idGrupo);
     }
 
     public static final class Fila extends RecyclerView.ViewHolder {
@@ -31,7 +40,8 @@ public final class SanidadAdapter extends RecyclerView.Adapter<SanidadAdapter.Fi
 
     private final Context contexto;
     private final Escucha escucha;
-    private final List<EventoSanitarioResumen> actividades = new ArrayList<>();
+    private EscuchaGrupo escuchaGrupo;
+    private final List<ElementoSanidad> elementos = new ArrayList<>();
     /** Con la lista de todos los animales cada tarjeta dice de cuál es; con uno elegido sobra. */
     private boolean conAnimal;
 
@@ -40,10 +50,20 @@ public final class SanidadAdapter extends RecyclerView.Adapter<SanidadAdapter.Fi
         this.escucha = escucha;
     }
 
+    public void alSeleccionarGrupo(EscuchaGrupo escuchaGrupo) { this.escuchaGrupo = escuchaGrupo; }
+
+    /** Muestra solo actividades individuales, como la lista de un animal. */
     public void mostrar(List<EventoSanitarioResumen> nuevas, boolean conAnimal) {
+        List<ElementoSanidad> individuales = new ArrayList<>();
+        for (EventoSanitarioResumen actividad : nuevas) individuales.add(ElementoSanidad.individual(actividad));
+        mostrarElementos(individuales, conAnimal);
+    }
+
+    /** Muestra actividades individuales y aplicaciones en grupo, cada una en su lugar. */
+    public void mostrarElementos(List<ElementoSanidad> nuevos, boolean conAnimal) {
         this.conAnimal = conAnimal;
-        actividades.clear();
-        actividades.addAll(nuevas);
+        elementos.clear();
+        elementos.addAll(nuevos);
         notifyDataSetChanged();
     }
 
@@ -52,7 +72,18 @@ public final class SanidadAdapter extends RecyclerView.Adapter<SanidadAdapter.Fi
     }
 
     @Override public void onBindViewHolder(@NonNull Fila fila, int posicion) {
-        EventoSanitarioResumen actividad = actividades.get(posicion);
+        ElementoSanidad elemento = elementos.get(posicion);
+        if (elemento.esGrupo()) {
+            EventoSanitario referencia = elemento.referencia;
+            fila.animal.setText(contexto.getResources().getQuantityString(R.plurals.grupo_aplicada_a, elemento.cantidad, elemento.cantidad));
+            fila.animal.setVisibility(View.VISIBLE);
+            fila.titulo.setText(Presentacion.tipoSanidad(contexto, referencia.tipo));
+            fila.detalle.setText(FormatoFecha.corta(referencia.fecha));
+            fila.descripcion.setText(referencia.descripcion);
+            fila.itemView.setOnClickListener(v -> { if (escuchaGrupo != null) escuchaGrupo.alSeleccionarGrupo(elemento.idGrupo); });
+            return;
+        }
+        EventoSanitarioResumen actividad = elemento.actividad;
         fila.animal.setText(actividad.animalNombre == null ? actividad.animalCodigo
                 : contexto.getString(R.string.codigo_nombre, actividad.animalCodigo, actividad.animalNombre));
         fila.animal.setVisibility(conAnimal ? View.VISIBLE : View.GONE);
@@ -63,5 +94,5 @@ public final class SanidadAdapter extends RecyclerView.Adapter<SanidadAdapter.Fi
         fila.itemView.setOnClickListener(v -> escucha.alSeleccionar(actividad));
     }
 
-    @Override public int getItemCount() { return actividades.size(); }
+    @Override public int getItemCount() { return elementos.size(); }
 }

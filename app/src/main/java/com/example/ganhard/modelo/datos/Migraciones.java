@@ -168,4 +168,12 @@ public final class Migraciones {
             db.execSQL("CREATE INDEX IF NOT EXISTS `index_animal_identificador_id_hierro` ON `animal_identificador` (`id_hierro`)");
         }
     };
+
+    /** Agrega a la actividad sanitaria el grupo con el que se aplicó a varios animales; las existentes quedan individuales. */
+    public static final Migration V8_V9 = new Migration(8, 9) {
+        @Override public void migrate(@NonNull SupportSQLiteDatabase db) {
+            db.execSQL("ALTER TABLE `evento_sanitario` ADD COLUMN `id_grupo` TEXT");
+            db.execSQL("CREATE INDEX IF NOT EXISTS `index_evento_sanitario_id_grupo` ON `evento_sanitario` (`id_grupo`)");
+        }
+    };
 }
