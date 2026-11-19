@@ -1,13 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Recuperar la finca en un teléfono vacío -->
-    <string name="recuperar_enlace">Ya tengo una cuenta: recuperar mi finca</string>
-    <string name="recuperar_titulo">Recuperar mi finca</string>
-    <string name="recuperar_ayuda">Inicia sesión con tu cuenta y elige la finca que quieres traer a este teléfono.</string>
+    <string name="recuperar_enlace">Ya tengo una cuenta: recuperar mi finca o aceptar una invitación</string>
+    <string name="recuperar_titulo">Entrar con mi cuenta</string>
+    <string name="recuperar_ayuda">Inicia sesión con tu cuenta. Aquí puedes recuperar tu finca en este teléfono o aceptar una invitación para trabajar en la finca de otra persona.</string>
     <string name="recuperar_sin_sesion">Primero inicia sesión con tu cuenta.</string>
     <string name="recuperar_iniciar">Iniciar sesión</string>
-    <string name="recuperar_sin_fincas">Tu cuenta no tiene fincas respaldadas. Si tienes una en otro teléfono, abre la app allí y sincroniza primero.</string>
+    <string name="recuperar_sin_fincas">Tu cuenta no tiene fincas respaldadas ni invitaciones. Si tienes una finca en otro teléfono, abre la app allí y sincroniza primero.</string>
     <string name="recuperar_elige">Elige una finca</string>
+    <string name="recuperar_fincas_titulo">Tus fincas</string>
+    <string name="recuperar_invitaciones_titulo">Invitaciones recibidas</string>
+    <string name="recuperar_invitacion_detalle">%1$s te invitó como encargado</string>
+    <string name="recuperar_aceptar">Aceptar</string>
+    <string name="recuperar_invitacion_aceptada">Aceptaste la invitación. Ahora elige la finca para traerla a este teléfono.</string>
     <string name="recuperar_confirmar_titulo">¿Recuperar esta finca?</string>
     <string name="recuperar_confirmar_texto">Se traerá «%1$s» a este teléfono con todos sus datos. Puede tardar si hay muchos registros.</string>
     <string name="recuperar_confirmar">Recuperar</string>

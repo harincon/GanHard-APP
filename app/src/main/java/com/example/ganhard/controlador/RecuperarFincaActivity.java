@@ -13,10 +13,12 @@ import com.example.ganhard.modelo.nucleo.ErrorModelo;
 import com.example.ganhard.modelo.remoto.CallbackRemoto;
 import com.example.ganhard.modelo.remoto.ErrorRemoto;
 import com.example.ganhard.modelo.remoto.IntegranteRemoto;
+import com.example.ganhard.modelo.remoto.InvitacionRemota;
 import com.example.ganhard.modelo.remoto.PertenenciaRemota;
 import com.example.ganhard.modelo.repositorio.EstadoCuenta;
 import com.example.ganhard.modelo.repositorio.ResultadoSincronizacion;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -66,23 +68,11 @@ public class RecuperarFincaActivity extends BaseActivity {
         cuenta().misFincas(new CallbackRemoto<List<PertenenciaRemota>>() {
             @Override public void exito(List<PertenenciaRemota> fincas) {
                 if (!disponible() || mia != lectura) return;
-                vista.progreso.setVisibility(View.INVISIBLE);
-                vista.iniciarSesion.setVisibility(View.GONE);
-                vista.listaFincas.removeAllViews();
-                boolean alguna = false;
+                List<PertenenciaRemota> activas = new ArrayList<>();
                 for (PertenenciaRemota finca : fincas) {
-                    if (!IntegranteRemoto.ACTIVO.equals(finca.estado)) continue; // una finca que perdió el acceso no se ofrece
-                    alguna = true;
-                    ItemPersonaBinding tarjeta = TarjetaPersona.agregar(RecuperarFincaActivity.this, vista.listaFincas,
-                            MensajesRemotos.rol(RecuperarFincaActivity.this, finca.rol), finca.nombreFinca, null, null);
-                    tarjeta.getRoot().setOnClickListener(v -> confirmar(finca));
+                    if (IntegranteRemoto.ACTIVO.equals(finca.estado)) activas.add(finca); // una finca que perdió el acceso no se ofrece
                 }
-                if (alguna) {
-                    vista.mensaje.setText(R.string.recuperar_elige);
-                    vista.mensaje.setVisibility(View.VISIBLE);
-                } else {
-                    sinLista(getString(R.string.recuperar_sin_fincas), false);
-                }
+                cargarInvitaciones(mia, activas);
             }
             @Override public void error(ErrorRemoto error) {
                 if (!disponible() || mia != lectura) return;
@@ -92,8 +82,77 @@ public class RecuperarFincaActivity extends BaseActivity {
         });
     }
 
+    /** Las invitaciones se aceptan aquí mismo: un teléfono vacío no tiene otra pantalla desde donde hacerlo. */
+    private void cargarInvitaciones(int mia, List<PertenenciaRemota> fincas) {
+        cuenta().misInvitaciones(new CallbackRemoto<List<InvitacionRemota>>() {
+            @Override public void exito(List<InvitacionRemota> invitaciones) {
+                if (!disponible() || mia != lectura) return;
+                pintar(fincas, invitaciones, null);
+            }
+            @Override public void error(ErrorRemoto error) {
+                if (!disponible() || mia != lectura) return;
+                // Sin poder leer las invitaciones (por ejemplo, con el correo sin confirmar) las fincas igual se ofrecen.
+                pintar(fincas, new ArrayList<>(), MensajesRemotos.texto(RecuperarFincaActivity.this, error));
+            }
+        });
+    }
+
+    private void pintar(List<PertenenciaRemota> fincas, List<InvitacionRemota> invitaciones, String aviso) {
+        vista.progreso.setVisibility(View.INVISIBLE);
+        vista.iniciarSesion.setVisibility(View.GONE);
+        vista.listaFincas.removeAllViews();
+        vista.listaInvitaciones.removeAllViews();
+        vista.tituloFincas.setVisibility(fincas.isEmpty() ? View.GONE : View.VISIBLE);
+        vista.tituloInvitaciones.setVisibility(invitaciones.isEmpty() ? View.GONE : View.VISIBLE);
+        for (PertenenciaRemota finca : fincas) {
+            ItemPersonaBinding tarjeta = TarjetaPersona.agregar(this, vista.listaFincas,
+                    MensajesRemotos.rol(this, finca.rol), finca.nombreFinca, null, null);
+            tarjeta.getRoot().setOnClickListener(v -> confirmar(finca));
+        }
+        for (InvitacionRemota invitacion : invitaciones) {
+            ItemPersonaBinding tarjeta = TarjetaPersona.agregar(this, vista.listaInvitaciones, null, invitacion.nombreFinca,
+                    getString(R.string.recuperar_invitacion_detalle, invitacion.invitadoPor), null);
+            TarjetaPersona.accion(tarjeta, R.string.recuperar_aceptar, v -> aceptar(invitacion));
+        }
+        if (fincas.isEmpty() && invitaciones.isEmpty()) {
+            sinLista(aviso != null ? aviso : getString(R.string.recuperar_sin_fincas), false);
+        } else if (aviso != null) {
+            vista.mensaje.setText(aviso);
+            vista.mensaje.setVisibility(View.VISIBLE);
+        } else if (!fincas.isEmpty()) {
+            vista.mensaje.setText(R.string.recuperar_elige);
+            vista.mensaje.setVisibility(View.VISIBLE);
+        } else {
+            vista.mensaje.setVisibility(View.GONE);
+        }
+    }
+
+    private void aceptar(InvitacionRemota invitacion) {
+        if (ocupado) return;
+        ocupado = true;
+        vista.progreso.setVisibility(View.VISIBLE);
+        cuenta().aceptarInvitacion(invitacion.idInvitacion, new CallbackRemoto<Void>() {
+            @Override public void exito(Void valor) {
+                if (!disponible()) return;
+                ocupado = false;
+                Toast.makeText(getApplicationContext(), R.string.recuperar_invitacion_aceptada, Toast.LENGTH_LONG).show();
+                cargar(); // la finca aceptada ya aparece en la lista
+            }
+            @Override public void error(ErrorRemoto error) {
+                if (!disponible()) return;
+                ocupado = false;
+                vista.progreso.setVisibility(View.INVISIBLE);
+                vista.mensaje.setText(MensajesRemotos.texto(RecuperarFincaActivity.this, error));
+                vista.mensaje.setVisibility(View.VISIBLE);
+            }
+        });
+    }
+
     private void sinLista(String texto, boolean conBotonDeSesion) {
         vista.listaFincas.removeAllViews();
+        vista.listaInvitaciones.removeAllViews();
+        vista.tituloFincas.setVisibility(View.GONE);
+        vista.tituloInvitaciones.setVisibility(View.GONE);
         vista.mensaje.setText(texto);
         vista.mensaje.setVisibility(View.VISIBLE);
         vista.iniciarSesion.setVisibility(conBotonDeSesion ? View.VISIBLE : View.GONE);

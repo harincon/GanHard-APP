@@ -14,8 +14,14 @@
             <com.google.android.material.button.MaterialButton android:id="@+id/iniciarSesion" style="@style/Gh.Boton"
                 android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="16dp"
                 android:text="@string/recuperar_iniciar" android:visibility="gone" />
+            <TextView android:id="@+id/tituloFincas" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="16dp" android:text="@string/recuperar_fincas_titulo" android:textAppearance="@style/Gh.Overline" android:visibility="gone" />
             <LinearLayout android:id="@+id/listaFincas" android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:layout_marginTop="16dp" android:orientation="vertical" />
+                android:layout_marginTop="8dp" android:orientation="vertical" />
+            <TextView android:id="@+id/tituloInvitaciones" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="16dp" android:text="@string/recuperar_invitaciones_titulo" android:textAppearance="@style/Gh.Overline" android:visibility="gone" />
+            <LinearLayout android:id="@+id/listaInvitaciones" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" android:orientation="vertical" />
             <TextView android:id="@+id/mensaje" android:layout_width="match_parent" android:layout_height="wrap_content"
                 android:layout_marginTop="12dp" android:textColor="@color/gh_muted" android:textSize="14sp"
                 android:accessibilityLiveRegion="polite" android:visibility="gone" />
