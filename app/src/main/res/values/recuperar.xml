@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Recuperar la finca en un teléfono vacío -->
+    <string name="recuperar_enlace">Ya tengo una cuenta: recuperar mi finca</string>
+    <string name="recuperar_titulo">Recuperar mi finca</string>
+    <string name="recuperar_ayuda">Inicia sesión con tu cuenta y elige la finca que quieres traer a este teléfono.</string>
+    <string name="recuperar_sin_sesion">Primero inicia sesión con tu cuenta.</string>
+    <string name="recuperar_iniciar">Iniciar sesión</string>
+    <string name="recuperar_sin_fincas">Tu cuenta no tiene fincas respaldadas. Si tienes una en otro teléfono, abre la app allí y sincroniza primero.</string>
+    <string name="recuperar_elige">Elige una finca</string>
+    <string name="recuperar_confirmar_titulo">¿Recuperar esta finca?</string>
+    <string name="recuperar_confirmar_texto">Se traerá «%1$s» a este teléfono con todos sus datos. Puede tardar si hay muchos registros.</string>
+    <string name="recuperar_confirmar">Recuperar</string>
+    <string name="recuperar_bajando">Bajando tu finca…</string>
+    <plurals name="recuperar_bajando_n">
+        <item quantity="one">Bajando… %d registro</item>
+        <item quantity="other">Bajando… %d registros</item>
+    </plurals>
+    <string name="recuperar_a_medias">La finca se recuperó solo en parte. Abre Sincronización y pulsa «Sincronizar ahora» para terminar.</string>
+    <string name="regla_ya_hay_finca">Este teléfono ya tiene una finca. Para recuperar otra, primero usa «Cerrar sesión y borrar datos».</string>
+
+    <!-- Quien usa el teléfono -->
+    <string name="responsable_encargado">%1$s · Encargado</string>
+
+    <!-- Pantalla Sincronización: ahora también baja -->
+    <plurals name="sinc_exito_bajadas">
+        <item quantity="one">Listo: se bajó %d cambio.</item>
+        <item quantity="other">Listo: se bajaron %d cambios.</item>
+    </plurals>
+    <string name="sinc_exito_ambas">Listo: se bajaron %1$d y se subieron %2$d cambios.</string>
+</resources>

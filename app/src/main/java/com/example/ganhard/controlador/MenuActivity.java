@@ -43,7 +43,7 @@ public class MenuActivity extends BaseActivity {
                     return;
                 }
                 vista.menuFinca.setText(datos.finca.nombre);
-                vista.menuAdministrador.setText(getString(R.string.responsable, datos.usuario.nombre));
+                vista.menuAdministrador.setText(getString(datos.esAdministrador() ? R.string.responsable : R.string.responsable_encargado, datos.usuario.nombre));
             }
             @Override public void error(ErrorModelo error) { /* El menú sigue siendo útil sin el nombre de la finca. */ }
         });

@@ -70,7 +70,7 @@ public class InicioActivity extends BaseActivity {
                     return;
                 }
                 vista.nombreFinca.setText(datos.finca.nombre);
-                vista.administrador.setText(getString(R.string.responsable, datos.usuario.nombre));
+                vista.administrador.setText(getString(datos.esAdministrador() ? R.string.responsable : R.string.responsable_encargado, datos.usuario.nombre));
                 buscarPrimerMes();
             }
             @Override public void error(ErrorModelo error) { if (disponible()) mostrarError(); }

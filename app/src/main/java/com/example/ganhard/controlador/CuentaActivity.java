@@ -72,7 +72,8 @@ public class CuentaActivity extends BaseActivity {
         else if (estado.fincaDeEstaCuenta) vista.fincaEstado.setText(getString(R.string.cuenta_finca_vinculada, estado.nombreFinca));
         else vista.fincaEstado.setText(getString(R.string.cuenta_finca_de_otra, estado.nombreFinca));
         vista.botonVincular.setVisibility(estado.hayFincaLocal && !estado.fincaVinculada ? View.VISIBLE : View.GONE);
-        vista.filaIntegrantes.setVisibility(estado.fincaDeEstaCuenta ? View.VISIBLE : View.GONE);
+        // Quien administra la finca ve sus integrantes; una persona encargada no.
+        vista.filaIntegrantes.setVisibility(estado.fincaDeEstaCuenta && estado.esAdministrador ? View.VISIBLE : View.GONE);
     }
 
     private void vincular() {

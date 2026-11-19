@@ -2,6 +2,7 @@ package com.example.ganhard.controlador;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import androidx.appcompat.app.AppCompatDelegate;
 import com.example.ganhard.R;
 import com.example.ganhard.databinding.ActivityAjustesBinding;
@@ -47,6 +48,9 @@ public class AjustesActivity extends BaseActivity {
                 vista.ajustesCorreo.setText(datos.usuario.correo);
                 String ubicacion = datos.finca.ubicacion;
                 vista.filaDatosFinca.setSubtitulo(ubicacion == null ? datos.finca.nombre : datos.finca.nombre + " · " + ubicacion);
+                // La finca y los hierros los administra el dueño; una persona encargada no ve esas filas.
+                vista.filaDatosFinca.setVisibility(datos.esAdministrador() ? View.VISIBLE : View.GONE);
+                vista.filaHierros.setVisibility(datos.esAdministrador() ? View.VISIBLE : View.GONE);
             }
             @Override public void error(ErrorModelo error) { /* La pantalla sigue siendo útil: el tema no depende de la base. */ }
         });

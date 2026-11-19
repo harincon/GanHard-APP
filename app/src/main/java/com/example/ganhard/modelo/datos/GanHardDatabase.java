@@ -19,8 +19,8 @@ import com.example.ganhard.modelo.entidad.MarcaSincronizacion;
 import com.example.ganhard.modelo.entidad.Raza;
 import com.example.ganhard.modelo.entidad.Usuario;
 
-/** Versión 11 (marcas del respaldo en la nube sobre la 10, con grupos y tipo propio en las tareas): configuración (con el vínculo de la finca a una cuenta), razas, animales con sus hierros e identificadores, pesajes, historial, sanidad, gastos y tareas. */
-@Database(entities = {Usuario.class, Finca.class, Raza.class, Animal.class, Pesaje.class, HistorialCambio.class, EventoSanitario.class, Gasto.class, Tarea.class, Hierro.class, AnimalIdentificador.class, MarcaSincronizacion.class}, version = 11, exportSchema = true)
+/** Versión 12 (la persona de este teléfono sobre la 11, con marcas del respaldo en la nube, grupos y tipo propio en las tareas): configuración (con el vínculo de la finca a una cuenta), razas, animales con sus hierros e identificadores, pesajes, historial, sanidad, gastos y tareas. */
+@Database(entities = {Usuario.class, Finca.class, Raza.class, Animal.class, Pesaje.class, HistorialCambio.class, EventoSanitario.class, Gasto.class, Tarea.class, Hierro.class, AnimalIdentificador.class, MarcaSincronizacion.class}, version = 12, exportSchema = true)
 public abstract class GanHardDatabase extends RoomDatabase {
     public abstract ConfiguracionDao configuracionDao();
     public abstract RazaDao razaDao();
@@ -39,7 +39,7 @@ public abstract class GanHardDatabase extends RoomDatabase {
         Builder<GanHardDatabase> constructor = archivo == null
                 ? Room.inMemoryDatabaseBuilder(contexto, GanHardDatabase.class)
                 : Room.databaseBuilder(contexto, GanHardDatabase.class, archivo);
-        return constructor.addMigrations(Migraciones.V1_V2, Migraciones.V2_V3, Migraciones.V3_V4, Migraciones.V4_V5, Migraciones.V5_V6, Migraciones.V6_V7, Migraciones.V7_V8, Migraciones.V8_V9, Migraciones.V9_V10, Migraciones.V10_V11).addCallback(new Callback() {
+        return constructor.addMigrations(Migraciones.V1_V2, Migraciones.V2_V3, Migraciones.V3_V4, Migraciones.V4_V5, Migraciones.V5_V6, Migraciones.V6_V7, Migraciones.V7_V8, Migraciones.V8_V9, Migraciones.V9_V10, Migraciones.V10_V11, Migraciones.V11_V12).addCallback(new Callback() {
             @Override public void onCreate(@NonNull SupportSQLiteDatabase db) { CatalogoRazas.insertar(db); }
         });
     }

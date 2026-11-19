@@ -3,6 +3,7 @@ package com.example.ganhard.modelo.repositorio;
 import com.example.ganhard.modelo.datos.GanHardDatabase;
 import com.example.ganhard.modelo.entidad.Finca;
 import com.example.ganhard.modelo.entidad.HistorialCambio;
+import com.example.ganhard.modelo.entidad.Usuario;
 import com.example.ganhard.modelo.nucleo.ErrorModelo;
 import java.util.UUID;
 import org.json.JSONObject;
@@ -26,7 +27,9 @@ public final class RegistroCambios {
         if (finca == null) throw ErrorModelo.noEncontrado(ErrorModelo.FINCA);
         HistorialCambio cambio = new HistorialCambio();
         cambio.idHistorialCambio = UUID.randomUUID().toString();
-        cambio.idUsuario = finca.idPropietario;
+        // El autor es la persona de este teléfono (la dueña o un encargado); sin esa marca, el dueño de la finca.
+        Usuario autor = db.configuracionDao().usuarioDeEsteTelefono();
+        cambio.idUsuario = autor != null ? autor.idUsuario : finca.idPropietario;
         cambio.idFinca = finca.idFinca;
         cambio.entidad = entidad;
         cambio.idRegistro = idRegistro;

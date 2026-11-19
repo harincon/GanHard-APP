@@ -10,14 +10,17 @@ import android.content.SharedPreferences;
  */
 @SuppressLint("ApplySharedPref") // commit() a propósito: la sesión debe quedar guardada antes de seguir, y se escribe fuera del hilo principal.
 public final class AlmacenSesion {
-    private static final String ARCHIVO = "sesion_remota";
+    private static final String ARCHIVO_POR_OMISION = "sesion_remota";
     private static final String ACCESO = "acceso", RENOVACION = "renovacion", CUENTA = "cuenta", CORREO = "correo",
             CONFIRMADO = "confirmado", EXPIRA = "expira";
 
     private final SharedPreferences preferencias;
 
-    public AlmacenSesion(Context contexto) {
-        preferencias = contexto.getApplicationContext().getSharedPreferences(ARCHIVO, Context.MODE_PRIVATE);
+    public AlmacenSesion(Context contexto) { this(contexto, ARCHIVO_POR_OMISION); }
+
+    /** Con un archivo propio: las pruebas simulan dos teléfonos con dos almacenes distintos. */
+    public AlmacenSesion(Context contexto, String archivo) {
+        preferencias = contexto.getApplicationContext().getSharedPreferences(archivo, Context.MODE_PRIVATE);
     }
 
     /** La sesión guardada, o nulo si no hay ninguna. */

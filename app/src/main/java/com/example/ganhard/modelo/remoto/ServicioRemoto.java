@@ -35,4 +35,13 @@ public interface ServicioRemoto {
      * reemplaza una fila si la que llega es más reciente. Devuelve cuántas filas aplicó.
      */
     int subirCambios(String tokenAcceso, String idFinca, String tabla, org.json.JSONArray filas) throws ErrorRemoto;
+
+    /**
+     * Hasta {@code limite} filas de una tabla de la finca posteriores a la marca (fecha e id; nulos traen desde el principio),
+     * ordenadas por fecha e id. Las razas se piden por id. Las filas traen todas las columnas del servidor.
+     */
+    org.json.JSONArray bajarCambios(String tokenAcceso, String idFinca, String tabla, String desdeEn, String desdeId, int limite) throws ErrorRemoto;
+
+    /** La finca y las personas con acceso, para armar la finca local; lo puede pedir cualquier integrante activo. */
+    DatosFincaRemota datosDeFinca(String tokenAcceso, String idFinca) throws ErrorRemoto;
 }

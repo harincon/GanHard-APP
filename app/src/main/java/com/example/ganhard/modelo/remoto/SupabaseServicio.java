@@ -145,6 +145,31 @@ public final class SupabaseServicio implements ServicioRemoto {
         }
     }
 
+    @Override public JSONArray bajarCambios(String tokenAcceso, String idFinca, String tabla, String desdeEn, String desdeId, int limite) throws ErrorRemoto {
+        // Un parámetro nulo debe viajar como null explícito: si se omite, el servidor no encuentra la función.
+        return arreglo(rpc("bajar_cambios", tokenAcceso, json("p_id_finca", idFinca, "p_tabla", tabla,
+                "p_desde_en", desdeEn == null ? JSONObject.NULL : desdeEn, "p_desde_id", desdeId == null ? JSONObject.NULL : desdeId,
+                "p_limite", limite)));
+    }
+
+    @Override public DatosFincaRemota datosDeFinca(String tokenAcceso, String idFinca) throws ErrorRemoto {
+        try {
+            JSONObject datos = new JSONObject(rpc("datos_de_finca", tokenAcceso, json("p_id_finca", idFinca)));
+            JSONObject f = datos.getJSONObject("finca");
+            Double area = f.isNull("area_hectareas") ? null : f.getDouble("area_hectareas");
+            FincaRemota finca = new FincaRemota(texto(f, "id_finca"), texto(f, "nombre"), f.isNull("ubicacion") ? null : f.getString("ubicacion"), area);
+            JSONArray filas = datos.getJSONArray("personas");
+            List<PersonaRemota> personas = new ArrayList<>();
+            for (int i = 0; i < filas.length(); i++) {
+                JSONObject p = filas.getJSONObject(i);
+                personas.add(new PersonaRemota(texto(p, "id_cuenta"), texto(p, "nombre"), texto(p, "correo"), texto(p, "rol"), texto(p, "estado")));
+            }
+            return new DatosFincaRemota(finca, texto(f, "id_propietario"), texto(f, "creado_en"), personas);
+        } catch (JSONException ex) {
+            throw respuestaInvalida(ex);
+        }
+    }
+
     // --- Lectura de respuestas ---
 
     private static List<InvitacionRemota> invitaciones(JSONArray filas) throws JSONException {

@@ -19,7 +19,8 @@ public abstract class HistorialDao {
             + "LEFT JOIN evento_sanitario e ON h.entidad = 'evento_sanitario' AND e.id_evento_sanitario = h.id_registro "
             + "LEFT JOIN tarea tt ON h.entidad = 'tarea' AND tt.id_tarea = h.id_registro "
             + "LEFT JOIN animal a ON a.id_animal = CASE WHEN h.entidad = 'animal' THEN h.id_registro ELSE COALESCE(p.id_animal, e.id_animal, tt.id_animal) END ";
-    private static final String ORDEN = "ORDER BY h.registrado_en DESC, h.id_historial_cambio";
+    // Entradas del mismo instante: primero la última guardada (si no, el orden sería el de un id al azar).
+    private static final String ORDEN = "ORDER BY h.registrado_en DESC, h.rowid DESC";
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
     public abstract void insertar(HistorialCambio cambio);

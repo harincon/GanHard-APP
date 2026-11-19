@@ -40,6 +40,7 @@ public final class ConfiguracionRepository {
                 usuario.idUsuario = UUID.randomUUID().toString();
                 finca.idFinca = UUID.randomUUID().toString();
                 usuario.creadoEn = fecha;
+                usuario.deEsteTelefono = 1;
                 finca.creadoEn = fecha;
                 finca.idPropietario = usuario.idUsuario;
             }

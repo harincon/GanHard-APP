@@ -186,6 +186,14 @@ public final class Migraciones {
         }
     };
 
+    /** Marca a la persona que usa el teléfono; la única que existía hasta ahora (la dueña) lo es. */
+    public static final Migration V11_V12 = new Migration(11, 12) {
+        @Override public void migrate(@NonNull SupportSQLiteDatabase db) {
+            db.execSQL("ALTER TABLE `usuario` ADD COLUMN `de_este_telefono` INTEGER NOT NULL DEFAULT 0");
+            db.execSQL("UPDATE `usuario` SET `de_este_telefono` = 1");
+        }
+    };
+
     /** Crea la tabla con hasta dónde se subió cada tabla al servidor (respaldo en la nube); no toca lo existente. */
     public static final Migration V10_V11 = new Migration(10, 11) {
         @Override public void migrate(@NonNull SupportSQLiteDatabase db) {

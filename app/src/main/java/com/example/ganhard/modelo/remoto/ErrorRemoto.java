@@ -46,6 +46,8 @@ public final class ErrorRemoto extends Exception {
     // Códigos que decide la app antes de llamar al servidor.
     /** Ya hay una sincronización en marcha; la segunda no se repite. */
     public static final String EN_CURSO = "sincronizacion_en_curso";
+    /** Recuperar una finca solo se puede en un teléfono vacío. */
+    public static final String YA_HAY_FINCA = "ya_hay_finca";
     public static final String SIN_FINCA_LOCAL = "sin_finca_local", YA_VINCULADA = "ya_vinculada";
     public static final String OTRA_CUENTA = "finca_vinculada_a_otra_cuenta", NO_VINCULADA = "finca_no_vinculada";
 

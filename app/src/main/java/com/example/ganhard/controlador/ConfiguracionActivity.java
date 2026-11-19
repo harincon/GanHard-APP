@@ -35,6 +35,7 @@ public class ConfiguracionActivity extends FormularioActivity {
                 estado.getString("finca"), estado.getString("ubicacion"), estado.getString("area")));
         vista.guardar.setOnClickListener(v -> guardar());
         vista.reintentar.setOnClickListener(v -> cargar());
+        vista.recuperarFinca.setOnClickListener(v -> startActivity(new Intent(this, RecuperarFincaActivity.class)));
         cargar();
     }
     private void cargar() {
@@ -53,6 +54,8 @@ public class ConfiguracionActivity extends FormularioActivity {
                     vista.guardar.setText(R.string.guardar_cambios);
                     if (!restaurado) mostrar(original);
                 }
+                // Un teléfono sin finca puede recuperar la de su cuenta en vez de crear otra.
+                vista.recuperarFinca.setVisibility(datos == null ? View.VISIBLE : View.GONE);
                 restaurado = true;
                 ocupado(false);
             }

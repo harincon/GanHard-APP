@@ -12,9 +12,11 @@ public final class EstadoCuenta {
     public final boolean fincaVinculada;
     /** La finca local está vinculada y a la cuenta con la sesión actual: solo entonces se puede administrar. */
     public final boolean fincaDeEstaCuenta;
+    /** Quien usa este teléfono es el dueño de la finca; si no, es una persona encargada (con menos permisos). */
+    public final boolean esAdministrador;
 
     public EstadoCuenta(boolean configurada, boolean conSesion, String correo, boolean correoConfirmado, boolean hayFincaLocal,
-                        String nombreFinca, boolean fincaVinculada, boolean fincaDeEstaCuenta) {
+                        String nombreFinca, boolean fincaVinculada, boolean fincaDeEstaCuenta, boolean esAdministrador) {
         this.configurada = configurada;
         this.conSesion = conSesion;
         this.correo = correo;
@@ -23,5 +25,6 @@ public final class EstadoCuenta {
         this.nombreFinca = nombreFinca;
         this.fincaVinculada = fincaVinculada;
         this.fincaDeEstaCuenta = fincaDeEstaCuenta;
+        this.esAdministrador = esAdministrador;
     }
 }

@@ -46,6 +46,8 @@
             </com.google.android.material.textfield.TextInputLayout>
             <com.google.android.material.button.MaterialButton android:id="@+id/guardar" style="@style/Gh.Boton" android:layout_width="match_parent" android:layout_height="wrap_content"
                 android:text="@string/guardar_comenzar" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/recuperarFinca" style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/recuperar_enlace" android:visibility="gone" />
             <com.google.android.material.button.MaterialButton android:id="@+id/reintentar" style="@style/Widget.Material3.Button.TextButton"
                 android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/reintentar" android:visibility="gone" />
             <TextView android:id="@+id/mensaje" android:layout_width="match_parent" android:layout_height="wrap_content"

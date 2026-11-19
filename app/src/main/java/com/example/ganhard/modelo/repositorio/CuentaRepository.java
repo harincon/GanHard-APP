@@ -62,7 +62,8 @@ public final class CuentaRepository {
             boolean vinculada = local != null && local.finca.vinculadaEn != null;
             boolean deEstaCuenta = vinculada && sesion != null && sesion.idCuenta.equals(local.usuario.idCuentaRemota);
             return new EstadoCuenta(servicio.configurado(), sesion != null, sesion == null ? null : sesion.correo,
-                    sesion != null && sesion.correoConfirmado, local != null, local == null ? null : local.finca.nombre, vinculada, deEstaCuenta);
+                    sesion != null && sesion.correoConfirmado, local != null, local == null ? null : local.finca.nombre, vinculada, deEstaCuenta,
+                    local == null || local.esAdministrador());
         }, callback);
     }
 

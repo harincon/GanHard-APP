@@ -58,6 +58,8 @@
             android:exported="false" />
         <activity android:name=".controlador.SanidadGrupoActivity"
             android:exported="false" />
+        <activity android:name=".controlador.RecuperarFincaActivity"
+            android:exported="false" />
         <activity android:name=".controlador.SincronizacionActivity"
             android:exported="false" />
         <activity android:name=".controlador.TareaGrupoActivity"

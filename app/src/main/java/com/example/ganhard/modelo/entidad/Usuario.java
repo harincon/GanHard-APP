@@ -14,6 +14,8 @@ public class Usuario {
     @NonNull public String correo = "";
     public String telefono;
     public int activo = 1;
+    /** 1 en la persona que usa este teléfono (la dueña o un encargado); 0 en las demás personas que solo se conocen por la finca. */
+    @ColumnInfo(name = "de_este_telefono", defaultValue = "0") public int deEsteTelefono = 0;
     @NonNull @ColumnInfo(name = "creado_en") public String creadoEn = "";
     @NonNull @ColumnInfo(name = "actualizado_en") public String actualizadoEn = "";
     public int version = 0;

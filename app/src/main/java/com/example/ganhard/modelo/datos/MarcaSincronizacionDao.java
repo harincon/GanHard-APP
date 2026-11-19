@@ -19,7 +19,7 @@ public abstract class MarcaSincronizacionDao {
     @Query("SELECT * FROM marca_sincronizacion")
     public abstract List<MarcaSincronizacion> todas();
 
-    /** Olvida lo subido de las tablas de datos (no el resumen): la próxima vez se sube todo otra vez. */
-    @Query("DELETE FROM marca_sincronizacion WHERE tabla <> '_resumen'")
-    public abstract void borrarMarcasDeDatos();
+    /** Olvida lo subido de las tablas de datos (no el resumen ni lo bajado): la próxima vez se sube todo otra vez. */
+    @Query("DELETE FROM marca_sincronizacion WHERE tabla NOT LIKE 'bajada:%' AND tabla <> '_resumen'")
+    public abstract void borrarMarcasDeSubida();
 }

@@ -96,8 +96,7 @@ public class SincronizacionActivity extends BaseActivity {
             @Override public void exito(ResultadoSincronizacion resultado) {
                 if (!disponible()) return;
                 ocupar(false);
-                mostrarMensaje(resultado.subidas == 0 ? getString(R.string.sinc_exito_nada)
-                        : getResources().getQuantityString(R.plurals.sinc_exito, resultado.subidas, resultado.subidas));
+                mostrarMensaje(resumen(resultado));
                 cargar();
             }
             @Override public void error(ErrorRemoto error) {
@@ -107,6 +106,14 @@ public class SincronizacionActivity extends BaseActivity {
                 cargar();
             }
         });
+    }
+
+    /** "Todo estaba al día", lo subido, lo bajado o las dos cosas. */
+    private String resumen(ResultadoSincronizacion resultado) {
+        if (resultado.bajadas > 0 && resultado.subidas > 0) return getString(R.string.sinc_exito_ambas, resultado.bajadas, resultado.subidas);
+        if (resultado.bajadas > 0) return getResources().getQuantityString(R.plurals.sinc_exito_bajadas, resultado.bajadas, resultado.bajadas);
+        if (resultado.subidas > 0) return getResources().getQuantityString(R.plurals.sinc_exito, resultado.subidas, resultado.subidas);
+        return getString(R.string.sinc_exito_nada);
     }
 
     private void confirmarReenvio() {

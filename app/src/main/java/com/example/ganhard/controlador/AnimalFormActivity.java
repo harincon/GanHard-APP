@@ -88,6 +88,8 @@ public class AnimalFormActivity extends FormularioActivity {
     /** Identificadores al abrir la edición, como claves comparables. */
     private String hierroOriginal = "";
     private List<String> extrasOriginales = new ArrayList<>();
+    /** Falso en el teléfono de una persona encargada: solo el dueño crea hierros nuevos. */
+    private boolean puedeCrearHierros = true;
     private boolean restaurado, razasCargadas;
     /** En edición, indica que los campos ya recibieron los datos del animal (aunque la pantalla se haya recreado). */
     private boolean formularioCargado, identificadoresCargados;
@@ -170,7 +172,9 @@ public class AnimalFormActivity extends FormularioActivity {
     private void verificarFinca() {
         repositorio().cargar(new Callback<ConfiguracionLocal>() {
             @Override public void exito(ConfiguracionLocal datos) {
-                if (disponible() && datos == null) irAConfiguracion();
+                if (!disponible()) return;
+                if (datos == null) irAConfiguracion();
+                else if (!datos.esAdministrador()) { puedeCrearHierros = false; actualizarMenuHierros(); } // solo el dueño crea hierros
             }
             @Override public void error(ErrorModelo error) {
                 if (disponible()) mensaje(R.string.error_carga);
@@ -220,7 +224,7 @@ public class AnimalFormActivity extends FormularioActivity {
     private List<String> nombresConNuevo() {
         List<String> nombres = new ArrayList<>();
         for (Hierro hierro : catalogo) nombres.add(hierro.nombre);
-        nombres.add(getString(R.string.hierro_nuevo_opcion));
+        if (puedeCrearHierros) nombres.add(getString(R.string.hierro_nuevo_opcion));
         return nombres;
     }
 
