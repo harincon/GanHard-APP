@@ -28,7 +28,7 @@
     <string name="sub_cerrar_todo">Quita la cuenta y todos los datos de este teléfono</string>
     <string name="borrar_todo_titulo">¿Cerrar sesión y borrar todo?</string>
     <string name="borrar_todo_aviso">Se borrarán de este teléfono tu perfil, la finca, los animales, los pesajes, la sanidad, los gastos, las tareas y el historial, y se cerrará la sesión de la cuenta.</string>
-    <string name="borrar_todo_sin_sincronizar">Todavía no hay sincronización: lo que no esté guardado en otro lugar se perderá y no se podrá recuperar.</string>
+    <string name="borrar_todo_sin_sincronizar">Lo que no esté respaldado en la nube se perderá y no se podrá recuperar.</string>
     <string name="borrar_todo_hint">Escribe BORRAR para confirmar</string>
     <string name="borrar_todo_palabra">BORRAR</string>
     <string name="borrar_todo_confirmar">Borrar todo</string>

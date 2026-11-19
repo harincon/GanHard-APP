@@ -29,4 +29,10 @@ public interface ServicioRemoto {
     void invitarEncargado(String tokenAcceso, String idFinca, String correo) throws ErrorRemoto;
     void cancelarInvitacion(String tokenAcceso, String idInvitacion) throws ErrorRemoto;
     void retirarAcceso(String tokenAcceso, String idUsuarioFinca, String motivo) throws ErrorRemoto;
+
+    /**
+     * Sube un lote de filas (hasta 500) de una tabla de la finca para el respaldo. Es idempotente: el servidor solo
+     * reemplaza una fila si la que llega es más reciente. Devuelve cuántas filas aplicó.
+     */
+    int subirCambios(String tokenAcceso, String idFinca, String tabla, org.json.JSONArray filas) throws ErrorRemoto;
 }

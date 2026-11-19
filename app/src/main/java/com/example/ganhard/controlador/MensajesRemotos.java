@@ -55,6 +55,11 @@ public final class MensajesRemotos {
             case ErrorRemoto.YA_VINCULADA: return R.string.regla_ya_vinculada;
             case ErrorRemoto.OTRA_CUENTA: return R.string.regla_otra_cuenta;
             case ErrorRemoto.NO_VINCULADA: return R.string.regla_no_vinculada;
+            case ErrorRemoto.NO_ES_INTEGRANTE: return R.string.regla_no_es_integrante;
+            case ErrorRemoto.EN_CURSO: return R.string.regla_sincronizacion_en_curso;
+            case ErrorRemoto.TABLA_INVALIDA:
+            case ErrorRemoto.DEMASIADAS_FILAS:
+            case ErrorRemoto.FILA_DE_OTRA_FINCA: return R.string.regla_respaldo_rechazado;
             default: return R.string.regla_desconocida;
         }
     }

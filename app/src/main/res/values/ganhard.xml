@@ -133,7 +133,7 @@
     <string name="sub_tareas">Actividades programadas</string>
     <string name="sub_gastos">Egresos y total del periodo</string>
     <string name="sub_historial">Responsables y correcciones</string>
-    <string name="sub_sincronizacion">Envíos y cambios por revisar · Próximamente</string>
+    <string name="sub_sincronizacion">Respaldo de tus datos en la nube</string>
     <string name="sub_configuracion">Perfil, finca y apariencia</string>
     <string name="ajustes_rol">Administrador · Perfil local</string>
     <string name="datos_finca_fila">Datos de la finca</string>

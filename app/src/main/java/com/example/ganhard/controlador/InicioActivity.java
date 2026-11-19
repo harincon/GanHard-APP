@@ -39,6 +39,8 @@ public class InicioActivity extends BaseActivity {
         vista.toolbar.setNavigationOnClickListener(v -> abrir(MenuActivity.class));
         vista.registrarAnimal.setOnClickListener(v -> abrir(AnimalFormActivity.class));
         vista.reintentar.setOnClickListener(v -> cargar());
+        // Al abrir la app, un intento de respaldo en silencio (una sola vez por ejecución, no al rotar).
+        if (estado == null && app().tomarIntentoAutomatico()) app().sincronizacion().sincronizarSiHaceFalta();
         vista.mesAnterior.setOnClickListener(v -> cambiarMes(mesElegido.minusMonths(1)));
         vista.mesSiguiente.setOnClickListener(v -> cambiarMes(mesElegido.plusMonths(1)));
     }

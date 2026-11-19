@@ -33,7 +33,8 @@ import java.util.Map;
  * <p>Esta clase nunca modifica ni borra datos de trabajo: cerrar sesión o perder el acceso solo afecta a la sesión.
  */
 public final class CuentaRepository {
-    private interface Operacion<T> {
+    /** Una llamada al servidor que necesita la sesión abierta; la usan también los demás repositorios remotos. */
+    interface Operacion<T> {
         T con(SesionRemota sesion) throws ErrorRemoto;
     }
 
@@ -262,7 +263,7 @@ public final class CuentaRepository {
     }
 
     /** El id de la finca local, solo si está vinculada y a la cuenta que tiene la sesión abierta. */
-    private String fincaDelDueno() throws ErrorRemoto {
+    String fincaDelDueno() throws ErrorRemoto {
         SesionRemota sesion = sesionGuardada();
         ConfiguracionLocal local = dao.cargar();
         if (local == null) throw ErrorRemoto.regla(ErrorRemoto.SIN_FINCA_LOCAL);
@@ -275,7 +276,7 @@ public final class CuentaRepository {
      * Ejecuta una operación con la sesión guardada. Si el token venció se renueva antes; si el servidor igual lo
      * rechaza, se renueva y se intenta una sola vez más. Si ya no se puede renovar, la sesión se borra.
      */
-    private <T> T conSesion(Operacion<T> operacion) throws ErrorRemoto {
+    <T> T conSesion(Operacion<T> operacion) throws ErrorRemoto {
         SesionRemota sesion = sesionGuardada();
         if (sesion.caducada(System.currentTimeMillis() / 1000)) sesion = renovar(sesion);
         try {

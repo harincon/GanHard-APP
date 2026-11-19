@@ -136,6 +136,15 @@ public final class SupabaseServicio implements ServicioRemoto {
         rpc("retirar_acceso", tokenAcceso, json("p_id_usuario_finca", idUsuarioFinca, "p_motivo", motivo));
     }
 
+    @Override public int subirCambios(String tokenAcceso, String idFinca, String tabla, JSONArray filas) throws ErrorRemoto {
+        String cuerpo = rpc("subir_cambios", tokenAcceso, json("p_id_finca", idFinca, "p_tabla", tabla, "p_filas", filas));
+        try {
+            return Integer.parseInt(cuerpo.trim());
+        } catch (NumberFormatException ex) {
+            throw respuestaInvalida(ex);
+        }
+    }
+
     // --- Lectura de respuestas ---
 
     private static List<InvitacionRemota> invitaciones(JSONArray filas) throws JSONException {

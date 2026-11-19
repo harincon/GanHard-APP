@@ -16,10 +16,9 @@ Java y XML (Android Views), arquitectura MVC, base de datos local con Room.
 - Historial de cambios de la finca y de cada animal: quién, cuándo, qué cambió y por qué.
 - Inicio con estadísticas mes por mes: animales (activos, hembras y machos, razas, ingresos, ventas y fallecimientos), pesos (promedio y animales sin pesar) y gastos (total y categorías), con barras simples.
 - Cuenta opcional: crear la cuenta o iniciar sesión (el correo se confirma con un código), vincular la finca, invitar a un encargado por correo y retirar accesos con motivo.
-- «Cerrar sesión y borrar datos» en el menú: cierra la sesión y deja el teléfono como recién instalado, previa advertencia.
+- Respaldo en la nube (menú → Sincronización): sube al servidor los animales, pesajes, sanidad, tareas, gastos e historial de la finca, con un botón o en silencio al abrir la app, y no pierde nada si se corta la conexión. Por ahora solo sube; aún no baja los datos a otro teléfono. Necesita ejecutar `supabase/sincronizacion.sql` una vez en Supabase.
+- «Cerrar sesión y borrar datos» en el menú: cierra la sesión y deja el teléfono como recién instalado, previa advertencia que dice cuántos cambios sin respaldar se perderían.
 - Tema claro, oscuro o el del sistema.
-
-Sincronización aparece en el menú como "Próximamente".
 
 ## Estructura
 

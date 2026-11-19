@@ -4,8 +4,8 @@
     android:paddingStart="24dp" android:paddingEnd="24dp" android:paddingTop="8dp">
     <TextView android:id="@+id/aviso" android:layout_width="match_parent" android:layout_height="wrap_content"
         android:text="@string/borrar_todo_aviso" android:textSize="14sp" android:textColor="@color/gh_text" />
-    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp"
-        android:text="@string/borrar_todo_sin_sincronizar" android:textSize="14sp" android:textStyle="bold" android:textColor="@color/gh_on_aviso" />
+    <TextView android:id="@+id/avisoRespaldo" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp"
+        android:accessibilityLiveRegion="polite" android:text="@string/borrar_todo_sin_sincronizar" android:textSize="14sp" android:textStyle="bold" android:textColor="@color/gh_on_aviso" />
     <com.google.android.material.textfield.TextInputLayout android:id="@+id/campoConfirmacion"
         style="@style/Widget.Material3.TextInputLayout.OutlinedBox" android:layout_width="match_parent" android:layout_height="wrap_content"
         android:layout_marginTop="16dp" android:hint="@string/borrar_todo_hint">

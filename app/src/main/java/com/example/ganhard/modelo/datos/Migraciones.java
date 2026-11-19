@@ -185,4 +185,12 @@ public final class Migraciones {
             db.execSQL("CREATE INDEX IF NOT EXISTS `index_tarea_id_grupo` ON `tarea` (`id_grupo`)");
         }
     };
+
+    /** Crea la tabla con hasta dónde se subió cada tabla al servidor (respaldo en la nube); no toca lo existente. */
+    public static final Migration V10_V11 = new Migration(10, 11) {
+        @Override public void migrate(@NonNull SupportSQLiteDatabase db) {
+            db.execSQL("CREATE TABLE IF NOT EXISTS `marca_sincronizacion` (`tabla` TEXT NOT NULL, `hasta_en` TEXT NOT NULL, "
+                    + "`hasta_id` TEXT NOT NULL, `sincronizado_en` TEXT NOT NULL, PRIMARY KEY(`tabla`))");
+        }
+    };
 }

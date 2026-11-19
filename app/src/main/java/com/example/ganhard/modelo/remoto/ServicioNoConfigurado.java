@@ -22,4 +22,5 @@ public final class ServicioNoConfigurado implements ServicioRemoto {
     @Override public void invitarEncargado(String tokenAcceso, String idFinca, String correo) throws ErrorRemoto { throw falta(); }
     @Override public void cancelarInvitacion(String tokenAcceso, String idInvitacion) throws ErrorRemoto { throw falta(); }
     @Override public void retirarAcceso(String tokenAcceso, String idUsuarioFinca, String motivo) throws ErrorRemoto { throw falta(); }
+    @Override public int subirCambios(String tokenAcceso, String idFinca, String tabla, org.json.JSONArray filas) throws ErrorRemoto { throw falta(); }
 }

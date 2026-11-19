@@ -19,6 +19,7 @@ import com.example.ganhard.modelo.repositorio.HierroRepository;
 import com.example.ganhard.modelo.repositorio.HistorialRepository;
 import com.example.ganhard.modelo.repositorio.PesajeRepository;
 import com.example.ganhard.modelo.repositorio.SanidadRepository;
+import com.example.ganhard.modelo.repositorio.SincronizacionRepository;
 import com.example.ganhard.modelo.repositorio.TareaRepository;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -36,6 +37,8 @@ public class GanHardApplication extends Application {
     private HierroRepository hierros;
     private EstadisticasRepository estadisticas;
     private CuentaRepository cuenta;
+    private SincronizacionRepository sincronizacion;
+    private boolean intentoAutomaticoHecho;
     @Override public void onCreate() {
         super.onCreate();
         PreferenciaTema.aplicar(this);
@@ -59,7 +62,9 @@ public class GanHardApplication extends Application {
         tareas = new TareaRepository(database, ejecutor);
         hierros = new HierroRepository(database, ejecutor);
         estadisticas = new EstadisticasRepository(database, ejecutor);
-        cuenta = new CuentaRepository(database, new EjecutorRemoto(trabajoRemoto), servicio, sesiones);
+        EjecutorRemoto remoto = new EjecutorRemoto(trabajoRemoto);
+        cuenta = new CuentaRepository(database, remoto, servicio, sesiones);
+        sincronizacion = new SincronizacionRepository(database, remoto, servicio, cuenta);
     }
     /** Con los datos de Supabase de local.properties usa el servidor real; sin ellos, la app funciona sin cuenta. */
     private static ServicioRemoto servicioDeLaCompilacion() {
@@ -77,4 +82,11 @@ public class GanHardApplication extends Application {
     public HierroRepository hierros() { return hierros; }
     public EstadisticasRepository estadisticas() { return estadisticas; }
     public CuentaRepository cuenta() { return cuenta; }
+    public SincronizacionRepository sincronizacion() { return sincronizacion; }
+    /** Verdadero solo la primera vez que se pregunta en esta ejecución: el intento de respaldo al abrir la app se hace una vez. */
+    public boolean tomarIntentoAutomatico() {
+        boolean primera = !intentoAutomaticoHecho;
+        intentoAutomaticoHecho = true;
+        return primera;
+    }
 }

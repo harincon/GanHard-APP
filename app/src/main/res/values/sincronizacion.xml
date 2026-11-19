@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Pantalla Sincronización (respaldo en la nube) -->
+    <string name="sinc_titulo">Sincronización</string>
+    <string name="sinc_respaldo_titulo">Respaldo en la nube</string>
+    <string name="sinc_todo_respaldado">Todo está respaldado</string>
+    <plurals name="sinc_pendientes">
+        <item quantity="one">%d cambio sin subir</item>
+        <item quantity="other">%d cambios sin subir</item>
+    </plurals>
+    <string name="sinc_ultima_vez">Última vez: %1$s</string>
+    <string name="sinc_nunca">Todavía no se ha subido nada.</string>
+    <string name="sinc_accion">Sincronizar ahora</string>
+    <string name="sinc_subiendo">Subiendo…</string>
+    <plurals name="sinc_subiendo_n">
+        <item quantity="one">Subiendo… %d cambio</item>
+        <item quantity="other">Subiendo… %d cambios</item>
+    </plurals>
+    <string name="sinc_exito_nada">Todo estaba al día.</string>
+    <plurals name="sinc_exito">
+        <item quantity="one">Listo: se subió %d cambio.</item>
+        <item quantity="other">Listo: se subieron %d cambios.</item>
+    </plurals>
+    <string name="sinc_nota">Por ahora solo se guarda una copia en el servidor. Todavía no se bajan los datos a otros teléfonos.</string>
+    <string name="sinc_ir_cuenta">Ir a la cuenta</string>
+
+    <!-- Cuando todavía no se puede -->
+    <string name="sinc_sin_configurar">Esta versión de la app no tiene configurado el servicio de cuentas, así que no puede respaldar los datos.</string>
+    <string name="sinc_sin_sesion">Para respaldar tus datos, inicia sesión con tu cuenta.</string>
+    <string name="sinc_sin_vincular">Para respaldar tus datos, primero vincula tu finca a la cuenta.</string>
+    <string name="sinc_otra_cuenta">La finca de este teléfono está vinculada a otra cuenta. Inicia sesión con esa cuenta para respaldarla.</string>
+
+    <!-- Volver a enviar todo -->
+    <string name="sinc_reenviar">Volver a enviar todo</string>
+    <string name="sinc_reenviar_titulo">¿Volver a enviar todo?</string>
+    <string name="sinc_reenviar_texto">Se subirán otra vez todos los datos de la finca. No se duplica nada en el servidor, pero puede tardar si hay muchos registros.</string>
+    <string name="sinc_reenviar_confirmar">Volver a enviar</string>
+    <string name="sinc_reenviar_listo">Listo: en la próxima sincronización se enviará todo.</string>
+
+    <!-- Errores del respaldo -->
+    <string name="regla_no_es_integrante">Tu cuenta ya no tiene acceso activo a esta finca en el servidor.</string>
+    <string name="regla_sincronizacion_en_curso">Ya se está sincronizando. Espera a que termine.</string>
+    <string name="regla_respaldo_rechazado">El servidor no aceptó algunos datos. Inténtalo de nuevo; si sigue igual, usa «Volver a enviar todo».</string>
+
+    <!-- Cuadro de «Cerrar sesión y borrar datos» -->
+    <plurals name="borrar_todo_pendientes">
+        <item quantity="one">Tienes %d cambio sin respaldar en la nube: se perderá y no se podrá recuperar.</item>
+        <item quantity="other">Tienes %d cambios sin respaldar en la nube: se perderán y no se podrán recuperar.</item>
+    </plurals>
+    <string name="borrar_todo_respaldado">Todo está respaldado en la nube (última vez: %1$s), pero esta versión todavía no puede bajar esos datos de vuelta al teléfono.</string>
+    <string name="borrar_todo_sin_nada">No hay datos por respaldar.</string>
+</resources>

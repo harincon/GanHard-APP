@@ -10,6 +10,7 @@ import com.example.ganhard.R;
 import com.example.ganhard.databinding.DialogBorrarTodoBinding;
 import com.example.ganhard.modelo.remoto.CallbackRemoto;
 import com.example.ganhard.modelo.remoto.ErrorRemoto;
+import com.example.ganhard.modelo.repositorio.EstadoSincronizacion;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 /**
@@ -18,6 +19,23 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
  */
 final class DialogoBorrarTodo {
     private DialogoBorrarTodo() {}
+
+    /** Dice cuántos cambios sin respaldar se perderían (o que todo está respaldado). Si no se puede leer, queda el aviso general. */
+    private static void avisarDelRespaldo(BaseActivity actividad, DialogBorrarTodoBinding vista) {
+        actividad.app().sincronizacion().estado(new CallbackRemoto<EstadoSincronizacion>() {
+            @Override public void exito(EstadoSincronizacion estado) {
+                if (actividad.isFinishing() || actividad.isDestroyed()) return;
+                if (estado.pendientes > 0) {
+                    vista.avisoRespaldo.setText(actividad.getResources().getQuantityString(R.plurals.borrar_todo_pendientes, estado.pendientes, estado.pendientes));
+                } else if (estado.ultimaSubida != null) {
+                    vista.avisoRespaldo.setText(actividad.getString(R.string.borrar_todo_respaldado, MensajesRemotos.fecha(estado.ultimaSubida)));
+                } else {
+                    vista.avisoRespaldo.setText(R.string.borrar_todo_sin_nada);
+                }
+            }
+            @Override public void error(ErrorRemoto error) { /* Se queda el aviso general. */ }
+        });
+    }
 
     static void mostrar(BaseActivity actividad) {
         DialogBorrarTodoBinding vista = DialogBorrarTodoBinding.inflate(actividad.getLayoutInflater());
@@ -30,6 +48,7 @@ final class DialogoBorrarTodo {
                 .setCancelable(false)
                 .create();
         dialogo.show();
+        avisarDelRespaldo(actividad, vista);
         Button borrar = dialogo.getButton(AlertDialog.BUTTON_POSITIVE), cancelar = dialogo.getButton(AlertDialog.BUTTON_NEGATIVE);
         borrar.setEnabled(false);
         vista.confirmacion.addTextChangedListener(new TextWatcher() {

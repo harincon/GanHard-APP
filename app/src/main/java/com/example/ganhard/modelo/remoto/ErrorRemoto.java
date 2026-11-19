@@ -40,7 +40,12 @@ public final class ErrorRemoto extends Exception {
     public static final String INVITACION_NO_VIGENTE = "invitacion_no_vigente", CORREO_NO_COINCIDE = "correo_no_coincide";
     public static final String YA_ES_INTEGRANTE = "ya_es_integrante", ES_ADMINISTRADOR = "es_administrador";
     public static final String YA_RETIRADO = "ya_retirado", MOTIVO_OBLIGATORIO = "motivo_obligatorio", CORREO_INVALIDO = "correo_invalido";
+    // Respaldo en la nube (supabase/sincronizacion.sql).
+    public static final String NO_ES_INTEGRANTE = "no_es_integrante", TABLA_INVALIDA = "tabla_invalida";
+    public static final String DEMASIADAS_FILAS = "demasiadas_filas", FILA_DE_OTRA_FINCA = "fila_de_otra_finca";
     // Códigos que decide la app antes de llamar al servidor.
+    /** Ya hay una sincronización en marcha; la segunda no se repite. */
+    public static final String EN_CURSO = "sincronizacion_en_curso";
     public static final String SIN_FINCA_LOCAL = "sin_finca_local", YA_VINCULADA = "ya_vinculada";
     public static final String OTRA_CUENTA = "finca_vinculada_a_otra_cuenta", NO_VINCULADA = "finca_no_vinculada";
 

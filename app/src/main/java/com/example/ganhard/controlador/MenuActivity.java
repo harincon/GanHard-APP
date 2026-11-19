@@ -8,7 +8,7 @@ import com.example.ganhard.modelo.ConfiguracionLocal;
 import com.example.ganhard.modelo.nucleo.Callback;
 import com.example.ganhard.modelo.nucleo.ErrorModelo;
 
-/** Menú de módulos (icono ☰ de Inicio). Los módulos que aún no existen aparecen deshabilitados con "Próximamente". */
+/** Menú de módulos (icono ☰ de Inicio). Un módulo que aún no exista aparece deshabilitado con "Próximamente". */
 public class MenuActivity extends BaseActivity {
     private ActivityMenuBinding vista;
 
@@ -29,9 +29,7 @@ public class MenuActivity extends BaseActivity {
         vista.filaGastos.setOnClickListener(v -> startActivity(new Intent(this, GastosActivity.class)));
         vista.filaTareas.setOnClickListener(v -> startActivity(new Intent(this, TareasActivity.class)));
         vista.filaCerrarTodo.setOnClickListener(v -> DialogoBorrarTodo.mostrar(this));
-        for (FilaNavegacion pendiente : new FilaNavegacion[]{vista.filaSincronizacion}) {
-            pendiente.setHabilitada(false);
-        }
+        vista.filaSincronizacion.setOnClickListener(v -> startActivity(new Intent(this, SincronizacionActivity.class)));
     }
 
     @Override protected void onResume() {
